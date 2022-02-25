@@ -1,0 +1,13 @@
+post http://localhost:3003/api/blogs
+Content-Type: application/json
+Accept: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVsc2Euc2FybGluIiwiaWQiOiI1ZjQ1NGZiOWE0OGFkZjQ2NTQzZWUzZjIiLCJpYXQiOjE1OTgzNzgxNDN9.PZN4XKjIUvgebssdRwagINIcHAvMSBSVu4B-5Otx1po
+
+{
+    "title":"Use cases considered harmful",
+    "author":"A.J.H Simons",
+    "url":"https://ieeexplore.ieee.org/document/779012",
+    "likes":"33"
+}
+
+

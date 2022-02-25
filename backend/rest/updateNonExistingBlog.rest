@@ -1,0 +1,12 @@
+put http://localhost:3003/api/blogs/5dfb49690be87b309200eec9
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title":"Kela, Jumalasta seuraava",
+    "author":"Riku Sarlin",
+    "url":"https://sinetti.kela.fi/blogs/Kela_jumalasta_seuraava",
+    "likes":"34"
+}
+
+

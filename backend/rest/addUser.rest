@@ -1,0 +1,11 @@
+post http://localhost:3003/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username":"elsa.sarlin",
+    "name":"Elsa Sarlin",
+    "password":"elsa"
+}
+
+

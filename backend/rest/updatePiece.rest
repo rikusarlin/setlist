@@ -1,0 +1,219 @@
+put http://localhost:3003/api/pieces/621a8f3406c0ce4fba4ff585
+Content-Type: application/json
+Accept: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpa3UiLCJpZCI6IjYyMWE1MjE4NDk5ZDhmNDcyZDU4MGUwYiIsImlhdCI6MTY0NTg5ODIzNX0.8opHC6XlbvksaKQ1LrjPEifKiEGzRy2L_uizanpcWP4
+
+{
+    "title":"Knockin on Heaven's Door",
+    "artist":"Bob Dylani",
+    "bpm":"80",
+    "pages":[
+        {
+            "pageNumber":1,
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "rowType": "Label",
+                    "contents": "[Intro]"
+                },
+                {
+                    "rowNumber": 2,
+                    "rowType": "Chords",
+                    "contents": "G D Am"
+                },
+                {
+                    "rowNumber": 3,
+                    "rowType": "Chords",
+                    "contents": "G D C"
+                },
+                {
+                    "rowNumber": 4,
+                    "rowType": "Label",
+                    "contents": "[Verse]"
+                },
+                {
+                    "rowNumber": 5,
+                    "rowType": "Chords",
+                    "contents": "G              D            Am"
+                },
+                {
+                    "rowNumber": 6,
+                    "rowType": "Lyrics",
+                    "contents": "Mama take this shite off of me"
+                },
+                {
+                    "rowNumber": 7,
+                    "rowType": "Chords",
+                    "contents": "G       D         C"
+                },
+                {
+                    "rowNumber": 8,
+                    "rowType": "Lyrics",
+                    "contents": "I can't use it anymore"
+                },
+                {
+                    "rowNumber": 9,
+                    "rowType": "Chords",
+                    "contents": "G            D                         Am"
+                },
+                {
+                    "rowNumber": 10,
+                    "rowType": "Lyrics",
+                    "contents": "It's getting dark, too dark to see"
+                },
+                {
+                    "rowNumber": 11,
+                    "rowType": "Chords",
+                    "contents": "G          D                   C"
+                },
+                {
+                    "rowNumber": 12,
+                    "rowType": "Lyrics",
+                    "contents": "I feel I'm knockin on heaven's door"
+                },
+                {
+                    "rowNumber": 13,
+                    "rowType": "Label",
+                    "contents": "[Chorus]"
+                },
+                {
+                    "rowNumber": 14,
+                    "rowType": "Chords",
+                    "contents": "G             D                    Am"
+                },
+                {
+                    "rowNumber": 15,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 16,
+                    "rowType": "Chords",
+                    "contents": "G             D                    C"
+                },
+                {
+                    "rowNumber": 17,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 18,
+                    "rowType": "Chords",
+                    "contents": "G             D                    Am"
+                },
+                {
+                    "rowNumber": 19,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 20,
+                    "rowType": "Chords",
+                    "contents": "G             D                    C"
+                },
+                {
+                    "rowNumber": 21,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                }
+            ]
+        },
+        {
+            "pageNumber":2,
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "rowType": "Label",
+                    "contents": "[Verse]"
+                },
+                {
+                    "rowNumber": 2,
+                    "rowType": "Chords",
+                    "contents": "G           D           Am"
+                },
+                {
+                    "rowNumber": 3,
+                    "rowType": "Lyrics",
+                    "contents": "Mama put my guns in the ground"
+                },
+                {
+                    "rowNumber": 4,
+                    "rowType": "Chords",
+                    "contents": "G       D             C"
+                },
+                {
+                    "rowNumber": 5,
+                    "rowType": "Lyrics",
+                    "contents": "I can't shoot them anymore"
+                },
+                {
+                    "rowNumber": 6,
+                    "rowType": "Chords",
+                    "contents": "G               D               Am"
+                },
+                {
+                    "rowNumber": 7,
+                    "rowType": "Lyrics",
+                    "contents": "That long black cloud is comin' down"
+                },
+                {
+                    "rowNumber": 8,
+                    "rowType": "Chords",
+                    "contents": "G          D                   C"
+                },
+                {
+                    "rowNumber": 9,
+                    "rowType": "Lyrics",
+                    "contents": "I feel I'm knockin on heaven's door"
+                },
+                {
+                    "rowNumber": 10,
+                    "rowType": "Label",
+                    "contents": "[Chorus]"
+                },
+                {
+                    "rowNumber": 11,
+                    "rowType": "Chords",
+                    "contents": "G             D                    Am"
+                },
+                {
+                    "rowNumber": 12,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 13,
+                    "rowType": "Chords",
+                    "contents": "G             D                    C"
+                },
+                {
+                    "rowNumber": 14,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 15,
+                    "rowType": "Chords",
+                    "contents": "G             D                    Am"
+                },
+                {
+                    "rowNumber": 16,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                },
+                {
+                    "rowNumber": 17,
+                    "rowType": "Chords",
+                    "contents": "G             D                    C"
+                },
+                {
+                    "rowNumber": 18,
+                    "rowType": "Lyrics",
+                    "contents": "Knock, knock, knockin' on heaven's door"
+                }
+            ]
+        }
+    ]
+}
+
+

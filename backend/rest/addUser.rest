@@ -3,7 +3,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "username":"elsa.sarlin",
+    "username":"elsa",
     "name":"Elsa Sarlin",
     "password":"elsa"
 }

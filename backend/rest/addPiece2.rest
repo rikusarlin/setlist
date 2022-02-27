@@ -1,0 +1,349 @@
+post http://localhost:3003/api/pieces
+Content-Type: application/json
+Accept: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpa3UiLCJpZCI6IjYyMWE1MjE4NDk5ZDhmNDcyZDU4MGUwYiIsImlhdCI6MTY0NTg5ODIzNX0.8opHC6XlbvksaKQ1LrjPEifKiEGzRy2L_uizanpcWP4
+
+{
+    "title":"Simple Man",
+    "artist":"Lynyrd Skynyrd",
+    "bpm":60,
+    "pages":[
+        {
+            "pageNumber":1,
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "rowType": "Label",
+                    "contents": "[Verse 1]"
+                },
+                {
+                    "rowNumber": 2,
+                    "rowType": "Chords",
+                    "contents": "       C            G            Am"
+                },
+                {
+                    "rowNumber": 3,
+                    "rowType": "Lyrics",
+                    "contents": "Well, Mama told me,  when I was young."
+                },
+                {
+                    "rowNumber": 4,
+                    "rowType": "Chords",
+                    "contents": "       C            G            Am"
+                },
+                {
+                    "rowNumber": 5,
+                    "rowType": "Lyrics",
+                    "contents": "Come sit beside me,  my only son."
+                },
+                {
+                    "rowNumber": 6,
+                    "rowType": "Chords",
+                    "contents": "       C            G            Am"
+                },
+                {
+                    "rowNumber": 7,
+                    "rowType": "Lyrics",
+                    "contents": "And listen closely,   to what I say."
+                },
+                {
+                    "rowNumber": 8,
+                    "rowType": "Chords",
+                    "contents": "       C            G            Am"
+                },
+                {
+                    "rowNumber": 9,
+                    "rowType": "Lyrics",
+                    "contents": "And if you do this, it'll help you, some sunny day."
+                },
+                {
+                    "rowNumber": 10,
+                    "rowType": "Lyrics",
+                    "contents": "Oh yeah!"
+                },
+                {
+                    "rowNumber": 11,
+                    "rowType": "Label",
+                    "contents": "[Verse 2]"
+                },
+                {
+                    "rowNumber": 12,
+                    "rowType": "Chords",
+                    "contents": "             C    G            Am"
+                },
+                {
+                    "rowNumber": 13,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, take your time,  don't live too fast."
+                },
+                {
+                    "rowNumber": 14,
+                    "rowType": "Chords",
+                    "contents": "              C    G             Am"
+                },
+                {
+                    "rowNumber": 15,
+                    "rowType": "Lyrics",
+                    "contents": "Troubles will come,  and they will pass."
+                },
+                {
+                    "rowNumber": 16,
+                    "rowType": "Chords",
+                    "contents": "          C         G           Am"
+                },
+                {
+                    "rowNumber": 17,
+                    "rowType": "Lyrics",
+                    "contents": "Go find a woman, and you'll find love."
+                },
+                {
+                    "rowNumber": 18,
+                    "rowType": "Chords",
+                    "contents": "          C         G           Am"
+                },
+                {
+                    "rowNumber": 19,
+                    "rowType": "Lyrics",
+                    "contents": "And don't forget son, there is someone up above."
+                },
+                {
+                    "rowNumber": 20,
+                    "rowType": "Label",
+                    "contents": "[Chorus]"
+                },
+                {
+                    "rowNumber": 21,
+                    "rowType": "Chords",
+                    "contents": "         C      G       Am"
+                },
+                {
+                    "rowNumber": 22,
+                    "rowType": "Lyrics",
+                    "contents": "And be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 23,
+                    "rowType": "Chords",
+                    "contents": "       C         G                   Am"
+                },
+                {
+                    "rowNumber": 24,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, be something,  you love and understand."
+                },
+                {
+                    "rowNumber": 25,
+                    "rowType": "Chords",
+                    "contents": "           C      G       Am"
+                },
+                {
+                    "rowNumber": 26,
+                    "rowType": "Lyrics",
+                    "contents": "Baby, be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 27,
+                    "rowType": "Chords",
+                    "contents": "              C              G             Am"
+                },
+                {
+                    "rowNumber": 28,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, won't you do this for me son, if you can?"
+                }
+            ]
+        },
+        {
+            "pageNumber":2,
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "rowType": "Label",
+                    "contents": "[Verse 3]"
+                },
+                {
+                    "rowNumber": 2,
+                    "rowType": "Chords",
+                    "contents": "            C     G                Am"
+                },
+                {
+                    "rowNumber": 3,
+                    "rowType": "Lyrics",
+                    "contents": "Forget your lust,  for rich man's gold,"
+                },
+                {
+                    "rowNumber": 4,
+                    "rowType": "Chords",
+                    "contents": "      C            G             Am"
+                },
+                {
+                    "rowNumber": 5,
+                    "rowType": "Lyrics",
+                    "contents": "All that you need,  is in your soul."
+                },
+                {
+                    "rowNumber": 6,
+                    "rowType": "Chords",
+                    "contents": "      C               G               Am"
+                },
+                {
+                    "rowNumber": 7,
+                    "rowType": "Lyrics",
+                    "contents": "And you can do this, oh baby,  if you try."
+                },
+                {
+                    "rowNumber": 8,
+                    "rowType": "Chords",
+                    "contents": "      C                   G                    Am"
+                },
+                {
+                    "rowNumber": 9,
+                    "rowType": "Lyrics",
+                    "contents": "All that I want for you my son, is to be satisfied."
+                },
+                {
+                    "rowNumber": 10,
+                    "rowType": "Label",
+                    "contents": "[Chorus]"
+                },
+                {
+                    "rowNumber": 11,
+                    "rowType": "Chords",
+                    "contents": "         C      G       Am"
+                },
+                {
+                    "rowNumber": 12,
+                    "rowType": "Lyrics",
+                    "contents": "And be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 13,
+                    "rowType": "Chords",
+                    "contents": "       C         G                   Am"
+                },
+                {
+                    "rowNumber": 14,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, be something,  you love and understand."
+                },
+                {
+                    "rowNumber": 15,
+                    "rowType": "Chords",
+                    "contents": "           C      G       Am"
+                },
+                {
+                    "rowNumber": 16,
+                    "rowType": "Lyrics",
+                    "contents": "Baby, be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 17,
+                    "rowType": "Chords",
+                    "contents": "              C              G             Am"
+                },
+                {
+                    "rowNumber": 18,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, won't you do this for me son, if you can?"
+                },
+                {
+                    "rowNumber": 19,
+                    "rowType": "Lyrics",
+                    "contents": "Oh yes, I will."
+                },
+                {
+                    "rowNumber": 20,
+                    "rowType": "Label",
+                    "contents": "[Verse 4]"
+                },
+                {
+                    "rowNumber": 21,
+                    "rowType": "Chords",
+                    "contents": "          C           G                 Am"
+                },
+                {
+                    "rowNumber": 22,
+                    "rowType": "Lyrics",
+                    "contents": "Boy, don't you worry,  you'll find yourself."
+                },
+                {
+                    "rowNumber": 23,
+                    "rowType": "Chords",
+                    "contents": "       C          G             Am"
+                },
+                {
+                    "rowNumber": 24,
+                    "rowType": "Lyrics",
+                    "contents": "Follow your heart,  and nothing else."
+                },
+                {
+                    "rowNumber": 25,
+                    "rowType": "Chords",
+                    "contents": "        C              G            Am"
+                },
+                {
+                    "rowNumber": 26,
+                    "rowType": "Lyrics",
+                    "contents": "You can do this,  oh baby,  if you try."
+                },
+                {
+                    "rowNumber": 27,
+                    "rowType": "Chords",
+                    "contents": "       C                     G                 Am"
+                },
+                {
+                    "rowNumber": 28,
+                    "rowType": "Lyrics",
+                    "contents": "All that I want for you my son, is to be satisfied."
+                },
+                {
+                    "rowNumber": 29,
+                    "rowType": "Label",
+                    "contents": "[Chorus]"
+                },
+                {
+                    "rowNumber": 30,
+                    "rowType": "Chords",
+                    "contents": "         C      G       Am"
+                },
+                {
+                    "rowNumber": 31,
+                    "rowType": "Lyrics",
+                    "contents": "And be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 32,
+                    "rowType": "Chords",
+                    "contents": "       C         G                   Am"
+                },
+                {
+                    "rowNumber": 33,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, be something,  you love and understand."
+                },
+                {
+                    "rowNumber": 34,
+                    "rowType": "Chords",
+                    "contents": "           C      G       Am"
+                },
+                {
+                    "rowNumber": 35,
+                    "rowType": "Lyrics",
+                    "contents": "Baby, be a simple  kind of man."
+                },
+                {
+                    "rowNumber": 36,
+                    "rowType": "Chords",
+                    "contents": "              C              G             Am"
+                },
+                {
+                    "rowNumber": 37,
+                    "rowType": "Lyrics",
+                    "contents": "Oh, won't you do this for me son, if you can?"
+                }
+            ]
+        }
+    ]
+}
+
+

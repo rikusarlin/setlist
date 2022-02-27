@@ -1,28 +1,28 @@
-const Blog = require('../models/blog')
+const Piece = require('../models/piece')
 const User = require('../models/user')
 
-const initialBlogs = [
+const initialPieces = [
   {
-    title: 'Kela, Jumalasta seuraava',
-    author: 'Riku Sarlin',
-    url: 'https://sinetti.kela.fi/blogs/Kela_jumalasta_seuraava',
-    likes: 23
+    'title':'Knockin on Heavens Door',
+    'artist':'Bob Dylan',
+    'bpm':80,
+    'pages':[]
   },
   {
-    title: 'Exploratory testing',
-    author: 'Martin Fowler',
-    url: 'https://martinfowler.com/bliki/ExploratoryTesting.html',
-    likes: 470
+    'title':'Here Comes The Sun',
+    'artist':'Beatles',
+    'bpm':70,
+    'pages':[]
   }
 ]
 
-var newBlog = {
-
-  title: 'Use cases considered harmful',
-  author: 'A.J.H Simons',
-  url: 'https://ieeexplore.ieee.org/document/779012',
-  likes: 30
+var newPiece =   {
+  'title':'Simple Man',
+  'artist':'Lynyrd Skynyrd',
+  'bpm':60,
+  'pages':[]
 }
+
 
 const newUser = {
   username: 'rikusarlin',
@@ -30,8 +30,8 @@ const newUser = {
   password: 'salainen',
 }
 
-const blogsInDb = async () => {
-  const blogs = await Blog.find({})
+const piecesInDb = async () => {
+  const blogs = await Piece.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
@@ -41,5 +41,5 @@ const usersInDb = async () => {
 }
 
 module.exports = {
-  initialBlogs, newBlog, blogsInDb, newUser, usersInDb
+  initialPieces, newPiece, piecesInDb, newUser, usersInDb
 }

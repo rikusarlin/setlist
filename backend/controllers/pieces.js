@@ -10,7 +10,7 @@ const logger = require('../utils/logger')
 piecesRouter.get('/', async (request, response, next) => {
   try {
     const pieces = await Piece.find({})
-    logger.info('In piecesRouter.getAll, results:', pieces)
+    logger.info(`In piecesRouter.getAll, found:${pieces.length} pieces`)
     response.json(pieces)
   } catch (error) {
     next(error)
@@ -188,6 +188,10 @@ piecesRouter.put('/:id', async (req, res, next) => {
 
     // Pages and rows are not updated, we just delete the previous ones and insert new ones
     let previousPiece =  await Piece.findById(req.params.id)
+    if(!previousPiece){
+      res.status(404).end()
+    }
+
     await deletePagesAndRows(previousPiece, next)
 
     //let updatedPiece = await Piece.findByIdAndUpdate(req.params.id, piece,

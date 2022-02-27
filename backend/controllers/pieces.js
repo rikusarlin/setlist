@@ -45,7 +45,7 @@ piecesRouter.post('/', async (req, res, next) => {
 
     let savedPiece = await newPiece.save()
     //logger.info('savedPiece: '+JSON.stringify(savedPiece.toJSON()))
-    insertNewPagesAndRows(savedPiece, pages)
+    insertNewPagesAndRows(savedPiece, pages, next)
     //logger.info('savedPiece after insertPagesAndRows: '+JSON.stringify(savedPiece.toJSON()))
     const savedPiece2 =  await Piece.findById(savedPiece._id)
       .populate({
@@ -74,6 +74,7 @@ piecesRouter.get('/:id', async (req, res, next) => {
       res.status(404).end()
     }
   } catch (error) {
+    logger.error('error: '+error)
     next(error)
   }
 })
@@ -87,10 +88,7 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     const tokenUser = await User.findById(decodedToken.id)
     logger.info('tokenUser: ',tokenUser)
     logger.info('id: ',req.params.id)
-    const pieceToDelete =  await Piece.findById(req.params.id)
-      .populate({
-        path: 'pages'
-      })
+    let pieceToDelete =  await Piece.findById(req.params.id)
     logger.info('pieceToDelete: ',pieceToDelete)
 
     if( !pieceToDelete){
@@ -104,53 +102,63 @@ piecesRouter.delete('/:id', async (req, res, next) => {
       setlist.pieces.splice(pieceIndex, 1)
       setlist.save()
     }
-    deletePagesAndRows(pieceToDelete)
+    deletePagesAndRows(pieceToDelete, next)
     await Piece.findByIdAndRemove(pieceToDelete._id).setOptions({ 'useFindAndModify':false })
   } catch(error) {
+    logger.error('error: '+error)
     next(error)
   }
 })
 
-const deletePagesAndRows = async (piece) => {
-  for(let page=0; page<piece.pages.length; page++){
-    await Row.deleteMany({ page: piece.pages[page]._id })
+const deletePagesAndRows = async (piece, next) => {
+  try {
+    let deleteManyRetval = await Row.deleteMany({ piece: piece._id })
+    logger.info('Deleted '+deleteManyRetval.deletedCount+' rows')
+    deleteManyRetval = await Page.deleteMany({ piece: piece._id })
+    logger.info('Deleted '+deleteManyRetval.deletedCount+' pages')
+  } catch(error) {
+    logger.error('error: '+error)
+    next(error)
   }
-  await Page.deleteMany({ piece: piece._id })
-  piece.pages = []
-  await piece.save()
 }
 
-const insertNewPagesAndRows = async (piece, pages) => {
-  logger.info('Pages to insert: '+pages.length+', piece id: '+piece._id)
-  for(let page=0; page<pages.length; page++){
-    let pageInfo = {
-      title: pages[page].title,
-      pageNumber: pages[page].pageNumber,
-      piece: piece._id
-    }
-    let newPage = new Page(pageInfo)
-    let savedPage = await newPage.save()
-    logger.info('# of Rows to insert to page '+(page+1)+': '+pages[page].rows.length+', page id: '+savedPage._id)
-    //logger.info('Rows to insert: '+JSON.stringify(pages[page].rows))
-    for(let row=0; row<pages[page].rows.length; row++){
-      //logger.info('Page: '+page+', row: '+row)
-      //logger.info('Row: '+JSON.stringify(pages[page].rows[row]))
-      let rowInfo = {
-        rowNumber: pages[page].rows[row].rowNumber,
-        rowType: pages[page].rows[row].rowType,
-        contents: pages[page].rows[row].contents,
-        page: savedPage._id
+const insertNewPagesAndRows = async (piece, pages, next) => {
+  try {
+    logger.info('Pages to insert: '+pages.length+', piece id: '+piece._id)
+    for(let page=0; page<pages.length; page++){
+      let pageInfo = {
+        title: pages[page].title,
+        pageNumber: pages[page].pageNumber,
+        piece: piece._id
       }
-      let newRow = new Row(rowInfo)
-      //logger.info('newRow: '+JSON.stringify(newRow.toJSON()))
-      const savedRow = await newRow.save()
-      //logger.info('savedRow: '+JSON.stringify(savedRow.toJSON()))
-      savedPage.rows.push(savedRow)
+      let newPage = new Page(pageInfo)
+      let savedPage = await newPage.save()
+      logger.info('# of Rows to insert to page '+(page+1)+': '+pages[page].rows.length+', page id: '+savedPage._id)
+      //logger.info('Rows to insert: '+JSON.stringify(pages[page].rows))
+      for(let row=0; row<pages[page].rows.length; row++){
+        //logger.info('Page: '+page+', row: '+row)
+        //logger.info('Row: '+JSON.stringify(pages[page].rows[row]))
+        let rowInfo = {
+          rowNumber: pages[page].rows[row].rowNumber,
+          rowType: pages[page].rows[row].rowType,
+          contents: pages[page].rows[row].contents,
+          page: savedPage._id,
+          piece: piece._id
+        }
+        let newRow = new Row(rowInfo)
+        //logger.info('newRow: '+JSON.stringify(newRow.toJSON()))
+        const savedRow = await newRow.save()
+        //logger.info('savedRow: '+JSON.stringify(savedRow.toJSON()))
+        savedPage.rows.push(savedRow)
+      }
+      const savedPage2 = await savedPage.save()
+      piece.pages.push(savedPage2)
     }
-    const savedPage2 = await savedPage.save()
-    piece.pages.push(savedPage2)
+    await piece.save()
+  } catch(error) {
+    logger.error('error: '+error)
+    next(error)
   }
-  await piece.save()
 }
 
 piecesRouter.put('/:id', async (req, res, next) => {
@@ -180,16 +188,13 @@ piecesRouter.put('/:id', async (req, res, next) => {
 
     // Pages and rows are not updated, we just delete the previous ones and insert new ones
     let previousPiece =  await Piece.findById(req.params.id)
-      .populate({
-        path: 'pages'
-      })
-    deletePagesAndRows(previousPiece)
+    await deletePagesAndRows(previousPiece, next)
 
     //let updatedPiece = await Piece.findByIdAndUpdate(req.params.id, piece,
     //  { new: true, runValidators: false, context: 'query', useFindAndModify:false })
     previousPiece.overwrite(piece)
     let updatedPiece = await previousPiece.save()
-    insertNewPagesAndRows(updatedPiece, pages)
+    insertNewPagesAndRows(updatedPiece, pages, next)
     const updatedPiece2 =  await Piece.findById(req.params.id)
       .populate({
         path: 'pages',

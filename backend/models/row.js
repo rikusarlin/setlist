@@ -12,6 +12,11 @@ const rowSchema = mongoose.Schema({
   {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Page'
+  },
+  piece:
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Piece'
   }
 })
 

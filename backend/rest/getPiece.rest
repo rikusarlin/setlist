@@ -1,2 +1,2 @@
-get http://localhost:3003/api/pieces/621a8e5beb22564f8a229ea7
+get http://localhost:3003/api/pieces/621b74a0dc01fb5776ef7d4a
 Content-Type: application/json

@@ -215,6 +215,6 @@ piecesRouter.put('/:id', async (req, res, next) => {
 })
 
 
-module.exports = { 
+module.exports = {
   piecesRouter, insertNewPagesAndRows
 }

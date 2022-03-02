@@ -1,11 +1,30 @@
 # Setlist app
-This is a hobby project for bands needing to create setlists and showing the notes of the pieces in setlist.
+This is a hobby project for bands needing to browse pieces played by the band, transpose the chords of the pieces, and to create setlists of the pieces.
 
-Still a work very much in progress, sorry...
+We aim at following functionality - grey ones have not yet been implemented.
 
-In some not so distant future, the aim is to provide more functionality:
-- possibility to transpose the pieces according to singers' whims
-- basic editing of chords in the pieces (and their positions)
+Backend
+* adding users
+* login
+* CRUD operations for pieces
+<span style="color:grey">
+* CRUD operations for bands
+* CRUD operations for bands' setlists
+* Adding and removing pieces to/from setlists
+</span>
+
+Frontend
+* login
+* sign up
+* browsing pieces
+<span style="color:grey">
+* adding and deleting pieces
+* modifying pieces
+* transposing pieces
+* adding bands and members to band
+* adding and deleting setlists
+* adding and removing pieces to/from setlists
+</span>
 
 It is assumed that pieces are represented in text files in the following style:
 ```
@@ -34,3 +53,8 @@ Knock, knock, knockin' on heaven's door
 G             D                    C
 Knock, knock, knockin' on heaven's door
 ```
+
+The data model of the application separates three different kinds of "rows" in pieces:
+* Label
+* Chords
+* Lyrics

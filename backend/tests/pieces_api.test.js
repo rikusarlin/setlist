@@ -156,7 +156,6 @@ describe('delete piece', () => {
   test('deletion succeeds with a valid id', async () => {
     const piecesAtStart = await helper.piecesInDb()
     const pieceToDelete = piecesAtStart[0]
-    console.error("piece id to delete: "+pieceToDelete.id)
     api
       .delete(`/api/pieces/${pieceToDelete.id}`)
       .set('Authorization', `bearer ${token}`)

@@ -32,14 +32,41 @@ code {
   margin-bottom: 10px;
 }
 
-.blog {
+.label {
+  color: green;
+  background: lightgrey;
+  font-size: 16px;
+  border-style: none;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+.chords {
+  color: blue;
+  background: lightgrey;
+  font-size: 16px;
+  border-style: none;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.lyrics {
+  color: black;
+  background: lightgrey;
+  font-size: 16px;
+  border-style: none;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.piece {
   padding-top: 10px;
   padding-left: 2px;
   border-width: 2px;
   margin-bottom: 5px;
 }
 
-.bloglist {
+.piecelist {
   padding-top: 10px;
   padding-left: 2px;
   border-style: solid;

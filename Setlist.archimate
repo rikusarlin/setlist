@@ -16,7 +16,7 @@
     <element xsi:type="archimate:BusinessObject" name="Piece" id="id-baac7694e5c741038bba8fd472a85653">
       <property key="id" value="UUID"/>
       <property key="title" value="String, mandatory"/>
-      <property key="artist" value="String"/>
+      <property key="artist" value="String, mandatory"/>
       <property key="bpm" value="Number"/>
     </element>
     <element xsi:type="archimate:BusinessObject" name="Setlist" id="id-1289245e9c14460485c54e9e1b997ee8">

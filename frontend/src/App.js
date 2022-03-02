@@ -1,12 +1,12 @@
 import React from 'react'
 import './App.css'
-import Blogs from './components/Blogs'
-import Blog from './components/Blog'
+import Pieces from './components/Pieces'
+import Piece from './components/Piece'
 import Users from './components/Users'
 import User from './components/User'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
-import NewBlog from './components/NewBlog'
+import NewPiece from './components/NewPiece'
 import {
   BrowserRouter as Router,
   Route, Link
@@ -14,7 +14,7 @@ import {
 import { connect } from 'react-redux'
 import { logout } from './reducers/loginReducer'
 import { showInfo, showError } from './reducers/notificationReducer'
-import { emptyBlogList } from './reducers/blogReducer'
+import { emptyPieceList } from './reducers/piecesReducer'
 
 export const App = (props) => {
 
@@ -22,7 +22,7 @@ export const App = (props) => {
     event.preventDefault()
     try {
       props.logout()
-      props.emptyBlogList()
+      props.emptyPieceList()
       props.showInfo('logout successful', 3)
     } catch (exception) {
       console.log('exception: '+exception)
@@ -42,9 +42,9 @@ export const App = (props) => {
     }
   }
 
-  const blogById = (id) => {
-    if(props.blogs !== null) {
-      return props.blogs.find(a => a.id === id)
+  const pieceById = (id) => {
+    if(props.pieces !== null) {
+      return props.pieces.find(a => a.id === id)
     } else {
       return null
     }
@@ -59,7 +59,7 @@ export const App = (props) => {
               <div className="navbar navbar-expand-lg">
                 <div className="navbar-nav navbar-light bg-light">
                   <div className="nav-item">
-                    <Link  className="nav-link" to="/">blogs</Link>
+                    <Link  className="nav-link" to="/">pieces</Link>
                   </div>
                   <div className="nav-item">
                     <Link  className="nav-link" to="/users">users</Link>
@@ -71,18 +71,18 @@ export const App = (props) => {
               </div>
               <Notification/>
               <div>
-                <h2>Blog app</h2>
+                <h2>Setlist app</h2>
               </div>
               <Route exact path="/" render={() =>
                 <div>
-                  <NewBlog/>
-                  <Blogs/>
+                  <NewPiece/>
+                  <Pieces/>
                 </div>
               } />
-              <Route exact path="/blogs" render={() =>
+              <Route exact path="/pieces" render={() =>
                 <div>
-                  <NewBlog/>
-                  <Blogs/>
+                  <NewPiece/>
+                  <Pieces/>
                 </div>
               } />
               <Route exact path="/users" render={() => <Users />} />
@@ -91,16 +91,16 @@ export const App = (props) => {
                   user={userById(match.params.id)}
                 />
               } />
-              <Route exact path="/blogs/:id" render={({ match }) =>
-                <Blog
-                  blog={blogById(match.params.id)}
+              <Route exact path="/pieces/:id" render={({ match }) =>
+                <Piece
+                  piece={pieceById(match.params.id)}
                 />
               } />
             </div>
           </div>
           :
           <div>
-            <h2>Blog app</h2>
+            <h2>Setlist app</h2>
             <Notification/>
             <LoginForm/>
           </div>
@@ -114,12 +114,12 @@ const mapStateToProps = (state) => {
   return {
     user: state.user,
     users: state.users,
-    blogs: state.blogs
+    pieces: state.pieces
   }
 }
 
 const mapDispatchToProps = {
-  logout, showInfo, showError, emptyBlogList
+  logout, showInfo, showError, emptyPieceList
 }
 
 export default connect(

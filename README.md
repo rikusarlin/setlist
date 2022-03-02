@@ -1,30 +1,28 @@
 # Setlist app
 This is a hobby project for bands needing to browse pieces played by the band, transpose the chords of the pieces, and to create setlists of the pieces.
 
-We aim at following functionality - grey ones have not yet been implemented.
+Since bands tend to train and play gigs in some shady cellars with no internet connectivity, the application should work in "offline mode", too. This means that we load the pieces and setlists to browser somewhere where there is connectivity, and can then use these without connectivity.
+
+We aim at following functionality - ones in parentheses have not yet been implemented.
 
 Backend
 * adding users
 * login
 * CRUD operations for pieces
-<span style="color:grey">
-* CRUD operations for bands
-* CRUD operations for bands' setlists
-* Adding and removing pieces to/from setlists
-</span>
+* (CRUD operations for bands)
+* (CRUD operations for bands' setlists)
+* (Adding and removing pieces to/from setlists)
 
 Frontend
 * login
 * sign up
 * browsing pieces
-<span style="color:grey">
-* adding and deleting pieces
-* modifying pieces
-* transposing pieces
-* adding bands and members to band
-* adding and deleting setlists
-* adding and removing pieces to/from setlists
-</span>
+* (adding and deleting pieces)
+* (modifying pieces)
+* (transposing pieces)
+* (adding bands and members to band)
+* (adding and deleting setlists)
+* (adding and removing pieces to/from setlists)
 
 It is assumed that pieces are represented in text files in the following style:
 ```

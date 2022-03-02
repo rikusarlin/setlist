@@ -2,12 +2,11 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
 const userHelper = require('./users_test_helper')
-const {insertNewPagesAndRows} = require('../controllers/pieces')
+const { insertNewPagesAndRows } = require('../controllers/pieces')
 const app = require('../app')
 const Piece = require('../models/piece')
 const Page = require('../models/page')
 const Row = require('../models/row')
-const { deleteOne } = require('../models/piece')
 
 const api = supertest(app)
 
@@ -44,7 +43,7 @@ beforeAll( async() => {
   token = res.body.token
 })
 
-var emptyFunc = function() { };
+var emptyFunc = function() { }
 
 beforeEach(async () => {
   await Piece.deleteMany({})
@@ -55,7 +54,7 @@ beforeEach(async () => {
   const piecePromiseArray = pieceObjects.map(piece => piece.save())
   const newPieces = await Promise.all(piecePromiseArray)
   for(let i = 0; i < newPieces.length; i++){
-    const pages = helper.initialPages[i] 
+    const pages = helper.initialPages[i]
     insertNewPagesAndRows(newPieces[i], pages, emptyFunc)
   }
 })

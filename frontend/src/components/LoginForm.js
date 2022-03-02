@@ -20,7 +20,7 @@ export const LoginFormNoHistory = (props) => {
       passWord.reset()
       props.showInfo('login successful', 3)
       // Always begin with a known address
-      props.history.push('/blogs')
+      props.history.push('/pieces')
     } catch (exception) {
       console.log('exception: '+exception)
       props.showError('wrong username or password',3)

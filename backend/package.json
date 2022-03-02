@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=prod node index.js",
     "watch": "cross-env NODE_ENV=dev nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles",
     "start:test": "cross-env NODE_ENV=test node index.js",
     "lint": "eslint ."
   },

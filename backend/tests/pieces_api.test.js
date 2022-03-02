@@ -1,8 +1,13 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const helper = require('./test_helper')
+const helper = require('./pieces_test_helper')
+const userHelper = require('./users_test_helper')
+const {insertNewPagesAndRows} = require('../controllers/pieces')
 const app = require('../app')
 const Piece = require('../models/piece')
+const Page = require('../models/page')
+const Row = require('../models/row')
+const { deleteOne } = require('../models/piece')
 
 const api = supertest(app)
 
@@ -26,7 +31,7 @@ const randomStr = function (length) {
 }
 
 beforeAll( async() => {
-  var newUser = helper.newUser
+  var newUser = userHelper.newUser
   newUser.username = randomStr(16)
   await api.post('/api/users')
     .send(newUser)
@@ -34,17 +39,25 @@ beforeAll( async() => {
     .post('/api/login')
     .send({
       username: newUser.username,
-      password: helper.newUser.password,
+      password: userHelper.newUser.password,
     })
   token = res.body.token
 })
 
+var emptyFunc = function() { };
+
 beforeEach(async () => {
   await Piece.deleteMany({})
+  await Page.deleteMany({})
+  await Row.deleteMany({})
   const pieceObjects = helper.initialPieces
     .map(piece => new Piece(piece))
-  const promiseArray = pieceObjects.map(piece => piece.save())
-  await Promise.all(promiseArray)
+  const piecePromiseArray = pieceObjects.map(piece => piece.save())
+  const newPieces = await Promise.all(piecePromiseArray)
+  for(let i = 0; i < newPieces.length; i++){
+    const pages = helper.initialPages[i] 
+    insertNewPagesAndRows(newPieces[i], pages, emptyFunc)
+  }
 })
 
 describe('fetch all pieces', () => {
@@ -140,16 +153,15 @@ describe('view a specific piece', () => {
 })
 
 describe('delete piece', () => {
-  /* Something fishy here still
   test('deletion succeeds with a valid id', async () => {
     const piecesAtStart = await helper.piecesInDb()
     const pieceToDelete = piecesAtStart[0]
-    await api
+    console.error("piece id to delete: "+pieceToDelete.id)
+    api
       .delete(`/api/pieces/${pieceToDelete.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(204)
   })
-  */
   test('succeeds with 204 status when called with non-existing but valid id', async () => {
     await api
       .delete('/api/pieces/5dfa698896cfe676450a2916')

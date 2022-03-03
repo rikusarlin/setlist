@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { deletePiece, fetchPiece } from '../reducers/piecesReducer'
+import { deletePiece } from '../reducers/piecesReducer'
+import { fetchPiece } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { Table } from 'react-bootstrap'
 
 export const PieceNoHistory = (props)  => {
   var token=props.user.token
-  var getPiece = props.fetchPieces
+  var getPiece = props.fetchPiece
   useEffect(() => {
-    getPiece(token)
+    getPiece(props.pieceId, token)
   }, [token, getPiece])
 
   if ( props.piece === undefined || props.piece === null){
@@ -28,7 +28,7 @@ export const PieceNoHistory = (props)  => {
   }
 
   const confirmDelete = () => {
-    if(window.confirm(`remove piece ${props.piece.title} by ${props.piece.atist}?`)){
+    if(window.confirm(`Remove ${props.piece.title} by ${props.piece.artist}?`)){
       handleDelete()
     }
 
@@ -38,30 +38,27 @@ export const PieceNoHistory = (props)  => {
 
     let deletePiece = <button className="btn btn-danger" type="button" onClick={confirmDelete}>delete</button>
 
-    const rowList = props.piece.pages.map(page =>
-      page.rows.map(row => {
-        if (row.type === 'Label'){
-          return (<tr key={row.id} className="label"><td>{row.contents}</td></tr>)
-        } else if (row.type === 'Chords'){
-          return (<tr key={row.id} className="chords"><td>{row.contents}</td></tr>)
-        } else {
-          return (<tr key={row.id} className="lyrics"><td>{row.contents}</td></tr>)
-        }
-      })
-    )
+    let rowList =  <div className="row"><div className="col-md-8 label">[No pages found]</div></div>
+    if(props.piece.pages !== undefined){
+      rowList = props.piece.pages.map(page =>
+        page.rows.map(row => {
+          const cellStyles = 'col-md-12 '+row.rowType.toLowerCase()
+          return <div key={row.id} className="row container"><div className={cellStyles}>{row.contents}</div></div>
+        })
+      )
+    }
+    console.log(`RowList: ${rowList}`)
 
     return(
-      <div className="piece">
-        <div>
-          <h2>{props.piece.title} by {props.piece.author}</h2>
-          Played at {props.piece.bpm} bpm <br/>
-          <Table>
-            <tbody>
-              {rowList}
-            </tbody>
-          </Table>
-          {deletePiece}<br/>
+      <div>
+        <h2>{props.piece.title} by {props.piece.artist}</h2>
+        Played at {props.piece.bpm} bpm <br/>
+        <div className="piece">
+          <pre>
+            {rowList}
+          </pre>
         </div>
+        {deletePiece}<br/>
       </div>
     )
   }

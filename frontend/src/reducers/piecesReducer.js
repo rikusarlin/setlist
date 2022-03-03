@@ -11,17 +11,6 @@ export const deletePiece = (pieceId, token) => {
   }
 }
 
-export const fetchPiece = (pieceId, token) => {
-  return async dispatch => {
-    const fetchedPiece = await pieceService.getPiece(pieceId, token)
-    console.log(`In getPiece (id ${pieceId}), response: ${fetchedPiece}`)
-    dispatch({
-      type: 'GET_PIECE',
-      data: fetchedPiece
-    })
-  }
-}
-
 export const createPiece = (content, token) => {
   return async dispatch => {
     const newPiece = await pieceService.create(content, token)
@@ -33,7 +22,7 @@ export const createPiece = (content, token) => {
 }
 
 export const fetchPieces = (token) => {
-  console.log('In pieceReducer.fetchPieces, token: ',token)
+  console.log('In piecesReducer.fetchPieces, token: ',token)
   return async dispatch => {
     const pieces = await pieceService.getAll(token)
     console.log('Pieces.length: ',pieces.length)
@@ -54,8 +43,8 @@ export const emptyPieceList = () => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in pieceReducer: ', state)
-  console.log('action in pieceReducer', action)
+  console.log('state before action in piecesReducer: ', state)
+  console.log('action in piecesReducer', action)
 
   switch(action.type) {
   case 'NEW_PIECE':
@@ -64,8 +53,6 @@ const reducer = (state = [], action) => {
     return state.filter(piece =>
       piece.id !== action.data
     )
-  case 'GET_PIECE':
-    return [...state, action.data]
   case 'FETCH_PIECES':
     return action.data
   case 'EMPTY_PIECE_LIST':

@@ -34,36 +34,25 @@ code {
 
 .label {
   color: green;
-  background: lightgrey;
-  font-size: 16px;
-  border-style: none;
-  padding: 5px;
-  margin-top: 10px;
+  padding-top: 10px;
 }
 
 .chords {
   color: blue;
-  background: lightgrey;
-  font-size: 16px;
-  border-style: none;
-  padding: 5px;
-  margin-top: 5px;
 }
 
 .lyrics {
   color: black;
-  background: lightgrey;
-  font-size: 16px;
-  border-style: none;
-  padding: 5px;
-  margin-top: 5px;
 }
 
 .piece {
-  padding-top: 10px;
-  padding-left: 2px;
-  border-width: 2px;
-  margin-bottom: 5px;
+  background: white;
+  border-style: none;
+  border-top: none;
+  padding-top: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
 }
 
 .piecelist {

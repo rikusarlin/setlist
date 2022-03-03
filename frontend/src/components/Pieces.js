@@ -8,7 +8,7 @@ export const Pieces = (props) => {
   var token=props.user.token
   var getPieces = props.fetchPieces
   useEffect(() => {
-    getPieces(token)
+    getPieces(props.id, token)
   }, [token, getPieces])
 
   if(props.pieces !== null){
@@ -16,7 +16,7 @@ export const Pieces = (props) => {
     const pieceList = sortedPieces.map(piece =>
       <tr key={piece.id}>
         <td>
-          <Link data-cy="piece-link" to={`/pieces/${piece.id}`}>{piece.title}</Link>
+          <Link data-cy="piece-link" to={`/piece/${piece.id}`}>{piece.title}</Link>
         </td>
       </tr>
     )

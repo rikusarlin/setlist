@@ -42,14 +42,6 @@ export const App = (props) => {
     }
   }
 
-  const pieceById = (id) => {
-    if(props.pieces !== null) {
-      return props.pieces.find(a => a.id === id)
-    } else {
-      return null
-    }
-  }
-
   return (
     <div className="container">
       <Router>
@@ -70,9 +62,6 @@ export const App = (props) => {
                 </div>
               </div>
               <Notification/>
-              <div>
-                <h2>Setlist app</h2>
-              </div>
               <Route exact path="/" render={() =>
                 <div>
                   <NewPiece/>
@@ -91,16 +80,15 @@ export const App = (props) => {
                   user={userById(match.params.id)}
                 />
               } />
-              <Route exact path="/pieces/:id" render={({ match }) =>
+              <Route exact path="/piece/:id" render={({ match }) =>
                 <Piece
-                  piece={pieceById(match.params.id)}
+                  pieceId={match.params.id}
                 />
               } />
             </div>
           </div>
           :
           <div>
-            <h2>Setlist app</h2>
             <Notification/>
             <LoginForm/>
           </div>

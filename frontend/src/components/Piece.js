@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { deletePiece } from '../reducers/piecesReducer'
-import { fetchPiece } from '../reducers/pieceReducer'
+import { fetchPiece, emptyPiece } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
@@ -18,6 +18,7 @@ export const PieceNoHistory = (props)  => {
 
   const handleDelete = async () => {
     try {
+      props.emptyPiece()
       props.deletePiece(props.piece.id, props.user.token)
       props.showInfo('piece deleted', 3)
       props.history.push('/pieces')
@@ -47,7 +48,6 @@ export const PieceNoHistory = (props)  => {
         })
       )
     }
-    console.log(`RowList: ${rowList}`)
 
     return(
       <div>
@@ -72,7 +72,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  showInfo, showError, deletePiece, fetchPiece
+  showInfo, showError, deletePiece, fetchPiece, emptyPiece
 }
 
 const Piece = withRouter(PieceNoHistory)

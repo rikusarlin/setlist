@@ -45,6 +45,7 @@ piecesRouter.post('/', async (req, res, next) => {
 
     let savedPiece = await newPiece.save()
     //logger.info('savedPiece: '+JSON.stringify(savedPiece.toJSON()))
+    //logger.info('pages: '+JSON.stringify(pages))
     insertNewPagesAndRows(savedPiece, pages, next)
     //logger.info('savedPiece after insertPagesAndRows: '+JSON.stringify(savedPiece.toJSON()))
     const savedPiece2 =  await Piece.findById(savedPiece._id)
@@ -104,6 +105,7 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     }
     deletePagesAndRows(pieceToDelete, next)
     await Piece.findByIdAndRemove(pieceToDelete._id).setOptions({ 'useFindAndModify':false })
+    return res.status(204).end()
   } catch(error) {
     logger.error('error: '+error)
     next(error)
@@ -127,7 +129,6 @@ const insertNewPagesAndRows = async (piece, pages, next) => {
     logger.info('Pages to insert: '+pages.length+', piece id: '+piece._id)
     for(let page=0; page<pages.length; page++){
       let pageInfo = {
-        title: pages[page].title,
         pageNumber: pages[page].pageNumber,
         piece: piece._id
       }

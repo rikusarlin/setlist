@@ -40,8 +40,6 @@ beforeAll( async() => {
   token = res.body.token
 })
 
-var emptyFunc = function() { }
-
 beforeEach(async () => {
   await Piece.deleteMany({})
   const pieceObjects = helper.initialPieces

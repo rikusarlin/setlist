@@ -40,7 +40,7 @@ const initialPieces = [
   {
     'title':'Here Comes The Sun',
     'artist':'Beatles',
-    'bpm':70, 
+    'bpm':70,
     'pages': [{
       'pageNumber':1,
       'rows':[  {
@@ -76,10 +76,9 @@ const initialPieces = [
         'rowNumber': 6,
         'rowType': 'Lyrics',
         'contents': ' Here comes the sun (doo doo doo doo)'
-      }
-    ]
+      }]
+    }]
   }]
-}]
 
 var newPiece =   {
   'title':'Simple Man',

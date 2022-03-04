@@ -6,13 +6,15 @@ import pieceReducer from './reducers/pieceReducer'
 import notificationReducer from './reducers/notificationReducer'
 import loginReducer from './reducers/loginReducer'
 import userReducer from './reducers/userReducer'
+import analyzeReducer from './reducers/analyzeReducer'
 
 const reducer = combineReducers({
   pieces: piecesReducer,
   piece: pieceReducer,
   notification: notificationReducer,
   user: loginReducer,
-  users: userReducer
+  users: userReducer,
+  analysisResult: analyzeReducer
 })
 
 const store = createStore(reducer, applyMiddleware(thunk))

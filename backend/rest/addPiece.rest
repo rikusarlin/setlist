@@ -1,7 +1,7 @@
 post http://localhost:3003/api/pieces
 Content-Type: application/json
 Accept: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpa3UiLCJpZCI6IjYyMWE1MjE4NDk5ZDhmNDcyZDU4MGUwYiIsImlhdCI6MTY0NTg5ODIzNX0.8opHC6XlbvksaKQ1LrjPEifKiEGzRy2L_uizanpcWP4
+Authorization: bearer xxx
 
 {
     "title":"Knockin on Heaven's Door",

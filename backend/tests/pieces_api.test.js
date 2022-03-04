@@ -2,11 +2,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
 const userHelper = require('./users_test_helper')
-const { insertNewPagesAndRows } = require('../controllers/pieces')
 const app = require('../app')
 const Piece = require('../models/piece')
-const Page = require('../models/page')
-const Row = require('../models/row')
 
 const api = supertest(app)
 
@@ -47,16 +44,10 @@ var emptyFunc = function() { }
 
 beforeEach(async () => {
   await Piece.deleteMany({})
-  await Page.deleteMany({})
-  await Row.deleteMany({})
   const pieceObjects = helper.initialPieces
     .map(piece => new Piece(piece))
   const piecePromiseArray = pieceObjects.map(piece => piece.save())
-  const newPieces = await Promise.all(piecePromiseArray)
-  for(let i = 0; i < newPieces.length; i++){
-    const pages = helper.initialPages[i]
-    insertNewPagesAndRows(newPieces[i], pages, emptyFunc)
-  }
+  await Promise.all(piecePromiseArray)
 })
 
 describe('fetch all pieces', () => {
@@ -155,10 +146,12 @@ describe('delete piece', () => {
   test('deletion succeeds with a valid id', async () => {
     const piecesAtStart = await helper.piecesInDb()
     const pieceToDelete = piecesAtStart[0]
-    api
+    await api
       .delete(`/api/pieces/${pieceToDelete.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(204)
+    const piecesAfterDelete = await helper.piecesInDb()
+    expect(piecesAfterDelete.length).toBe(piecesAtStart.length-1)
   })
   test('succeeds with 204 status when called with non-existing but valid id', async () => {
     await api

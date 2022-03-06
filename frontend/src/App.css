@@ -67,6 +67,11 @@ code {
   background: blue;
 }
 
+.paddedButton {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 .menuItem{
   background-color: #333;
   overflow: hidden;

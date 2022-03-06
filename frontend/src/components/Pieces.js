@@ -1,15 +1,22 @@
 import React, { useEffect } from 'react'
 import { fetchPieces } from '../reducers/piecesReducer'
+import { clearAnalysis } from '../reducers/analyzeReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'react-bootstrap'
+import { withRouter } from 'react-router-dom'
 
-export const Pieces = (props) => {
+export const PiecesNoHistory = (props) => {
   var token=props.user.token
   var getPieces = props.fetchPieces
   useEffect(() => {
     getPieces(props.id, token)
   }, [token, getPieces])
+
+  const moveToNewPiece = () => {
+    props.clearAnalysis()
+    props.history.push('/newpiece')
+  }
 
   if(props.pieces !== null){
     const sortedPieces = props.pieces.sort((a,b) => a.title.localeCompare(b.title) )
@@ -23,11 +30,14 @@ export const Pieces = (props) => {
 
     if(props.user.user !== null){
       return(
-        <Table striped>
-          <tbody>
-            {pieceList}
-          </tbody>
-        </Table>
+        <div>
+          <button onClick={moveToNewPiece} data-cy="new-piece" className="btn btn-primary">New piece</button>
+          <Table striped>
+            <tbody>
+              {pieceList}
+            </tbody>
+          </Table>
+        </div>
       )
     }
   }
@@ -43,8 +53,11 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  fetchPieces
+  fetchPieces,
+  clearAnalysis
 }
+
+const Pieces = withRouter(PiecesNoHistory)
 
 export default connect(
   mapStateToProps,

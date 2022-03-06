@@ -31,7 +31,7 @@ export const App = (props) => {
   }
 
   const logoutForm = () => (
-    <button type="button" onClick={handleLogout} className="btn btn-primary my-2 my-sm-0">logout</button>
+    <button type="button" onClick={handleLogout} className="btn btn-primary mr-2 my-2 my-sm-0">logout</button>
   )
 
   const userById = (id) => {
@@ -57,20 +57,23 @@ export const App = (props) => {
                     <Link  className="nav-link" to="/users">users</Link>
                   </div>
                   <div className="nav-item">
-                    {props.user.name } logged in {logoutForm()}
+                    {logoutForm()}
                   </div>
                 </div>
               </div>
               <Notification/>
               <Route exact path="/" render={() =>
                 <div>
-                  <NewPiece/>
                   <Pieces/>
+                </div>
+              } />
+              <Route exact path="/newpiece" render={() =>
+                <div>
+                  <NewPiece/>
                 </div>
               } />
               <Route exact path="/pieces" render={() =>
                 <div>
-                  <NewPiece/>
                   <Pieces/>
                 </div>
               } />

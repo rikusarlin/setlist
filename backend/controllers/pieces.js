@@ -4,6 +4,7 @@ const Setlist = require('../models/setlist')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
+const { transpose } = require('../utils/music')
 
 piecesRouter.get('/', async (request, response, next) => {
   try {
@@ -135,6 +136,43 @@ piecesRouter.put('/:id', async (req, res, next) => {
     next(error)
   }
 })
+
+piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
+  try {
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    if (!req.token || !decodedToken.id) {
+      return res.status(401).json({ error: 'Token missing or invalid' })
+    }
+
+    let piece =  await Piece.findById(req.params.id)
+    if(!piece){
+      res.status(404).end()
+    }
+
+    if(req.params.dir === 'undefined'){
+      return res.status(400).json({ error:'Transposing direction not given' })
+    }
+
+    for(let page=0; page<piece.pages.length; page++){
+      for(let row=0; row<piece.pages[page].rows.length; row++){
+        if(piece.pages[page].rows[row].rowType==='Chords'){
+          piece.pages[page].rows[row].contents = transpose(piece.pages[page].rows[row].contents, req.params.dir==='up')
+        }
+      }
+    }
+
+    piece.overwrite(piece)
+    let updatedPiece = await piece.save()
+    if(updatedPiece){
+      res.json(updatedPiece.toJSON())
+    } else {
+      res.status(404).end()
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 module.exports = {

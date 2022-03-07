@@ -17,7 +17,7 @@ export const NewPieceNoHistory = (props) => {
   const handlePost = async (event) => {
     event.preventDefault()
     try {
-      let newPiece = props.analysisResult
+      let newPiece = props.analyzedPiece
       newPiece.title = title.value
       newPiece.artist = artist.value
       newPiece.bpm = bpm.value

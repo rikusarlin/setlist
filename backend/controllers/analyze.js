@@ -1,5 +1,4 @@
 const analyzeRouter = require('express').Router()
-const { NewPieceNoHistory } = require('../../frontend/src/components/NewPiece')
 const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
 
@@ -69,10 +68,10 @@ analyzeRouter.post('/', async (req, res, next) => {
       }
     }
 
-    piece.pages[0].rows = rows;
+    piece.pages[0].rows = rows
     logger.info('rows: '+JSON.stringify(piece))
 
-    res.status(200).json(NewPieceNoHistory)
+    res.status(200).json(piece)
   } catch (error) {
     logger.error('error: '+error)
     next(error)

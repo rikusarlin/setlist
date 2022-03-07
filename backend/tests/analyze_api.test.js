@@ -66,68 +66,136 @@ const introOutput2 = {
 }
 
 const chordInput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': 'C Em G'
 }
-const chordOutput1 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Chords',
-    'contents': 'C Em G'
-  }
-]
+const chordOutput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[{
+        'rowNumber': 1,
+        'rowType': 'Chords',
+        'contents': 'C Em G'
+      }]
+    }
+  ],
+}
 
 const chordInput2 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': 'C Hm B'
 }
-const chordOutput2 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Chords',
-    'contents': 'C Bm Bb'
-  }
-]
+const chordOutput2 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[{
+        'rowNumber': 1,
+        'rowType': 'Chords',
+        'contents': 'C Bm Bb'
+      }]
+    }
+  ],
+}
 
 const chordInput3 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': 'C Bm Bb'
 }
-const chordOutput3 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Chords',
-    'contents': 'C Bm Bb'
-  }
-]
+const chordOutput3 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':  [{
+        'rowNumber': 1,
+        'rowType': 'Chords',
+        'contents': 'C Bm Bb'
+      }]
+    }
+  ],
+}
 
 const songInput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine'
 }
-const songOutput1 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Label',
-    'contents': '[Intro]'
-  },
-  {
-    'rowNumber': 2,
-    'rowType': 'Chords',
-    'contents': 'C Bm Bb'
-  },
-  {
-    'rowNumber': 3,
-    'rowType': 'Label',
-    'contents': '[Verse 1]'
-  },
-  {
-    'rowNumber': 4,
-    'rowType': 'Chords',
-    'contents': 'C Bm Bb'
-  },
-  {
-    'rowNumber': 5,
-    'rowType': 'Lyrics',
-    'contents': 'Hey mama doing fine'
-  },
-]
+const songOutput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':  [  {
+        'rowNumber': 1,
+        'rowType': 'Label',
+        'contents': '[Intro]'
+      },
+      {
+        'rowNumber': 2,
+        'rowType': 'Chords',
+        'contents': 'C Bm Bb'
+      },
+      {
+        'rowNumber': 3,
+        'rowType': 'Label',
+        'contents': '[Verse 1]'
+      },
+      {
+        'rowNumber': 4,
+        'rowType': 'Chords',
+        'contents': 'C Bm Bb'
+      },
+      {
+        'rowNumber': 5,
+        'rowType': 'Lyrics',
+        'contents': 'Hey mama doing fine'
+      }]
+    }
+  ],
+}
 
 describe('single rows', () => {
   test('single rows row beginning with angle bracket is recognized as label', async (done) => {

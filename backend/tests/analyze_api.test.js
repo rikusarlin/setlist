@@ -10,26 +10,60 @@ global.console = {
 }
 
 const introInput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': '[Intro]'
 }
-const introOutput1 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Label',
-    'contents': '[Intro]'
-  }
-]
+const introOutput1 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[{
+        'rowNumber': 1,
+        'rowType': 'Label',
+        'contents': '[Intro]'
+      }]
+    }
+  ],
+}
 
 const introInput2 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[]
+    }
+  ],
   'contents': '  begin with [Intro]'
 }
-const introOutput2 = [
-  {
-    'rowNumber': 1,
-    'rowType': 'Label',
-    'contents': '  begin with [Intro]'
-  }
-]
+const introOutput2 = {
+  'title':'title1',
+  'artist':'artist1',
+  'bpm':60,
+  'pages': [
+    {
+      'pageNumber':1,
+      'rows':[{
+        'rowNumber': 1,
+        'rowType': 'Label',
+        'contents': '  begin with [Intro]'
+      }]
+    }
+  ],
+}
 
 const chordInput1 = {
   'contents': 'C Em G'

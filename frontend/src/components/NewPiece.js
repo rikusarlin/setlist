@@ -7,36 +7,30 @@ import  { useField } from '../hooks'
 import { removeReset } from '../utils'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
-import { useState } from 'react'
 
 export const NewPieceNoHistory = (props) => {
   const title = useField('text')
   const artist = useField('text')
   const bpm = useField('number')
   const contents = useField('textarea')
-  const [piece, setPiece] = useState()
 
   const handlePost = async (event) => {
     event.preventDefault()
     try {
-      const page = {
-        pageNumber: 1,
-        rows: props.analaysisResults
-      }
-      const newPiece = {
-        title: title.value,
-        artist: artist.value,
-        bpm: bpm.value,
-        pages: [page],
-      }
+      let newPiece = props.analysisResult
+      newPiece.title = title.value
+      newPiece.artist = artist.value
+      newPiece.bpm = bpm.value
+      newPiece.pages = props.analysisResult.pages
 
       props.createPiece(newPiece, props.user.token)
       bpm.reset()
       title.reset()
       artist.reset()
       contents.reset()
-      props.history.push('/pieces')
+      //props.history.push('/pieces')
       props.showInfo('added new piece', 3)
+      props.clearAnalysis()
     } catch (exception) {
       console.log('exception: '+exception)
       props.showError('error in adding new piece', 3)
@@ -44,19 +38,19 @@ export const NewPieceNoHistory = (props) => {
   }
 
   const analyzeContents = async () => {
-    const analyzeRequest = {
+    let page = {
+      pageNumber: 1,
+      rows: []
+    }
+    let newPiece = {
+      title: title.value,
+      artist: artist.value,
+      bpm: bpm.value,
+      pages: [page],
       contents: contents.value
     }
-    await props.analyzeContents(analyzeRequest)
-    const newPiece = {
-      pages: [],
-    }
-    const page = {
-      pageNumber: 1,
-      rows: props.analaysisResults
-    }
-    newPiece.pages.push(page)
-    setPiece(newPiece)
+
+    props.analyzeContents(newPiece)
   }
 
   const returnToPieces = () => {
@@ -64,13 +58,13 @@ export const NewPieceNoHistory = (props) => {
     props.clearAnalysis()
   }
 
-  const analyzeOrCreate = props.analysisResult !== null ?
+  const analyzeOrCreate = props.analyzedPiece !== null ?
     <button type="submit" data-cy="create" className="col-sm-1 mr-2 btn btn-primary">create</button>
     :
-    <button onClick={analyzeContents} data-cy="create" className="col-sm-1 mr-2 btn btn-primary">analyze</button>
+    <button onClick={analyzeContents} data-cy="analyze" className="col-sm-1 mr-2 btn btn-primary">analyze</button>
 
-  const analyzedOrRaw = props.analysisResult !== null ?
-    <PieceRows piece={piece}/>
+  const analyzedOrRaw = props.analyzedPiece !== null ?
+    <PieceRows piece={props.analyzedPiece}/>
     :
     <textarea className="col-sm-12" rows="20" data-cy="contents" {...removeReset(contents)}/>
 
@@ -105,7 +99,7 @@ export const NewPieceNoHistory = (props) => {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    analysisResult: state.analysisResult
+    analyzedPiece: state.analyzedPiece
   }
 }
 

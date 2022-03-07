@@ -14,7 +14,7 @@ const reducer = combineReducers({
   notification: notificationReducer,
   user: loginReducer,
   users: userReducer,
-  analysisResult: analyzeReducer
+  analyzedPiece: analyzeReducer
 })
 
 const store = createStore(reducer, applyMiddleware(thunk))

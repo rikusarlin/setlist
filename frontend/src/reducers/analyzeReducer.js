@@ -3,6 +3,7 @@ import analyzeService from '../services/analyze'
 export const analyzeContents = (contents) => {
   return async dispatch => {
     const analyzedContents = await analyzeService.analyze(contents)
+    console.log(JSON.stringify(analyzedContents))
     dispatch({
       type: 'ANALYZE_PIECE',
       data: analyzedContents,

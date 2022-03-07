@@ -1,12 +1,12 @@
 import React from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { createPiece } from '../reducers/piecesReducer'
-import { analyzeContents, clearAnalysis } from '../reducers/analyzeReducer'
+import { analyzeContents, clearAnalysis, changeRowType, changeContents } from '../reducers/analyzeReducer'
 import { connect } from 'react-redux'
 import  { useField } from '../hooks'
 import { removeReset } from '../utils'
 import { withRouter } from 'react-router-dom'
-import PieceRows from './PieceRows'
+import EditablePieceRows from './EditablePieceRows'
 
 export const NewPieceNoHistory = (props) => {
   const title = useField('text')
@@ -21,7 +21,6 @@ export const NewPieceNoHistory = (props) => {
       newPiece.title = title.value
       newPiece.artist = artist.value
       newPiece.bpm = bpm.value
-      newPiece.pages = props.analysisResult.pages
 
       props.createPiece(newPiece, props.user.token)
       bpm.reset()
@@ -37,6 +36,22 @@ export const NewPieceNoHistory = (props) => {
     }
   }
 
+  const handleFieldChange = async (event) => {
+    event.preventDefault()
+    try {
+      const [page, row] = event.target.id.split('_')
+      console.log(`handleFieldChange, page ${page}, row ${row}, field ${event.target.name}, new value: ${event.target.value} `)
+      if(event.target.name === 'rowType'){
+        props.changeRowType(page, row, event.target.value)
+      } else if (event.target.name === 'contents'){
+        props.changeContents(page, row, event.target.value)
+      }
+    } catch (exception) {
+      console.log('exception: '+exception)
+      props.showError('error in handling field change', 3)
+    }
+  }
+
   const analyzeContents = async () => {
     let page = {
       pageNumber: 1,
@@ -49,7 +64,6 @@ export const NewPieceNoHistory = (props) => {
       pages: [page],
       contents: contents.value
     }
-
     props.analyzeContents(newPiece)
   }
 
@@ -64,14 +78,14 @@ export const NewPieceNoHistory = (props) => {
     <button onClick={analyzeContents} data-cy="analyze" className="col-sm-1 mr-2 btn btn-primary">analyze</button>
 
   const analyzedOrRaw = props.analyzedPiece !== null ?
-    <PieceRows piece={props.analyzedPiece}/>
+    <EditablePieceRows piece={props.analyzedPiece} handleFieldChange={handleFieldChange}/>
     :
     <textarea className="col-sm-12" rows="20" data-cy="contents" {...removeReset(contents)}/>
 
   return (
     <div>
       <h3>New piece</h3>
-      <form onSubmit={handlePost}>
+      <form onSubmit={handlePost} onChange={handleFieldChange}>
         <div className="form-group row">
           <label htmlFor="Title" className="col-sm-2 col-form-label">Title</label>
           <input className="col-sm-5" data-cy="title" {...removeReset(title)}/>
@@ -89,7 +103,7 @@ export const NewPieceNoHistory = (props) => {
         </div>
         <div className="form-group">
           {analyzeOrCreate}
-          <button onClick={returnToPieces} data-cy="cancel" className="col-sm-1 mr-2 btn btn-primary">cancel</button>
+          <button onClick={returnToPieces} data-cy="cancel" className="col-sm-1 mr-2 btn btn-primary">back</button>
         </div>
       </form>
     </div>
@@ -104,7 +118,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  createPiece, showInfo, showError, analyzeContents, clearAnalysis
+  createPiece, showInfo, showError, analyzeContents, clearAnalysis, changeContents, changeRowType
 }
 
 const NewPiece = withRouter(NewPieceNoHistory)

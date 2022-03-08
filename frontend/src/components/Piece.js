@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { deletePiece } from '../reducers/piecesReducer'
+import { transposeDown, transposeUp } from '../reducers/analyzeReducer'
 import { fetchPiece, emptyPiece } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 
 export const PieceNoHistory = (props)  => {
-  var token=props.user.token
+  var token = props.user.token
   var getPiece = props.fetchPiece
   useEffect(() => {
     getPiece(props.pieceId, token)
@@ -34,17 +35,35 @@ export const PieceNoHistory = (props)  => {
       handleDelete()
     }
   }
+  const transposeUp = async () => {
+    try {
+      props.transposeUp(props.piece, props.user.token)
+      props.showInfo('piece transposed up', 3)
+    } catch (exception) {
+      console.log('exception: '+exception)
+      props.showError('error in transposing piece up', 3)
+    }
+  }
+
+  const transposeDown = async () => {
+    try {
+      props.transposeDown(props.piece, props.user.token)
+      props.showInfo('piece transposed down', 3)
+    } catch (exception) {
+      console.log('exception: '+exception)
+      props.showError('error in transposing piece down', 3)
+    }
+  }
 
   if(props.user.username !== null){
-
-    let deletePiece = <button className="btn btn-danger" type="button" onClick={confirmDelete}>delete</button>
-
     return(
       <div>
         <h2>{props.piece.title} by {props.piece.artist}</h2>
         Played at {props.piece.bpm} bpm <br/>
         <PieceRows piece={props.piece}/>
-        {deletePiece}<br/>
+        <button onClick={transposeUp} data-cy="transposeUp" className="col-sm-2 mr-2 btn btn-primary">transpose up</button>
+        <button onClick={transposeDown} data-cy="transposeDown" className="col-sm-2 mr-2 btn btn-primary">transpose down</button>
+        <button onClick={confirmDelete} data-cy="delete" className="col-sm-2 mr-2 btn btn-danger" type="button">delete</button>
       </div>
     )
   }
@@ -58,7 +77,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  showInfo, showError, deletePiece, fetchPiece, emptyPiece
+  showInfo, showError, deletePiece, fetchPiece, emptyPiece, transposeDown, transposeUp
 }
 
 const Piece = withRouter(PieceNoHistory)

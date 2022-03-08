@@ -1,12 +1,46 @@
 import analyzeService from '../services/analyze'
+import piecesService from '../services/pieces'
 
-export const analyzeContents = (contents) => {
+export const analyzeContents = (contents, token) => {
   return async dispatch => {
-    const analyzedContents = await analyzeService.analyze(contents)
-    console.log(JSON.stringify(analyzedContents))
+    const analyzedContents = await analyzeService.analyze(contents, token)
+    //console.log(JSON.stringify(analyzedContents))
     dispatch({
       type: 'ANALYZE_PIECE',
       data: analyzedContents,
+    })
+  }
+}
+
+export const updatePiece = (piece, token) => {
+  return async dispatch => {
+    const updatedPiece = await piecesService.update(piece, token)
+    //console.log(JSON.stringify(updatedPiece))
+    dispatch({
+      type: 'UPDATE_PIECE',
+      data: updatedPiece,
+    })
+  }
+}
+
+export const transposeUp = (piece, token) => {
+  return async dispatch => {
+    const updatedPiece = await piecesService.transpose(piece, 'up', token)
+    //console.log(JSON.stringify(updatedPiece))
+    dispatch({
+      type: 'TRANSPOSE_PIECE',
+      data: updatedPiece,
+    })
+  }
+}
+
+export const transposeDown = (piece, token) => {
+  return async dispatch => {
+    const updatedPiece = await piecesService.transpose(piece, 'down', token)
+    //console.log(JSON.stringify(updatedPiece))
+    dispatch({
+      type: 'TRANSPOSE_PIECE',
+      data: updatedPiece,
     })
   }
 }
@@ -52,6 +86,10 @@ const reducer = (state = [], action) => {
 
   switch(action.type) {
   case 'ANALYZE_PIECE':
+    return action.data
+  case 'UPDATE_PIECE':
+    return action.data
+  case 'TRANSPOSE_PIECE':
     return action.data
   case 'CHANGE_ROW_TYPE':{
     const pages = state.pages.map((page) =>

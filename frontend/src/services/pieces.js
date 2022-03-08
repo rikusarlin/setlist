@@ -34,6 +34,15 @@ const update = async (updatedPiece, token) => {
   return response.data
 }
 
+const transpose = async (piece, direction, token) => {
+  const config = {
+    headers: { 'Authorization': `bearer ${token}` },
+  }
+  const response = await axios.put(baseUrl+'/'+piece.id+'/transpose/'+direction, piece, config)
+  return response.data
+}
+
+
 const deletePiece = async (id, token) => {
   const config = {
     headers: { 'Authorization': `bearer ${token}` },
@@ -42,4 +51,4 @@ const deletePiece = async (id, token) => {
   return response.data
 }
 
-export default { getAll, create, update, deletePiece, getPiece }
+export default { getAll, create, update, deletePiece, getPiece, transpose }

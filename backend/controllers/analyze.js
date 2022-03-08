@@ -1,6 +1,11 @@
 const analyzeRouter = require('express').Router()
 const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
+const Piece = require('../models/piece')
+
+const onlyWhitespace= (str) => {
+  return /^\s*$/.test(str);
+}
 
 analyzeRouter.post('/', async (req, res, next) => {
 
@@ -34,19 +39,21 @@ analyzeRouter.post('/', async (req, res, next) => {
     let rows = []
     let rN = 1
     req.body.contents.split('\n').map(row => {
-      // Analyze whether the row is lyrics, chords or label
-      let rowType = 'Lyrics'
-      if(row.indexOf('[') >= 0){
-        rowType = 'Label'
-      } else if(chordTest.test(`  ${row}  `)) {
-        rowType = 'Chords'
-      }
-      rows.push({
-        rowNumber: rN,
-        rowType: rowType,
-        contents: row
-      })
+      if(!onlyWhitespace(row)){
+        // Analyze whether the row is lyrics, chords or label
+        let rowType = 'Lyrics'
+        if(row.indexOf('[') >= 0){
+          rowType = 'Label'
+        } else if(chordTest.test(`  ${row}  `)) {
+          rowType = 'Chords'
+        }
+        rows.push({
+          rowNumber: rN,
+          rowType: rowType,
+          contents: row
+        })
       rN++
+      }
     })
 
     // Change possible german notation to english (H=>B, B => Bb)
@@ -69,9 +76,12 @@ analyzeRouter.post('/', async (req, res, next) => {
     }
 
     piece.pages[0].rows = rows
-    logger.info('rows: '+JSON.stringify(piece))
+    // logger.info('rows: '+JSON.stringify(piece))
 
-    res.status(200).json(piece)
+    let newPiece = new Piece(piece)
+    let savedPiece = await newPiece.save()
+    res.status(201).json(savedPiece.toJSON())
+
   } catch (error) {
     logger.error('error: '+error)
     next(error)

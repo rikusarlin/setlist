@@ -1,8 +1,11 @@
 import axios from 'axios'
 const baseUrl = '/api/analyze'
 
-const analyze= async (contents) => {
-  const response = await axios.post(baseUrl, contents)
+const analyze= async (piece, token) => {
+  const config = {
+    headers: { 'Authorization': `bearer ${token}` },
+  }
+  const response = await axios.post(baseUrl, piece, config)
   return response.data
 }
 

@@ -39,20 +39,11 @@ const getWordBoundsAtPosition = (str, position) => {
 // Thanks Forivin, just added down direction to this
 // https://stackoverflow.com/questions/7936843/how-do-i-transpose-music-chords-using-javascript
 const transposeChord = (chord, amount) => {
-  var scale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-  var scaleDown = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
-  var normalizeMap = { 'Cb':'B', 'Db':'C#', 'Eb':'D#', 'Fb':'E', 'Gb':'F#', 'Ab':'G#', 'Bb':'A#', 'E#':'F', 'B#':'C' }
-  var normalizeMapDown = { 'C#':'Db', 'D#':'Eb', 'E#':'F', 'F#':'Gb', 'G#':'Ab', 'A#':'Bb', 'B#':'C' }
+  var scale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
+  var normalizeMap = { 'Cb':'B', 'Db':'C#', 'Eb':'D#', 'Fb':'E', 'Gb':'F#', 'Ab':'G#', 'A#':'Bb', 'E#':'F', 'B#':'C' }
   return chord.replace(/[CDEFGAB](b|#)?/g, function(match) {
-    let retVal = chord, i
-    if(amount>0){
-      i = (scale.indexOf((normalizeMap[match] ? normalizeMap[match] : match)) + amount) % scale.length
-      retVal = scale[ i < 0 ? i + scale.length : i ]
-    } else if (amount < 0){
-      i = (scaleDown.indexOf((normalizeMapDown[match] ? normalizeMapDown[match] : match)) + amount) % scaleDown.length
-      retVal = scaleDown[ i < 0 ? i + scaleDown.length : i ]
-    }
-    return retVal
+    const i = (scale.indexOf((normalizeMap[match] ? normalizeMap[match] : match)) + amount) % scale.length
+    return scale[ i < 0 ? i + scale.length : i ]
   })
 }
 
@@ -65,7 +56,7 @@ const transpose = (chords, isUp) => {
   let newChords = []
   let currentStartPosition = -1
   // Chart position of chords and the new chords
-  for(let pos=0;pos<chords.length-1;pos++){
+  for(let pos=0;pos<chords.length;pos++){
     const [start, end] = getWordBoundsAtPosition(chords, pos)
     if((start !== currentStartPosition) && (start !== end)){
       currentStartPosition = start

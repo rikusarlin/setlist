@@ -22,9 +22,6 @@ const introInput1 = {
   'contents': '[Intro]'
 }
 const introOutput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -50,9 +47,6 @@ const introInput2 = {
   'contents': '  begin with [Intro]'
 }
 const introOutput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -78,9 +72,6 @@ const chordInput1 = {
   'contents': 'C Em G'
 }
 const chordOutput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -106,9 +97,6 @@ const chordInput2 = {
   'contents': 'C Hm B'
 }
 const chordOutput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -134,9 +122,6 @@ const chordInput3 = {
   'contents': 'C Bm Bb'
 }
 const chordOutput3 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -162,9 +147,6 @@ const songInput1 = {
   'contents': '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine'
 }
 const songOutput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
   'pages': [
     {
       'pageNumber':1,
@@ -201,41 +183,41 @@ describe('single rows', () => {
   test('single rows row beginning with angle bracket is recognized as label', async (done) => {
     const response = await api.post('/api/analyze')
       .send(introInput1)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(introOutput1)
+    expect(response.body.pages[0].rows).toStrictEqual(introOutput1.pages[0].rows)
     done()
   })
   test('single rows row having an angle bracket is recognized as label', async (done) => {
     const response = await api.post('/api/analyze')
       .send(introInput2)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(introOutput2)
+    expect(response.body.pages[0].rows).toStrictEqual(introOutput2.pages[0].rows)
     done()
   })
   test('row with chrods is recognised as chords', async (done) => {
     const response = await api.post('/api/analyze')
       .send(chordInput1)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(chordOutput1)
+    expect(response.body.pages[0].rows).toStrictEqual(chordOutput1.pages[0].rows)
     done()
   })
   test('row with German chrods is recognised as chords and translated into English notation', async (done) => {
     const response = await api.post('/api/analyze')
       .send(chordInput2)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(chordOutput2)
+    expect(response.body.pages[0].rows).toStrictEqual(chordOutput2.pages[0].rows)
     done()
   })
   test('English chords remain English chords', async (done) => {
     const response = await api.post('/api/analyze')
       .send(chordInput3)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(chordOutput3)
+    expect(response.body.pages[0].rows).toStrictEqual(chordOutput3.pages[0].rows)
     done()
   })
 })
@@ -244,9 +226,9 @@ describe('song analysis', () => {
   test('5 row piece is correctly analyzed', async (done) => {
     const response = await api.post('/api/analyze')
       .send(songInput1)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body).toStrictEqual(songOutput1)
+    expect(response.body.pages[0].rows).toStrictEqual(songOutput1.pages[0].rows)
     done()
   })
 })

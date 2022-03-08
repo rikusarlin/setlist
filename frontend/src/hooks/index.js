@@ -10,10 +10,15 @@ export const useField = (type) => {  const [value, setValue] = useState('')
     setValue('')
   }
 
+  const set = (value) => {
+    setValue(value)
+  }
+
   return {
     type,
     value,
     onChange,
-    reset
+    reset,
+    set
   }
 }

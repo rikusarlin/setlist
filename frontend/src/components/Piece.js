@@ -33,7 +33,6 @@ export const PieceNoHistory = (props)  => {
     if(window.confirm(`Remove ${props.piece.title} by ${props.piece.artist}?`)){
       handleDelete()
     }
-
   }
 
   if(props.user.username !== null){

@@ -4,11 +4,11 @@ describe('Transposing algorithm tests', () => {
   test('C is correctely transposed up as C#', async () => {
     expect(music.transposeChord('C', 1)).toBe('C#')
   })
-  test('Am is correctely transposed down as Abm', async () => {
-    expect(music.transposeChord('Am', -1)).toBe('Abm')
+  test('Am is correctely transposed down as G#m', async () => {
+    expect(music.transposeChord('Am', -1)).toBe('G#m')
   })
-  test('Dm7 is correctely transposed down as Dbm7', async () => {
-    expect(music.transposeChord('Dm7', -1)).toBe('Dbm7')
+  test('Dm7 is correctely transposed down as C#m7', async () => {
+    expect(music.transposeChord('Dm7', -1)).toBe('C#m7')
   })
   test('Cmaj7 is correctely transposed down as Bmaj7', async () => {
     expect(music.transposeChord('Cmaj7', -1)).toBe('Bmaj7')
@@ -91,13 +91,13 @@ describe('Word bound algorithm test', () => {
 
 describe('Chords string transposing test', () => {
   const testString1 = 'C Am'
-  test('C Am is correctly transposed up as C# A#m', async () => {
+  test('C Am is correctly transposed up as C# Bbm', async () => {
     const transposedString = music.transpose(testString1, true)
-    expect(transposedString).toBe('C# A#m')
+    expect(transposedString).toBe('C# Bbm')
   })
-  test('C Am is correctly transposed down as B Abm', async () => {
+  test('C Am is correctly transposed down as B G#m', async () => {
     const transposedString = music.transpose(testString1, false)
-    expect(transposedString).toBe('B Abm')
+    expect(transposedString).toBe('B G#m')
   })
   const testString2 = 'C# A#m'
   test('C# A#m is correctly transposed up as D  Bm', async () => {
@@ -118,4 +118,33 @@ describe('Chords string transposing test', () => {
     const transposedString = music.transpose(testString4, true)
     expect(transposedString).toBe(' C G#mmaj7  D#7')
   })
+  const testString5 = 'B E'
+  const testString5UpResult = 'C F'
+  test(`${testString5} is correctly transposed up as ${testString5UpResult} and back again`, async () => {
+    const transposedString = music.transpose(testString5, true)
+    expect(transposedString).toBe(testString5UpResult)
+    const transposedString2 = music.transpose(transposedString, false)
+    expect(transposedString2).toBe(testString5)
+  })
+
+  const testString6 = 'B A B'
+  const testString6UpResult = 'C Bb C'
+  const testString6DownResult = 'B A  B'
+  test(`${testString6} is correctly transposed up as ${testString6UpResult} and back again`, async () => {
+    const transposedString = music.transpose(testString6, true)
+    expect(transposedString).toBe(testString6UpResult)
+    const transposedString2 = music.transpose(transposedString, false)
+    expect(transposedString2).toBe(testString6DownResult)
+  })
+
+  const testString7 = 'E C#m A B'
+  const testString7UpResult = 'F Dm  Bb C'
+  const testString7DownResult = 'E C#m  A  B'
+  test(`${testString7} is correctly transposed up as ${testString7UpResult} and back again`, async () => {
+    const transposedString = music.transpose(testString7, true)
+    expect(transposedString).toBe(testString7UpResult)
+    const transposedString2 = music.transpose(transposedString, false)
+    expect(transposedString2).toBe(testString7DownResult)
+  })
+
 })

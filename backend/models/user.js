@@ -6,15 +6,15 @@ const userSchema = mongoose.Schema({
     type: String,
     unique: true,
     minlength: 3,
-    required: true
+    required: true,
   },
   name: String,
   passwordHash: String,
   bands: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Band'
-    }
+      ref: 'Band',
+    },
   ],
 })
 
@@ -27,7 +27,7 @@ userSchema.set('toJSON', {
     delete returnedObject.__v
     // the passwordHash should not be revealed
     delete returnedObject.passwordHash
-  }
+  },
 })
 
 const User = mongoose.model('User', userSchema)

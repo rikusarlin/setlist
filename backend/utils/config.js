@@ -13,5 +13,5 @@ if (process.env.NODE_ENV === 'dev') {
 
 module.exports = {
   MONGODB_URI,
-  PORT
+  PORT,
 }

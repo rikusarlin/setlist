@@ -1,4 +1,3 @@
-
 const config = require('./utils/config')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -13,7 +12,11 @@ const mongoose = require('mongoose')
 const logger = require('./utils/logger')
 
 mongoose.set('useCreateIndex', true)
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(config.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     logger.info('connected to MongoDB')
   })

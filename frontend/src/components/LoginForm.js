@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { login } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import  { useField } from '../hooks'
+import { useField } from '../hooks'
 import { removeReset } from '../utils'
 import { withRouter } from 'react-router-dom'
 
@@ -22,8 +22,8 @@ export const LoginFormNoHistory = (props) => {
       // Always begin with a known address
       props.history.push('/pieces')
     } catch (exception) {
-      console.log('exception: '+exception)
-      props.showError('wrong username or password',3)
+      console.log('exception: ' + exception)
+      props.showError('wrong username or password', 3)
     }
   }
 
@@ -32,30 +32,43 @@ export const LoginFormNoHistory = (props) => {
       <h3>Login</h3>
       <form onSubmit={handleLogin}>
         <div className="form-group row">
-          <label htmlFor="Username" className="col-sm-1 col-form-label">Username</label>
+          <label htmlFor="Username" className="col-sm-1 col-form-label">
+            Username
+          </label>
           <div className="col-sm-3">
-            <input className="form-control" data-cy="username" {...removeReset(userName)} />
+            <input
+              className="form-control"
+              data-cy="username"
+              {...removeReset(userName)}
+            />
           </div>
         </div>
         <div className="form-group row">
-          <label htmlFor="Password" className="col-sm-1 col-form-label">Password</label>
+          <label htmlFor="Password" className="col-sm-1 col-form-label">
+            Password
+          </label>
           <div className="col-sm-3">
-            <input className="form-control" data-cy="password" {...removeReset(passWord)} />
+            <input
+              className="form-control"
+              data-cy="password"
+              {...removeReset(passWord)}
+            />
           </div>
         </div>
-        <button type="submit" className="btn btn-primary" data-cy="login">login</button>
+        <button type="submit" className="btn btn-primary" data-cy="login">
+          login
+        </button>
       </form>
     </div>
   )
 }
 
 const mapDispatchToProps = {
-  login, showInfo, showError
+  login,
+  showInfo,
+  showError,
 }
 
 const LoginForm = withRouter(LoginFormNoHistory)
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(LoginForm)
+export default connect(null, mapDispatchToProps)(LoginForm)

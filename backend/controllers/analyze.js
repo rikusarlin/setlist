@@ -3,72 +3,70 @@ const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
 const Piece = require('../models/piece')
 
-const onlyWhitespace= (str) => {
-  return /^\s*$/.test(str);
+const onlyWhitespace = (str) => {
+  return /^\s*$/.test(str)
 }
 
 analyzeRouter.post('/', async (req, res, next) => {
-
   try {
-
-    if(typeof req.body.contents === 'undefined'){
-      return res.status(400).json({ error:'No contents to analyze' })
+    if (typeof req.body.contents === 'undefined') {
+      return res.status(400).json({ error: 'No contents to analyze' })
     }
 
-    if(typeof req.body.title === 'undefined'){
-      return res.status(400).json({ error:'Title of piece is required' })
+    if (typeof req.body.title === 'undefined') {
+      return res.status(400).json({ error: 'Title of piece is required' })
     }
-    if(typeof req.body.artist === 'undefined'){
-      return res.status(400).json({ error:'Artist of piece is required' })
+    if (typeof req.body.artist === 'undefined') {
+      return res.status(400).json({ error: 'Artist of piece is required' })
     }
 
     let piece = {
       title: req.body.title,
       artist: req.body.artist,
       bpm: req.body.bpm,
-      pages: req.body.pages
+      pages: req.body.pages,
     }
-    if(typeof req.body.bpm === 'undefined'){
+    if (typeof req.body.bpm === 'undefined') {
       piece.bpm = 0
     }
 
     let contents = req.body.contents
-    if(contents.indexOf('\n')===-1) {
+    if (contents.indexOf('\n') === -1) {
       contents = contents + '\n'
     }
     let rows = []
     let rN = 1
-    req.body.contents.split('\n').map(row => {
-      if(!onlyWhitespace(row)){
+    req.body.contents.split('\n').map((row) => {
+      if (!onlyWhitespace(row)) {
         // Analyze whether the row is lyrics, chords or label
         let rowType = 'Lyrics'
-        if(row.indexOf('[') >= 0){
+        if (row.indexOf('[') >= 0) {
           rowType = 'Label'
-        } else if(chordTest.test(`  ${row}  `)) {
+        } else if (chordTest.test(`  ${row}  `)) {
           rowType = 'Chords'
         }
         rows.push({
           rowNumber: rN,
           rowType: rowType,
-          contents: row
+          contents: row,
         })
-      rN++
+        rN++
       }
     })
 
     // Change possible german notation to english (H=>B, B => Bb)
     let isGerman = false
-    for(let i=0; i<rows.length; i++){
-      if(rows[i].rowType==='Chords'){
-        if(rows[i].contents.indexOf('H')>=0){
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].rowType === 'Chords') {
+        if (rows[i].contents.indexOf('H') >= 0) {
           isGerman = true
           break
         }
       }
     }
-    if(isGerman){
-      for(let i=0; i<rows.length; i++){
-        if(rows[i].rowType==='Chords'){
+    if (isGerman) {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].rowType === 'Chords') {
           rows[i].contents = rows[i].contents.replace('B', 'Bb')
           rows[i].contents = rows[i].contents.replace('H', 'B')
         }
@@ -81,9 +79,8 @@ analyzeRouter.post('/', async (req, res, next) => {
     let newPiece = new Piece(piece)
     let savedPiece = await newPiece.save()
     res.status(201).json(savedPiece.toJSON())
-
   } catch (error) {
-    logger.error('error: '+error)
+    logger.error('error: ' + error)
     next(error)
   }
 })

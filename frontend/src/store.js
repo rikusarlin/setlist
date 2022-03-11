@@ -1,4 +1,3 @@
-
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import piecesReducer from './reducers/piecesReducer'
@@ -14,7 +13,7 @@ const reducer = combineReducers({
   notification: notificationReducer,
   user: loginReducer,
   users: userReducer,
-  analyzedPiece: analyzeReducer
+  analyzedPiece: analyzeReducer,
 })
 
 const store = createStore(reducer, applyMiddleware(thunk))

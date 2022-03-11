@@ -7,7 +7,7 @@ import { Table } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 
 export const PiecesNoHistory = (props) => {
-  var token=props.user.token
+  var token = props.user.token
   var getPieces = props.fetchPieces
   useEffect(() => {
     getPieces(props.id, token)
@@ -18,48 +18,52 @@ export const PiecesNoHistory = (props) => {
     props.history.push('/newpiece')
   }
 
-  if(props.pieces !== null){
-    const sortedPieces = props.pieces.sort((a,b) => a.title.localeCompare(b.title) )
-    const pieceList = sortedPieces.map(piece =>
+  if (props.pieces !== null) {
+    const sortedPieces = props.pieces.sort((a, b) =>
+      a.title.localeCompare(b.title)
+    )
+    const pieceList = sortedPieces.map((piece) => (
       <tr key={piece.id}>
         <td>
-          <Link data-cy="piece-link" to={`/piece/${piece.id}`}>{piece.title}</Link>
+          <Link data-cy="piece-link" to={`/piece/${piece.id}`}>
+            {piece.title}
+          </Link>
         </td>
       </tr>
-    )
+    ))
 
-    if(props.user.user !== null){
-      return(
+    if (props.user.user !== null) {
+      return (
         <div>
-          <button onClick={moveToNewPiece} data-cy="new-piece" className="btn btn-primary">New piece</button>
+          <button
+            onClick={moveToNewPiece}
+            data-cy="new-piece"
+            className="btn btn-primary"
+          >
+            New piece
+          </button>
           <Table striped>
-            <tbody>
-              {pieceList}
-            </tbody>
+            <tbody>{pieceList}</tbody>
           </Table>
         </div>
       )
     }
   }
-  return(<div/>)
+  return <div />
 }
-
 
 const mapStateToProps = (state) => {
   return {
     pieces: state.pieces,
-    user: state.user
+    user: state.user,
   }
 }
 
 const mapDispatchToProps = {
   fetchPieces,
-  clearAnalysis
+  clearAnalysis,
 }
 
 const Pieces = withRouter(PiecesNoHistory)
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Pieces)
+export default connect(mapStateToProps, mapDispatchToProps)(Pieces)

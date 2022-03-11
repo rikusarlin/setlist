@@ -1,0 +1,24 @@
+post http://localhost:3003/api/pieces
+Content-Type: application/json
+Accept: application/json
+Authorization: bearer xxx
+
+{
+    "title":"Simple Man",
+    "artist":"Lynyrd Skynyrd",
+    "bpm":60,
+    "pages":[
+        {
+            "pageNumber":1,
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "rowType": "Chords",
+                    "contents": "       C            G            Am"
+                }
+            ]
+        }
+    ]
+}
+
+

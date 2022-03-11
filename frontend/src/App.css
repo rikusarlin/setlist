@@ -32,14 +32,30 @@ code {
   margin-bottom: 10px;
 }
 
-.blog {
+.label {
+  color: green;
   padding-top: 10px;
-  padding-left: 2px;
-  border-width: 2px;
-  margin-bottom: 5px;
 }
 
-.bloglist {
+.chords {
+  color: blue;
+}
+
+.lyrics {
+  color: black;
+}
+
+.piece {
+  background: white;
+  border-style: none;
+  border-top: none;
+  padding-top: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+
+.piecelist {
   padding-top: 10px;
   padding-left: 2px;
   border-style: solid;
@@ -49,6 +65,11 @@ code {
 
 .deleteButton {
   background: blue;
+}
+
+.paddedButton {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .menuItem{

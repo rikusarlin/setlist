@@ -6,13 +6,13 @@
   "scripts": {
     "start": "cross-env NODE_ENV=prod node index.js",
     "watch": "cross-env NODE_ENV=dev nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles",
     "start:test": "cross-env NODE_ENV=test node index.js",
     "lint": "eslint ."
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rikusarlin/fullstack/osa4/blogilista"
+    "url": "https://github.com/rikusarlin/setlist"
   },
   "author": "rikusarlin",
   "license": "MIT",

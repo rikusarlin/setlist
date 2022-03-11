@@ -1,0 +1,9 @@
+post http://localhost:3003/api/analyze
+Content-Type: application/json
+Accept: application/json
+
+{
+    "contents": "[Intro]\nC Hm B\n[Verse 1]\nC Hm B\nHey mama doing fine"
+}
+
+

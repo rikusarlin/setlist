@@ -1,0 +1,2 @@
+get http://localhost:3003/api/pieces/62220f7332cdffec7ecd1603
+Content-Type: application/json

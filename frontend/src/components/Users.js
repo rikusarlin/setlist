@@ -12,21 +12,19 @@ export const Users = (props) => {
     getUsers()
   }, [user, getUsers])
 
-  // const filteredBlogs = blogs.filter(blog => blog.author.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0)
   //console.log("props.users: ",props.users)
   if(props.users !== null){
     const sortedUsers = props.users.sort((a,b) => b.name - a.name )
     const userList = sortedUsers.map(user =>
       <tr key={user.id}>
         <td className="col-sm-1"><Link to={`/users/${user.id}`}>{user.name}</Link></td>
-        <td className="col-sm-2">{ user.blogs.length }</td>
       </tr>
     )
     if(props.user.username !== null){
       return(
         <Table striped>
           <thead>
-            <tr><th className="col-sm-1"/><th className="col-sm-2">blogs created</th></tr>
+            <tr><th className="col-sm-1">Username</th></tr>
           </thead>
           <tbody>
             {userList}

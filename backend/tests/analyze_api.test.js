@@ -10,13 +10,13 @@ global.console = {
 }
 
 const introInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': '[Intro]'
@@ -24,8 +24,8 @@ const introInput1 = {
 const introOutput1 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[{
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Label',
         'contents': '[Intro]'
@@ -35,13 +35,13 @@ const introOutput1 = {
 }
 
 const introInput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': '  begin with [Intro]'
@@ -49,8 +49,8 @@ const introInput2 = {
 const introOutput2 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[{
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Label',
         'contents': '  begin with [Intro]'
@@ -60,13 +60,13 @@ const introOutput2 = {
 }
 
 const chordInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': 'C Em G'
@@ -74,8 +74,8 @@ const chordInput1 = {
 const chordOutput1 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[{
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Chords',
         'contents': 'C Em G'
@@ -85,13 +85,13 @@ const chordOutput1 = {
 }
 
 const chordInput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': 'C Hm B'
@@ -99,8 +99,8 @@ const chordInput2 = {
 const chordOutput2 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[{
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Chords',
         'contents': 'C Bm Bb'
@@ -110,13 +110,13 @@ const chordOutput2 = {
 }
 
 const chordInput3 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': 'C Bm Bb'
@@ -124,8 +124,8 @@ const chordInput3 = {
 const chordOutput3 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':  [{
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Chords',
         'contents': 'C Bm Bb'
@@ -135,13 +135,13 @@ const chordOutput3 = {
 }
 
 const songInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
+  'title': 'title1',
+  'artist': 'artist1',
+  'bpm': 60,
   'pages': [
     {
-      'pageNumber':1,
-      'rows':[]
+      'pageNumber': 1,
+      'rows': []
     }
   ],
   'contents': '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine'
@@ -149,8 +149,8 @@ const songInput1 = {
 const songOutput1 = {
   'pages': [
     {
-      'pageNumber':1,
-      'rows':  [  {
+      'pageNumber': 1,
+      'rows': [{
         'rowNumber': 1,
         'rowType': 'Label',
         'contents': '[Intro]'

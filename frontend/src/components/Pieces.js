@@ -40,6 +40,9 @@ export const PiecesNoHistory = (props) => {
     if (props.user.user !== null) {
       return (
         <div>
+          <Table striped>
+            <tbody>{pieceList}</tbody>
+          </Table>
           <button
             onClick={moveToNewPiece}
             data-cy="new-piece"
@@ -47,9 +50,6 @@ export const PiecesNoHistory = (props) => {
           >
             New piece
           </button>
-          <Table striped>
-            <tbody>{pieceList}</tbody>
-          </Table>
         </div>
       )
     }

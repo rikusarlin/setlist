@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { deletePiece } from '../reducers/piecesReducer'
 import { fetchPiece, emptyPiece } from '../reducers/pieceReducer'
+import { changePieceData } from '../reducers/editPieceReducer'
 import {
   updatePiece,
   analyzeContents,
@@ -11,37 +12,30 @@ import {
   setPiece,
 } from '../reducers/analyzeReducer'
 import { connect } from 'react-redux'
-import { useField } from '../hooks'
-import { removeReset } from '../utils'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 
 export const EditPieceNoHistory = (props) => {
-  const title = useField('text')
-  const artist = useField('text')
-  const bpm = useField('number')
-  const contents = useField('textarea')
   useEffect(() => {
     async function fetchData() {
       if (props.pieceId !== undefined) {
         await props.fetchPiece(props.pieceId, props.user.token)
         props.setPiece(props.piece)
-        title.set(props.analyzedPiece.title)
-        artist.set(props.analyzedPiece.artist)
-        bpm.set(props.analyzedPiece.bpm)
+        props.changePieceData(props.piece)
       }
     }
     fetchData()
-  }, [props.user.token, props.fetchPiece, props.pieceId, title, artist, bpm])
+  }, [props.user.token, props.fetchPiece, props.pieceId, props.changePieceData])
 
   const updateContents = async () => {
     try {
       let newPiece = props.analyzedPiece
-      newPiece.title = title.value
-      newPiece.artist = artist.value
-      newPiece.bpm = bpm.value
+      newPiece.title = props.editedPiece.title
+      newPiece.artist = props.editedPiece.artist
+      newPiece.bpm = props.editedPiece.bpm
 
       props.updatePiece(newPiece, props.user.token)
+      props.changePieceData(props.piece)
       props.showInfo('piece updated', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -61,10 +55,6 @@ export const EditPieceNoHistory = (props) => {
 
   const deletePiece = async () => {
     try {
-      title.reset()
-      artist.reset()
-      bpm.reset()
-      contents.reset()
       props.deletePiece(props.analyzedPiece.id, props.user.token)
       props.clearAnalysis()
       props.showInfo('piece deleted', 3)
@@ -100,28 +90,71 @@ export const EditPieceNoHistory = (props) => {
       rows: [],
     }
     let newPiece = {
-      title: title.value,
-      artist: artist.value,
-      bpm: bpm.value,
+      title: props.editedPiece.title,
+      artist: props.editedPiece.artist,
+      bpm: props.editedPiece.bpm,
       pages: [page],
-      contents: contents.value,
+      contents: props.editedPiece.contents,
     }
     props.analyzeContents(newPiece)
   }
 
-  const editContents = async () => {
-    props.clearAnalysis()
+  const getRowContents = () => {
     const rowContents = props.analyzedPiece.pages.map((page) =>
       page.rows.map((row) => row.contents).join('\n')
     )
-    contents.set(rowContents[0])
+    return rowContents[0]
+  }
+
+  const editContents = async () => {
+    props.clearAnalysis()
+  }
+
+  const handleTitleChange = async (event) => {
+    const newPiece = {
+      title: event.target.value,
+      artist: props.editedPiece.artist,
+      bpm: props.editedPiece.bpm,
+      pages: props.editedPiece.pages,
+    }
+    newPiece.contents = getRowContents()
+    props.changePieceData(newPiece)
+  }
+
+  const handleArtistChange = async (event) => {
+    const newPiece = {
+      artist: event.target.value,
+      title: props.editedPiece.title,
+      bpm: props.editedPiece.bpm,
+      pages: props.editedPiece.pages,
+    }
+    newPiece.contents = getRowContents()
+    props.changePieceData(newPiece)
+  }
+
+  const handleBpmChange = async (event) => {
+    const newPiece = {
+      bpm: event.target.value,
+      title: props.editedPiece.title,
+      artist: props.editedPiece.artist,
+      pages: props.editedPiece.pages,
+    }
+    newPiece.contents = getRowContents()
+    props.changePieceData(newPiece)
+  }
+
+  const handleContentChange = async (event) => {
+    const newPiece = {
+      bpm: props.editedPiece.bpm,
+      title: props.editedPiece.title,
+      artist: props.editedPiece.artist,
+      pages: props.editedPiece.pages,
+      content: event.target.value,
+    }
+    props.changePieceData(newPiece)
   }
 
   const returnToPieces = () => {
-    title.reset
-    artist.reset
-    bpm.reset
-    contents.reset
     props.history.push('/pieces')
     props.clearAnalysis()
   }
@@ -182,34 +215,50 @@ export const EditPieceNoHistory = (props) => {
       <textarea
         className="col-sm-12"
         rows="20"
+        name="contents"
         data-cy="contents"
-        {...removeReset(contents)}
+        onChange={handleContentChange}
       />
     )
 
-  const newOrEdit =
-    props.analyzedPiece !== null ? <h3>Edit piece</h3> : <h3>New piece</h3>
-
   return (
     <div>
-      {newOrEdit}
+      <h3>Edit piece</h3>
       <div className="form-group row">
         <label htmlFor="Title" className="col-sm-2 col-form-label">
           Title
         </label>
-        <input className="col-sm-5" data-cy="title" {...removeReset(title)} />
+        <input
+          className="col-sm-5"
+          name="title"
+          data-cy="title"
+          value={props.editedPiece.title}
+          onChange={handleTitleChange}
+        />
       </div>
       <div className="form-group row">
         <label htmlFor="Artist" className="col-sm-2 col-form-label">
           Artist
         </label>
-        <input className="col-sm-5" data-cy="artist" {...removeReset(artist)} />
+        <input
+          className="col-sm-5"
+          name="artist"
+          data-cy="artist"
+          value={props.editedPiece.artist}
+          onChange={handleArtistChange}
+        />
       </div>
       <div className="form-group row">
         <label htmlFor="Bpm" className="col-sm-2 col-form-label">
           Bpm
         </label>
-        <input className="col-sm-5" data-cy="bpm" {...removeReset(bpm)} />
+        <input
+          className="col-sm-5"
+          name="bpm"
+          data-cy="bpm"
+          value={props.editedPiece.bpm}
+          onChange={handleBpmChange}
+        />
       </div>
       <div className="form-group row">{analyzedOrRaw}</div>
       <div className="form-group">
@@ -231,6 +280,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     analyzedPiece: state.analyzedPiece,
     piece: state.piece,
+    editedPiece: state.editedPiece,
   }
 }
 
@@ -246,6 +296,7 @@ const mapDispatchToProps = {
   fetchPiece,
   emptyPiece,
   setPiece,
+  changePieceData,
 }
 
 const EditPiece = withRouter(EditPieceNoHistory)

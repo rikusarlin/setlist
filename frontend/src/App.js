@@ -51,68 +51,64 @@ export const App = (props) => {
         {props.user.username !== null ? (
           <div>
             <div>
-              <div className="navbar navbar-expand-lg">
-                <div className="navbar-nav navbar-light bg-light">
-                  <div className="nav-item">
-                    <Link className="nav-link" to="/">
-                      pieces
-                    </Link>
-                  </div>
-                  <div className="nav-item">
-                    <Link className="nav-link" to="/users">
-                      users
-                    </Link>
-                  </div>
-                  <div className="nav-item">{logoutForm()}</div>
+              <div className="nav nav-tabs">
+                <div className="nav-item">
+                  <Link className="nav-link" to="/">
+                    pieces
+                  </Link>
                 </div>
+                <div className="nav-item">
+                  <Link className="nav-link" to="/users">
+                    users
+                  </Link>
+                </div>
+                <div className="nav-item">{logoutForm()}</div>
               </div>
-              <Notification />
-              <Route
-                exact
-                path="/"
-                render={() => (
-                  <div>
-                    <Pieces />
-                  </div>
-                )}
-              />
-              <Route
-                exact
-                path="/newpiece"
-                render={() => (
-                  <div>
-                    <NewPiece />
-                  </div>
-                )}
-              />
-              <Route
-                exact
-                path="/editpiece/:id"
-                render={({ match }) => <EditPiece pieceId={match.params.id} />}
-              />
-              <Route
-                exact
-                path="/pieces"
-                render={() => (
-                  <div>
-                    <Pieces />
-                  </div>
-                )}
-              />
-              <Route exact path="/users" render={() => <Users />} />
-              <Route
-                exact
-                path="/users/:id"
-                render={({ match }) => (
-                  <User user={userById(match.params.id)} />
-                )}
-              />
-              <Route
-                exact
-                path="/piece/:id"
-                render={({ match }) => <Piece pieceId={match.params.id} />}
-              />
             </div>
+            <Notification />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <div>
+                  <Pieces />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/newpiece"
+              render={() => (
+                <div>
+                  <NewPiece />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/editpiece/:id"
+              render={({ match }) => <EditPiece pieceId={match.params.id} />}
+            />
+            <Route
+              exact
+              path="/pieces"
+              render={() => (
+                <div>
+                  <Pieces />
+                </div>
+              )}
+            />
+            <Route exact path="/users" render={() => <Users />} />
+            <Route
+              exact
+              path="/users/:id"
+              render={({ match }) => <User user={userById(match.params.id)} />}
+            />
+            <Route
+              exact
+              path="/piece/:id"
+              render={({ match }) => <Piece pieceId={match.params.id} />}
+            />
           </div>
         ) : (
           <div>

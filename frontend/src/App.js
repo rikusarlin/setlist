@@ -7,6 +7,7 @@ import User from './components/User'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
+import NewPiece from './components/NewPiece'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { logout } from './reducers/loginReducer'
@@ -80,7 +81,7 @@ export const App = (props) => {
                 path="/newpiece"
                 render={() => (
                   <div>
-                    <EditPiece />
+                    <NewPiece />
                   </div>
                 )}
               />

@@ -26,10 +26,13 @@ export const EditPieceNoHistory = (props) => {
       if (props.pieceId !== undefined) {
         await props.fetchPiece(props.pieceId, props.user.token)
         props.setPiece(props.piece)
+        title.set(props.analyzedPiece.title)
+        artist.set(props.analyzedPiece.artist)
+        bpm.set(props.analyzedPiece.bpm)
       }
     }
     fetchData()
-  }, [props.user.token, props.fetchPiece, props.pieceId])
+  }, [props.user.token, props.fetchPiece, props.pieceId, title, artist, bpm])
 
   const updateContents = async () => {
     try {
@@ -106,14 +109,12 @@ export const EditPieceNoHistory = (props) => {
     props.analyzeContents(newPiece)
   }
 
-  const rowsToContents = () => {
+  const editContents = async () => {
+    props.clearAnalysis()
     const rowContents = props.analyzedPiece.pages.map((page) =>
       page.rows.map((row) => row.contents).join('\n')
     )
-    return rowContents[0]
-  }
-  const editContents = async () => {
-    props.clearAnalysis()
+    contents.set(rowContents[0])
   }
 
   const returnToPieces = () => {
@@ -183,7 +184,6 @@ export const EditPieceNoHistory = (props) => {
         rows="20"
         data-cy="contents"
         {...removeReset(contents)}
-        value={props.analyzedPiece !== null ? rowsToContents() : ''}
       />
     )
 
@@ -197,34 +197,19 @@ export const EditPieceNoHistory = (props) => {
         <label htmlFor="Title" className="col-sm-2 col-form-label">
           Title
         </label>
-        <input
-          className="col-sm-5"
-          data-cy="title"
-          {...removeReset(title)}
-          value={props.analyzedPiece !== null ? props.analyzedPiece.title : ''}
-        />
+        <input className="col-sm-5" data-cy="title" {...removeReset(title)} />
       </div>
       <div className="form-group row">
         <label htmlFor="Artist" className="col-sm-2 col-form-label">
           Artist
         </label>
-        <input
-          className="col-sm-5"
-          data-cy="artist"
-          {...removeReset(artist)}
-          value={props.analyzedPiece !== null ? props.analyzedPiece.artist : ''}
-        />
+        <input className="col-sm-5" data-cy="artist" {...removeReset(artist)} />
       </div>
       <div className="form-group row">
         <label htmlFor="Bpm" className="col-sm-2 col-form-label">
           Bpm
         </label>
-        <input
-          className="col-sm-5"
-          data-cy="bpm"
-          {...removeReset(bpm)}
-          value={props.analyzedPiece !== null ? props.analyzedPiece.bpm : ''}
-        />
+        <input className="col-sm-5" data-cy="bpm" {...removeReset(bpm)} />
       </div>
       <div className="form-group row">{analyzedOrRaw}</div>
       <div className="form-group">

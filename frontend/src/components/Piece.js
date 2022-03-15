@@ -57,6 +57,11 @@ export const PieceNoHistory = (props) => {
     }
   }
 
+  const returnToPieces = () => {
+    props.history.push('/pieces')
+    props.clearAnalysis()
+  }
+
   if (props.user.username !== null) {
     return (
       <div>
@@ -86,6 +91,13 @@ export const PieceNoHistory = (props) => {
           type="button"
         >
           delete
+        </button>
+        <button
+          onClick={returnToPieces}
+          data-cy="back"
+          className="col-sm-1 mr-2 my-2 btn btn-primary"
+        >
+          back
         </button>
       </div>
     )

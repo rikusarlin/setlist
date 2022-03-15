@@ -6,7 +6,7 @@ import Users from './components/Users'
 import User from './components/User'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
-import NewPiece from './components/NewPiece'
+import EditPiece from './components/EditPiece'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { logout } from './reducers/loginReducer'
@@ -80,9 +80,14 @@ export const App = (props) => {
                 path="/newpiece"
                 render={() => (
                   <div>
-                    <NewPiece />
+                    <EditPiece />
                   </div>
                 )}
+              />
+              <Route
+                exact
+                path="/editpiece/:id"
+                render={({ match }) => <EditPiece pieceId={match.params.id} />}
               />
               <Route
                 exact

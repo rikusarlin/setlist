@@ -29,6 +29,11 @@ export const PiecesNoHistory = (props) => {
             {piece.title}
           </Link>
         </td>
+        <td>
+          <Link data-cy="piece-link" to={`/editpiece/${piece.id}`}>
+            Edit
+          </Link>
+        </td>
       </tr>
     ))
 

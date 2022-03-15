@@ -12,6 +12,15 @@ export const analyzeContents = (contents, token) => {
   }
 }
 
+export const setPiece = (piece) => {
+  return async (dispatch) => {
+    dispatch({
+      type: 'UPDATE_PIECE',
+      data: piece,
+    })
+  }
+}
+
 export const updatePiece = (piece, token) => {
   return async (dispatch) => {
     const updatedPiece = await piecesService.update(piece, token)

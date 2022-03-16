@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { fetchPieces } from '../reducers/piecesReducer'
-import { clearAnalysis } from '../reducers/analyzeReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'react-bootstrap'
@@ -14,7 +13,6 @@ export const PiecesNoHistory = (props) => {
   }, [token, getPieces])
 
   const moveToNewPiece = () => {
-    props.clearAnalysis()
     props.history.push('/newpiece')
   }
 
@@ -66,7 +64,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   fetchPieces,
-  clearAnalysis,
 }
 
 const Pieces = withRouter(PiecesNoHistory)

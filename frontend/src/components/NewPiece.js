@@ -1,6 +1,6 @@
 import React from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { analyzeContents, clearAnalysis } from '../reducers/analyzeReducer'
+import { analyzeContents, clearAnalysis } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'

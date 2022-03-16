@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { deletePiece } from '../reducers/piecesReducer'
-import { fetchPiece, emptyPiece } from '../reducers/pieceReducer'
-import { changePieceData } from '../reducers/editPieceReducer'
 import {
   updatePiece,
   analyzeContents,
@@ -10,32 +8,44 @@ import {
   transposeDown,
   transposeUp,
   setPiece,
-} from '../reducers/analyzeReducer'
+  fetchPiece,
+} from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 
 export const EditPieceNoHistory = (props) => {
+  const [previousPiece, setPreviousPiece] = useState({})
+  const [formData, setFormData] = useState({
+    title: '',
+    artist: '',
+    bpm: 0,
+    contents: '',
+  })
   useEffect(() => {
-    async function fetchData() {
-      if (props.pieceId !== undefined) {
-        await props.fetchPiece(props.pieceId, props.user.token)
-        props.setPiece(props.piece)
-        props.changePieceData(props.piece)
+    props.fetchPiece(props.pieceId, props.user.token)
+  }, [props.user.token, props.pieceId])
+
+  useEffect(() => {
+    if (props.piece !== null) {
+      const startFormData = {
+        title: props.piece.title,
+        artist: props.piece.artist,
+        bpm: props.piece.bpm,
+        contents: getRowContents(props.pages),
       }
+      setFormData(startFormData)
     }
-    fetchData()
-  }, [props.user.token, props.fetchPiece, props.pieceId, props.changePieceData])
+  }, [props.piece])
 
   const updateContents = async () => {
     try {
-      let newPiece = props.analyzedPiece
-      newPiece.title = props.editedPiece.title
-      newPiece.artist = props.editedPiece.artist
-      newPiece.bpm = props.editedPiece.bpm
+      let newPiece = props.piece
+      newPiece.title = formData.title
+      newPiece.artist = formData.artist
+      newPiece.bpm = formData.bpm
 
       props.updatePiece(newPiece, props.user.token)
-      props.changePieceData(props.piece)
       props.showInfo('piece updated', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -45,7 +55,7 @@ export const EditPieceNoHistory = (props) => {
 
   const transposeUp = async () => {
     try {
-      props.transposeUp(props.analyzedPiece, props.user.token)
+      props.transposeUp(props.piece, props.user.token)
       props.showInfo('piece transposed up', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -55,8 +65,9 @@ export const EditPieceNoHistory = (props) => {
 
   const deletePiece = async () => {
     try {
-      props.deletePiece(props.analyzedPiece.id, props.user.token)
+      props.deletePiece(props.piece.id, props.user.token)
       props.clearAnalysis()
+      props.history.push('/pieces')
       props.showInfo('piece deleted', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -66,9 +77,7 @@ export const EditPieceNoHistory = (props) => {
 
   const confirmDelete = () => {
     if (
-      window.confirm(
-        `Remove ${props.analyzedPiece.title} by ${props.analyzedPiece.artist}?`
-      )
+      window.confirm(`Remove ${props.piece.title} by ${props.piece.artist}?`)
     ) {
       deletePiece()
     }
@@ -76,8 +85,9 @@ export const EditPieceNoHistory = (props) => {
 
   const transposeDown = async () => {
     try {
-      props.transposeDown(props.analyzedPiece, props.user.token)
+      props.transposeDown(props.piece, props.user.token)
       props.showInfo('piece transposed down', 3)
+      props.changePieceData(props.piece)
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in transposing piece down', 3)
@@ -90,68 +100,36 @@ export const EditPieceNoHistory = (props) => {
       rows: [],
     }
     let newPiece = {
-      title: props.editedPiece.title,
-      artist: props.editedPiece.artist,
-      bpm: props.editedPiece.bpm,
+      title: formData.title,
+      artist: formData.artist,
+      bpm: formData.bpm,
       pages: [page],
-      contents: props.editedPiece.contents,
+      contents: formData.contents,
     }
-    props.analyzeContents(newPiece)
+    try {
+      props.analyzeContents(newPiece)
+      props.deletePiece(previousPiece.id, props.user.token)
+      props.showInfo('piece re-analyzed', 3)
+    } catch (exception) {
+      console.log('exception: ' + exception)
+      props.showError('error in re-analyzing piece', 3)
+    }
   }
 
   const getRowContents = () => {
-    const rowContents = props.analyzedPiece.pages.map((page) =>
+    const rowContents = props.piece.pages.map((page) =>
       page.rows.map((row) => row.contents).join('\n')
     )
     return rowContents[0]
   }
 
   const editContents = async () => {
+    setPreviousPiece(props.piece)
     props.clearAnalysis()
   }
 
-  const handleTitleChange = async (event) => {
-    const newPiece = {
-      title: event.target.value,
-      artist: props.editedPiece.artist,
-      bpm: props.editedPiece.bpm,
-      pages: props.editedPiece.pages,
-    }
-    newPiece.contents = getRowContents()
-    props.changePieceData(newPiece)
-  }
-
-  const handleArtistChange = async (event) => {
-    const newPiece = {
-      artist: event.target.value,
-      title: props.editedPiece.title,
-      bpm: props.editedPiece.bpm,
-      pages: props.editedPiece.pages,
-    }
-    newPiece.contents = getRowContents()
-    props.changePieceData(newPiece)
-  }
-
-  const handleBpmChange = async (event) => {
-    const newPiece = {
-      bpm: event.target.value,
-      title: props.editedPiece.title,
-      artist: props.editedPiece.artist,
-      pages: props.editedPiece.pages,
-    }
-    newPiece.contents = getRowContents()
-    props.changePieceData(newPiece)
-  }
-
-  const handleContentChange = async (event) => {
-    const newPiece = {
-      bpm: props.editedPiece.bpm,
-      title: props.editedPiece.title,
-      artist: props.editedPiece.artist,
-      pages: props.editedPiece.pages,
-      content: event.target.value,
-    }
-    props.changePieceData(newPiece)
+  const cancelEdit = async () => {
+    props.setPiece(previousPiece)
   }
 
   const returnToPieces = () => {
@@ -160,7 +138,7 @@ export const EditPieceNoHistory = (props) => {
   }
 
   const editOrAnalyze =
-    props.analyzedPiece !== null ? (
+    props.piece !== null ? (
       <div>
         <button
           onClick={updateContents}
@@ -199,25 +177,36 @@ export const EditPieceNoHistory = (props) => {
         </button>
       </div>
     ) : (
-      <button
-        onClick={analyzeContents}
-        data-cy="analyze"
-        className="col-sm-1 mr-2 btn btn-primary"
-      >
-        analyze
-      </button>
+      <div>
+        <button
+          onClick={analyzeContents}
+          data-cy="analyze"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          analyze
+        </button>
+        <button
+          onClick={cancelEdit}
+          data-cy="cancel"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          cancel
+        </button>
+      </div>
     )
 
   const analyzedOrRaw =
-    props.analyzedPiece !== null ? (
-      <PieceRows piece={props.analyzedPiece} />
+    props.piece !== null ? (
+      <PieceRows piece={props.piece} />
     ) : (
       <textarea
         className="col-sm-12"
         rows="20"
         name="contents"
+        id="conenents"
         data-cy="contents"
-        onChange={handleContentChange}
+        value={formData.contents}
+        onChange={(e) => setFormData({ ...formData, contents: e.target.value })}
       />
     )
 
@@ -231,9 +220,10 @@ export const EditPieceNoHistory = (props) => {
         <input
           className="col-sm-5"
           name="title"
+          id="title"
           data-cy="title"
-          value={props.editedPiece.title}
-          onChange={handleTitleChange}
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
       </div>
       <div className="form-group row">
@@ -243,9 +233,10 @@ export const EditPieceNoHistory = (props) => {
         <input
           className="col-sm-5"
           name="artist"
+          id="artist"
           data-cy="artist"
-          value={props.editedPiece.artist}
-          onChange={handleArtistChange}
+          value={formData.artist}
+          onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
         />
       </div>
       <div className="form-group row">
@@ -255,21 +246,24 @@ export const EditPieceNoHistory = (props) => {
         <input
           className="col-sm-5"
           name="bpm"
+          id="bpm"
           data-cy="bpm"
-          value={props.editedPiece.bpm}
-          onChange={handleBpmChange}
+          value={formData.bpm}
+          onChange={(e) => setFormData({ ...formData, bpm: e.target.value })}
         />
       </div>
       <div className="form-group row">{analyzedOrRaw}</div>
       <div className="form-group">
-        {editOrAnalyze}
-        <button
-          onClick={returnToPieces}
-          data-cy="cancel"
-          className="col-sm-1 mr-2 my-2 btn btn-primary"
-        >
-          back
-        </button>
+        <div className="form-group">{editOrAnalyze}</div>
+        <div className="form-group">
+          <button
+            onClick={returnToPieces}
+            data-cy="back"
+            className="col-sm-1 mr-2 my-2 btn btn-primary"
+          >
+            back
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -278,9 +272,7 @@ export const EditPieceNoHistory = (props) => {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    analyzedPiece: state.analyzedPiece,
     piece: state.piece,
-    editedPiece: state.editedPiece,
   }
 }
 
@@ -294,9 +286,7 @@ const mapDispatchToProps = {
   transposeUp,
   deletePiece,
   fetchPiece,
-  emptyPiece,
   setPiece,
-  changePieceData,
 }
 
 const EditPiece = withRouter(EditPieceNoHistory)

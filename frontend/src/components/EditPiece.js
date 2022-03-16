@@ -23,8 +23,8 @@ export const EditPieceNoHistory = (props) => {
     contents: '',
   })
   useEffect(() => {
-    props.fetchPiece(props.pieceId, props.user.token)
-  }, [props.user.token, props.pieceId])
+    props.fetchPiece(props.pieceId, props.band.token)
+  }, [props.band.token, props.pieceId])
 
   useEffect(() => {
     if (props.piece !== null) {
@@ -45,7 +45,7 @@ export const EditPieceNoHistory = (props) => {
       newPiece.artist = formData.artist
       newPiece.bpm = formData.bpm
 
-      props.updatePiece(newPiece, props.user.token)
+      props.updatePiece(newPiece, props.band.token)
       props.showInfo('piece updated', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -55,7 +55,7 @@ export const EditPieceNoHistory = (props) => {
 
   const transposeUp = async () => {
     try {
-      props.transposeUp(props.piece, props.user.token)
+      props.transposeUp(props.piece, props.band.token)
       props.showInfo('piece transposed up', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -65,7 +65,7 @@ export const EditPieceNoHistory = (props) => {
 
   const deletePiece = async () => {
     try {
-      props.deletePiece(props.piece.id, props.user.token)
+      props.deletePiece(props.piece.id, props.band.token)
       props.clearAnalysis()
       props.history.push('/pieces')
       props.showInfo('piece deleted', 3)
@@ -85,7 +85,7 @@ export const EditPieceNoHistory = (props) => {
 
   const transposeDown = async () => {
     try {
-      props.transposeDown(props.piece, props.user.token)
+      props.transposeDown(props.piece, props.band.token)
       props.showInfo('piece transposed down', 3)
       props.changePieceData(props.piece)
     } catch (exception) {
@@ -108,7 +108,7 @@ export const EditPieceNoHistory = (props) => {
     }
     try {
       props.analyzeContents(newPiece)
-      props.deletePiece(previousPiece.id, props.user.token)
+      props.deletePiece(previousPiece.id, props.band.token)
       props.showInfo('piece re-analyzed', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -271,7 +271,7 @@ export const EditPieceNoHistory = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
+    band: state.band,
     piece: state.piece,
   }
 }

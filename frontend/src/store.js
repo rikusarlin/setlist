@@ -3,14 +3,14 @@ import thunk from 'redux-thunk'
 import piecesReducer from './reducers/piecesReducer'
 import notificationReducer from './reducers/notificationReducer'
 import loginReducer from './reducers/loginReducer'
-import userReducer from './reducers/userReducer'
+import bandReducer from './reducers/bandReducer'
 import pieceReducer from './reducers/pieceReducer'
 
 const reducer = combineReducers({
   pieces: piecesReducer,
   notification: notificationReducer,
-  user: loginReducer,
-  users: userReducer,
+  band: loginReducer,
+  bands: bandReducer,
   piece: pieceReducer,
 })
 

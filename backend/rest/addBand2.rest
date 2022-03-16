@@ -1,0 +1,13 @@
+post http://localhost:3003/api/bands
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username":"dela",
+    "name":"Dela",
+    "password":"st3mmatRulez",
+    "securityQuestion":"Bändin syntymävaiheen nimi" ,  
+    "securityAnswer":"The Project"   
+}
+
+

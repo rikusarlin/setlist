@@ -2,8 +2,8 @@ import React from 'react'
 import './App.css'
 import Pieces from './components/Pieces'
 import Piece from './components/Piece'
-import Users from './components/Users'
-import User from './components/User'
+import Bands from './components/Bands'
+import Band from './components/Band'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
@@ -37,9 +37,9 @@ export const App = (props) => {
     </button>
   )
 
-  const userById = (id) => {
-    if (props.user !== null) {
-      return props.users.find((a) => a.id === id)
+  const bandById = (id) => {
+    if (props.band !== null) {
+      return props.bands.find((a) => a.id === id)
     } else {
       return null
     }
@@ -48,7 +48,7 @@ export const App = (props) => {
   return (
     <div className="container">
       <Router>
-        {props.user.username !== null ? (
+        {props.band.username !== null ? (
           <div>
             <div>
               <div className="nav nav-tabs">
@@ -58,8 +58,8 @@ export const App = (props) => {
                   </Link>
                 </div>
                 <div className="nav-item">
-                  <Link className="nav-link" to="/users">
-                    users
+                  <Link className="nav-link" to="/bands">
+                    bands
                   </Link>
                 </div>
                 <div className="nav-item">{logoutForm()}</div>
@@ -98,11 +98,11 @@ export const App = (props) => {
                 </div>
               )}
             />
-            <Route exact path="/users" render={() => <Users />} />
+            <Route exact path="/bands" render={() => <Bands />} />
             <Route
               exact
-              path="/users/:id"
-              render={({ match }) => <User user={userById(match.params.id)} />}
+              path="/bands/:id"
+              render={({ match }) => <Band band={bandById(match.params.id)} />}
             />
             <Route
               exact
@@ -123,8 +123,8 @@ export const App = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
-    users: state.users,
+    band: state.band,
+    bands: state.bands,
     pieces: state.pieces,
   }
 }

@@ -1,2 +1,2 @@
-get http://localhost:3003/api/users
+get http://localhost:3003/api/bands
 Content-type: application/application/json

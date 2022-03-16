@@ -25,7 +25,7 @@ export const NewPieceNoHistory = (props) => {
       contents: contents.value,
     }
     try {
-      props.analyzeContents(newPiece, props.user.token)
+      props.analyzeContents(newPiece, props.band.token)
       props.showInfo('piece inserted', 3)
       props.history.push('/pieces')
     } catch (exception) {
@@ -94,7 +94,7 @@ export const NewPieceNoHistory = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
+    band: state.band,
   }
 }
 

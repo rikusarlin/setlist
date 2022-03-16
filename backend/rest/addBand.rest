@@ -1,0 +1,13 @@
+post http://localhost:3003/api/bands
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username":"kyarhem",
+    "name":"Kyarhem",
+    "password":"tal0JaPuutarha",
+    "securityQuestion":"Mille vankilassa olo ei ole este",
+    "securityAnswer":"Kelan kuntoutukselle"
+}
+
+

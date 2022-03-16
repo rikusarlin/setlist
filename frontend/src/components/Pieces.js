@@ -6,7 +6,7 @@ import { Table } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 
 export const PiecesNoHistory = (props) => {
-  var token = props.user.token
+  var token = props.band.token
   var getPieces = props.fetchPieces
   useEffect(() => {
     getPieces(props.id, token)
@@ -35,7 +35,7 @@ export const PiecesNoHistory = (props) => {
       </tr>
     ))
 
-    if (props.user.user !== null) {
+    if (props.band.username !== null) {
       return (
         <div>
           <Table striped>
@@ -58,7 +58,7 @@ export const PiecesNoHistory = (props) => {
 const mapStateToProps = (state) => {
   return {
     pieces: state.pieces,
-    user: state.user,
+    band: state.band,
   }
 }
 

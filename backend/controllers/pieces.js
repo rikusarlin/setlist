@@ -1,7 +1,7 @@
 const piecesRouter = require('express').Router()
 const Piece = require('../models/piece')
 const Setlist = require('../models/setlist')
-const User = require('../models/user')
+const Band = require('../models/band')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
 const { transpose } = require('../utils/music')
@@ -69,7 +69,7 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     if (!req.token || !decodedToken.id) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    const tokenUser = await User.findById(decodedToken.id)
+    const tokenUser = await Band.findById(decodedToken.id)
     logger.info('tokenUser: ', tokenUser)
     logger.info('id: ', req.params.id)
     let pieceToDelete = await Piece.findById(req.params.id)

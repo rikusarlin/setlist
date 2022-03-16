@@ -1,0 +1,12 @@
+post http://localhost:3003/api/bands
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "root",
+    "name": "root band",
+    "password": "sekret",
+    "securityQuestion": "Question",
+    "securityAnswer": "Answer"
+}
+

@@ -11,7 +11,7 @@ import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 
 export const PieceNoHistory = (props) => {
-  var token = props.user.token
+  var token = props.band.token
   var getPiece = props.fetchPiece
   useEffect(() => {
     getPiece(props.pieceId, token)
@@ -23,7 +23,7 @@ export const PieceNoHistory = (props) => {
 
   const handleDelete = async () => {
     try {
-      props.deletePiece(props.piece.id, props.user.token)
+      props.deletePiece(props.piece.id, props.band.token)
       props.showInfo('piece deleted', 3)
       props.history.push('/pieces')
     } catch (exception) {
@@ -41,7 +41,7 @@ export const PieceNoHistory = (props) => {
   }
   const transposeUp = async () => {
     try {
-      props.transposeUp(props.piece, props.user.token)
+      props.transposeUp(props.piece, props.band.token)
       props.showInfo('piece transposed up', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -51,7 +51,7 @@ export const PieceNoHistory = (props) => {
 
   const transposeDown = async () => {
     try {
-      props.transposeDown(props.piece, props.user.token)
+      props.transposeDown(props.piece, props.band.token)
       props.showInfo('piece transposed down', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -63,7 +63,7 @@ export const PieceNoHistory = (props) => {
     props.history.push('/pieces')
   }
 
-  if (props.user.username !== null) {
+  if (props.band.username !== null) {
     return (
       <div>
         <h2>
@@ -107,7 +107,7 @@ export const PieceNoHistory = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
+    band: state.band,
     piece: state.piece,
   }
 }

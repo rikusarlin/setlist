@@ -4,9 +4,10 @@ const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
 const { piecesRouter } = require('./controllers/pieces')
-const usersRouter = require('./controllers/users')
+const bandsRouter = require('./controllers/bands')
 const analyzeRouter = require('./controllers/analyze')
 const loginRouter = require('./controllers/login')
+const resetRouter = require('./controllers/reset')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 const logger = require('./utils/logger')
@@ -31,9 +32,10 @@ app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)
 
 app.use('/api/pieces', piecesRouter)
-app.use('/api/users', usersRouter)
+app.use('/api/bands', bandsRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/analyze', analyzeRouter)
+app.use('/api/reset', resetRouter)
 
 // Add testing router (reset database) in test env
 if (process.env.NODE_ENV === 'test') {

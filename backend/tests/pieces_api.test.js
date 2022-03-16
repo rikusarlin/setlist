@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
-const userHelper = require('./users_test_helper')
+const bandHelper = require('./bands_test_helper')
 const app = require('../app')
 const Piece = require('../models/piece')
 
@@ -30,12 +30,12 @@ const randomStr = function (length) {
 }
 
 beforeAll(async () => {
-  var newUser = userHelper.newUser
-  newUser.username = randomStr(16)
-  await api.post('/api/users').send(newUser)
+  var newBand = bandHelper.newBand
+  newBand.username = randomStr(16)
+  await api.post('/api/bands').send(newBand)
   const res = await api.post('/api/login').send({
-    username: newUser.username,
-    password: userHelper.newUser.password,
+    username: newBand.username,
+    password: bandHelper.newBand.password,
   })
   token = res.body.token
 })

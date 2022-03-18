@@ -6,4 +6,9 @@ const getAll = async () => {
   return response.data
 }
 
-export default { getAll }
+const signUp = async (newBand) => {
+  const response = await axios.post(baseUrl, newBand)
+  return response.data
+}
+
+export default { getAll, signUp }

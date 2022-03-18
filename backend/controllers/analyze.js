@@ -2,6 +2,7 @@ const analyzeRouter = require('express').Router()
 const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
 const Piece = require('../models/piece')
+const jwt = require('jsonwebtoken')
 
 const onlyWhitespace = (str) => {
   return /^\s*$/.test(str)
@@ -9,6 +10,11 @@ const onlyWhitespace = (str) => {
 
 analyzeRouter.post('/', async (req, res, next) => {
   try {
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    if (!req.token || !decodedToken.id) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+
     if (typeof req.body.contents === 'undefined') {
       return res.status(400).json({ error: 'No contents to analyze' })
     }
@@ -25,6 +31,7 @@ analyzeRouter.post('/', async (req, res, next) => {
       artist: req.body.artist,
       bpm: req.body.bpm,
       pages: req.body.pages,
+      band: decodedToken.id,
     }
     if (typeof req.body.bpm === 'undefined') {
       piece.bpm = 0

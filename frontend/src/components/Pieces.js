@@ -9,8 +9,8 @@ export const PiecesNoHistory = (props) => {
   var token = props.band.token
   var getPieces = props.fetchPieces
   useEffect(() => {
-    getPieces(props.id, token)
-  }, [token, getPieces])
+    getPieces(token)
+  }, [token])
 
   const moveToNewPiece = () => {
     props.history.push('/newpiece')

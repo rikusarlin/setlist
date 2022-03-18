@@ -22,10 +22,8 @@ export const createPiece = (content, token) => {
 }
 
 export const fetchPieces = (token) => {
-  console.log('In piecesReducer.fetchPieces, token: ', token)
   return async (dispatch) => {
     const pieces = await pieceService.getAll(token)
-    console.log('Pieces.length: ', pieces.length)
     dispatch({
       type: 'FETCH_PIECES',
       data: pieces,

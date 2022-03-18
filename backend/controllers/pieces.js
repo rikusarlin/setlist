@@ -8,7 +8,15 @@ const { transpose } = require('../utils/music')
 
 piecesRouter.get('/', async (request, response, next) => {
   try {
-    let pieces = await Piece.find({}, ['title', 'artist', 'bpm'])
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!request.token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    let pieces = await Piece.find({ band: decodedToken.id }, [
+      'title',
+      'artist',
+      'bpm',
+    ])
     logger.info(`In piecesRouter.getAll, found:${pieces.length} pieces`)
     response.json(pieces)
   } catch (error) {
@@ -22,6 +30,8 @@ piecesRouter.post('/', async (req, res, next) => {
     if (!req.token || !decodedToken.id) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
+    const band = await Band.findById(decodedToken.id)
+
     if (typeof req.body.title === 'undefined') {
       return res.status(400).json({ error: 'Title of piece is required' })
     }
@@ -34,6 +44,7 @@ piecesRouter.post('/', async (req, res, next) => {
       artist: req.body.artist,
       bpm: req.body.bpm,
       pages: req.body.pages,
+      band: band._id,
     }
     if (typeof req.body.bpm === 'undefined') {
       piece.bpm = 0
@@ -41,6 +52,8 @@ piecesRouter.post('/', async (req, res, next) => {
 
     let newPiece = new Piece(piece)
     let savedPiece = await newPiece.save()
+    band.pieces = band.pieces.concat(savedPiece._id)
+    await band.save()
     res.status(201).json(savedPiece.toJSON())
   } catch (error) {
     logger.error('error: ' + error)
@@ -69,11 +82,7 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     if (!req.token || !decodedToken.id) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    const tokenUser = await Band.findById(decodedToken.id)
-    logger.info('tokenUser: ', tokenUser)
-    logger.info('id: ', req.params.id)
     let pieceToDelete = await Piece.findById(req.params.id)
-    logger.info('pieceToDelete: ', pieceToDelete)
 
     if (!pieceToDelete) {
       return res.status(204).end()
@@ -84,9 +93,18 @@ piecesRouter.delete('/:id', async (req, res, next) => {
       pieces: { _id: req.params.id },
     })
     for (let setlist = 0; setlist < setlistsWithPiece.length; setlist++) {
-      var pieceIndex = setlist.pieces.indexOf(req.params.id)
-      setlist.pieces.splice(pieceIndex, 1)
-      setlist.save()
+      var pieceIndex = setlistsWithPiece[setlist].pieces.indexOf(req.params.id)
+      setlistsWithPiece[setlist].pieces.splice(pieceIndex, 1)
+      setlistsWithPiece[setlist].save()
+    }
+    // Delete piece from band, if any
+    const bandsWithPiece = await Band.find({
+      pieces: { _id: req.params.id },
+    })
+    for (let band = 0; band < bandsWithPiece.length; band++) {
+      var pieceIndex2 = bandsWithPiece[band].pieces.indexOf(req.params.id)
+      bandsWithPiece[band].pieces.splice(pieceIndex2, 1)
+      bandsWithPiece[band].save()
     }
     await Piece.findByIdAndRemove(pieceToDelete._id).setOptions({
       useFindAndModify: false,
@@ -104,6 +122,7 @@ piecesRouter.put('/:id', async (req, res, next) => {
     if (!req.token || !decodedToken.id) {
       return res.status(401).json({ error: 'Token missing or invalid' })
     }
+    const band = await Band.findById(decodedToken.id)
 
     if (typeof req.body.title === 'undefined') {
       return res.status(400).json({ error: 'Title of piece is required' })
@@ -117,6 +136,7 @@ piecesRouter.put('/:id', async (req, res, next) => {
       artist: req.body.artist,
       bpm: req.body.bpm,
       pages: req.body.pages,
+      band: band._id,
     }
     if (typeof req.body.bpm === 'undefined') {
       piece.bpm = 0

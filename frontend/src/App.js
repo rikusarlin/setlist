@@ -5,6 +5,7 @@ import Piece from './components/Piece'
 import Bands from './components/Bands'
 import Band from './components/Band'
 import LoginForm from './components/LoginForm'
+import SignUpForm from './components/SignUpForm'
 import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
 import NewPiece from './components/NewPiece'
@@ -113,7 +114,33 @@ export const App = (props) => {
         ) : (
           <div>
             <Notification />
-            <LoginForm />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <div>
+                  <LoginForm />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/pieces"
+              render={() => (
+                <div>
+                  <LoginForm />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/signup"
+              render={() => (
+                <div>
+                  <SignUpForm />
+                </div>
+              )}
+            />
           </div>
         )}
       </Router>

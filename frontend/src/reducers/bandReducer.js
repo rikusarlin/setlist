@@ -2,10 +2,10 @@ import bandService from '../services/bands'
 
 export const fetchBands = () => {
   return async (dispatch) => {
-    const users = await bandService.getAll()
+    const bands = await bandService.getAll()
     dispatch({
       type: 'FETCH_BANDS',
-      data: users,
+      data: bands,
     })
   }
 }

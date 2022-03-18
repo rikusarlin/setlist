@@ -23,8 +23,11 @@ export const EditPieceNoHistory = (props) => {
     contents: '',
   })
   useEffect(() => {
-    props.fetchPiece(props.pieceId, props.band.token)
-  }, [props.band.token, props.pieceId])
+    const fetchData = async () => {
+      await props.fetchPiece(props.pieceId, props.band.token)
+    }
+    fetchData()
+  }, [props.band.token, props.pieceId, props.fetchPiece])
 
   useEffect(() => {
     if (props.piece !== null) {
@@ -107,7 +110,7 @@ export const EditPieceNoHistory = (props) => {
       contents: formData.contents,
     }
     try {
-      props.analyzeContents(newPiece)
+      props.analyzeContents(newPiece, props.band.token)
       props.deletePiece(previousPiece.id, props.band.token)
       props.showInfo('piece re-analyzed', 3)
     } catch (exception) {

@@ -4,6 +4,10 @@ const pieceSchema = mongoose.Schema({
   title: String,
   artist: String,
   bpm: Number,
+  band: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Band',
+  },
   pages: [
     {
       pageNumber: Number,

@@ -4,10 +4,13 @@ const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
 const app = require('../app')
 const Piece = require('../models/piece')
+const jwt = require('jsonwebtoken')
+const testUtil = require('./test_utils')
 
 const api = supertest(app)
 
 var token
+var decodedToken
 
 // Define console functions so that they exist...
 global.console = {
@@ -16,34 +19,25 @@ global.console = {
   error: jest.fn(),
 }
 
-const randomStr = function (length) {
-  let radom13chars = function () {
-    return Math.random().toString(16).substring(2, 15)
-  }
-  let loops = Math.ceil(length / 13)
-  return new Array(loops)
-    .fill(radom13chars)
-    .reduce((string, func) => {
-      return string + func()
-    }, '')
-    .substring(0, length)
-}
-
 beforeAll(async () => {
   var newBand = bandHelper.newBand
-  newBand.username = randomStr(16)
+  newBand.username = testUtil.randomStr(16)
   await api.post('/api/bands').send(newBand)
   const res = await api.post('/api/login').send({
     username: newBand.username,
     password: bandHelper.newBand.password,
   })
   token = res.body.token
+  decodedToken = jwt.verify(token, process.env.SECRET)
 })
 
 beforeEach(async () => {
   await Piece.deleteMany({})
   const pieceObjects = helper.initialPieces.map((piece) => new Piece(piece))
-  const piecePromiseArray = pieceObjects.map((piece) => piece.save())
+  const piecePromiseArray = pieceObjects.map((piece) => {
+    piece.band = decodedToken.id
+    return piece.save()
+  })
   await Promise.all(piecePromiseArray)
 })
 
@@ -235,6 +229,31 @@ describe('update piece', () => {
       .set('Authorization', `bearer ${token}`)
       .send(pieceToUpdate)
       .expect(400)
+  })
+})
+
+describe('transpose piece', () => {
+  test('transpose up', async () => {
+    const piecesAtStart = await helper.piecesInDb()
+    const pieceToTranspose = piecesAtStart[0]
+    const resultPiece = await api
+      .put(`/api/pieces/${pieceToTranspose.id}/transpose/up`)
+      .set('Authorization', `bearer ${token}`)
+      .send(pieceToTranspose)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(resultPiece.body.pages[0].rows[1].contents).toBe('G# D# Bbm')
+  })
+  test('transpose down', async () => {
+    const piecesAtStart = await helper.piecesInDb()
+    const pieceToTranspose = piecesAtStart[0]
+    const resultPiece = await api
+      .put(`/api/pieces/${pieceToTranspose.id}/transpose/down`)
+      .set('Authorization', `bearer ${token}`)
+      .send(pieceToTranspose)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(resultPiece.body.pages[0].rows[1].contents).toBe('F# C# G#m')
   })
 })
 

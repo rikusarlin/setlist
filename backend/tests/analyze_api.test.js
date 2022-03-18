@@ -1,6 +1,10 @@
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
+const bandHelper = require('./bands_test_helper')
+const testUtil = require('./test_utils')
+
+var token
 
 // Define console functions so that they exist...
 global.console = {
@@ -191,10 +195,22 @@ const songOutput1 = {
   ],
 }
 
+beforeAll(async () => {
+  var newBand = bandHelper.newBand
+  newBand.username = testUtil.randomStr(16)
+  await api.post('/api/bands').send(newBand)
+  const res = await api.post('/api/login').send({
+    username: newBand.username,
+    password: bandHelper.newBand.password,
+  })
+  token = res.body.token
+})
+
 describe('single rows', () => {
   test('single rows row beginning with angle bracket is recognized as label', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(introInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -206,6 +222,7 @@ describe('single rows', () => {
   test('single rows row having an angle bracket is recognized as label', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(introInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -217,6 +234,7 @@ describe('single rows', () => {
   test('row with chrods is recognised as chords', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -228,6 +246,7 @@ describe('single rows', () => {
   test('row with German chrods is recognised as chords and translated into English notation', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -239,6 +258,7 @@ describe('single rows', () => {
   test('English chords remain English chords', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput3)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -253,6 +273,7 @@ describe('song analysis', () => {
   test('5 row piece is correctly analyzed', async (done) => {
     const response = await api
       .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(songInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)

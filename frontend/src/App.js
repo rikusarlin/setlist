@@ -9,6 +9,7 @@ import SignUpForm from './components/SignUpForm'
 import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
 import NewPiece from './components/NewPiece'
+import ResetPasswordForm from './components/ResetPasswordForm'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { logout } from './reducers/loginReducer'
@@ -138,6 +139,15 @@ export const App = (props) => {
               render={() => (
                 <div>
                   <SignUpForm />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/reset-password"
+              render={() => (
+                <div>
+                  <ResetPasswordForm />
                 </div>
               )}
             />

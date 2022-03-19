@@ -28,19 +28,21 @@ export const LoginFormNoHistory = (props) => {
   }
 
   const handleSignUp = async () => {
-    props.hhistory.push('/signup')
+    props.history.push('/signup')
   }
 
   const handleResetPassword = async () => {
-    props.hhistory.push('/resetPassword')
+    props.history.push('/reset-password')
   }
 
   return (
-    <div>
-      <h3>Login</h3>
+    <div className="container">
       <form onSubmit={handleLogin}>
         <div className="form-group row">
-          <label htmlFor="Username" className="col-sm-1 col-form-label">
+          <h3 className="col-sm-2 px-0">Setlist login</h3>
+        </div>
+        <div className="form-group row">
+          <label htmlFor="Username" className="col-sm-1 col-form-label px-0">
             Username
           </label>
           <div className="col-sm-3">
@@ -52,7 +54,7 @@ export const LoginFormNoHistory = (props) => {
           </div>
         </div>
         <div className="form-group row">
-          <label htmlFor="Password" className="col-sm-1 col-form-label">
+          <label htmlFor="Password" className="col-sm-1 col-form-label px-0">
             Password
           </label>
           <div className="col-sm-3">
@@ -63,23 +65,33 @@ export const LoginFormNoHistory = (props) => {
             />
           </div>
         </div>
-        <button type="submit" className="btn btn-primary mx-2" data-cy="login">
-          login
-        </button>
-        <button
-          onClick={handleSignUp}
-          className="btn btn-primary mx-2"
-          data-cy="sign up"
-        >
-          sign up
-        </button>
-        <button
-          onClick={handleResetPassword}
-          className="btn btn-primary mx-2"
-          data-cy="reset password"
-        >
-          reset password
-        </button>
+        <div className="form-group row">
+          <button
+            type="submit"
+            className="col-sm-2 btn btn-primary mx-1"
+            data-cy="login"
+          >
+            login
+          </button>
+          <button
+            type="button"
+            onClick={handleResetPassword}
+            className="col-sm-2 btn btn-primary mx-1"
+            data-cy="reset password"
+          >
+            reset password
+          </button>
+        </div>
+        <div className="row">
+          <button
+            type="button"
+            onClick={handleSignUp}
+            className="col-sm-2 btn btn-primary mx-1 my-1"
+            data-cy="sign up"
+          >
+            sign up
+          </button>
+        </div>
       </form>
     </div>
   )

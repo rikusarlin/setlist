@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { deletePiece } from '../reducers/piecesReducer'
+import { deletePiece, fetchPieces } from '../reducers/piecesReducer'
 import {
   updatePiece,
   analyzeContents,
@@ -112,6 +112,7 @@ export const EditPieceNoHistory = (props) => {
     try {
       props.analyzeContents(newPiece, props.band.token)
       props.deletePiece(previousPiece.id, props.band.token)
+      props.fetchPieces(props.band.token)
       props.showInfo('piece re-analyzed', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -290,6 +291,7 @@ const mapDispatchToProps = {
   deletePiece,
   fetchPiece,
   setPiece,
+  fetchPieces,
 }
 
 const EditPiece = withRouter(EditPieceNoHistory)

@@ -1,6 +1,7 @@
 import React from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { analyzeContents, clearAnalysis } from '../reducers/pieceReducer'
+import { fetchPieces } from '../reducers/piecesReducer'
 import { connect } from 'react-redux'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
@@ -26,6 +27,7 @@ export const NewPieceNoHistory = (props) => {
     }
     try {
       props.analyzeContents(newPiece, props.band.token)
+      props.fetchPieces(props.band.token)
       props.showInfo('piece inserted', 3)
       props.history.push('/pieces')
     } catch (exception) {
@@ -103,6 +105,7 @@ const mapDispatchToProps = {
   showError,
   analyzeContents,
   clearAnalysis,
+  fetchPieces,
 }
 
 const NewPiece = withRouter(NewPieceNoHistory)

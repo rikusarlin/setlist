@@ -1,5 +1,6 @@
 import loginService from '../services/login'
 import bandService from '../services/bands'
+import resetService from '../services/reset'
 
 const initialState = {
   username: null,
@@ -42,6 +43,24 @@ export const signUpBand = (bandData) => {
   }
 }
 
+export const resetPassword = (resetInfo) => {
+  return async (dispatch) => {
+    await resetService.reset(resetInfo)
+    const band = await loginService.login({
+      username: resetInfo.username,
+      password: resetInfo.newPassword,
+    })
+    dispatch({
+      type: 'RESET_PASSWORD',
+      data: {
+        username: band.username,
+        name: band.name,
+        token: band.token,
+      },
+    })
+  }
+}
+
 export const logout = () => {
   return async (dispatch) => {
     dispatch({
@@ -59,6 +78,8 @@ const reducer = (state = initialState, action) => {
     case 'LOGIN':
       return action.data
     case 'SIGNUP':
+      return action.data
+    case 'RESET_PASSWORD':
       return action.data
     case 'LOGOUT':
       return initialState

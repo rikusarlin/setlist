@@ -35,6 +35,8 @@ resetRouter.post('/', async (request, response, next) => {
       name: band.name,
       securityQuestion: band.securityQuestion,
       securityAnswerHash: band.securityAnswerHash,
+      pieces: band.pieces,
+      setlists: band.setlists,
       passwordHash,
     })
 

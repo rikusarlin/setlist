@@ -1,43 +1,53 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { signUpBand } from '../reducers/loginReducer'
+import { resetPassword } from '../reducers/loginReducer'
+import { fetchBands } from '../reducers/bandReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { withRouter } from 'react-router-dom'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
 
-export const SignUpFormNoHistory = (props) => {
+export const ResetPasswordNoHistory = (props) => {
+  const [securityQuestion, setSecurityQuestion] = useState('')
   const username = useField('text')
-  const bandName = useField('text')
-  const bandPassword = useField('password')
-  const securityQuestion = useField('text')
+  const newPassword = useField('password')
   const securityAnswer = useField('text')
   useEffect(() => {
-    username.reset
-    bandName.reset
-    bandPassword.reset
-    securityQuestion.reset
-    securityAnswer.reset
+    setSecurityQuestion('')
+    props.fetchBands()
   }, [])
 
-  const handleSignUp = async (event) => {
+  const handleReset = async (event) => {
     event.preventDefault()
     try {
       const formData = {
         username: username.value,
-        name: bandName.value,
-        password: bandPassword.value,
-        securityQuestion: securityQuestion.value,
+        newPassword: newPassword.value,
         securityAnswer: securityAnswer.value,
       }
-      props.signUpBand(formData)
-      props.showInfo('sign up successful', 3)
+      props.resetPassword(formData)
+      props.showInfo('password reset successful', 3)
       props.history.push('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
-      props.showError('error in sign up', 3)
+      props.showError('error password reset', 3)
     }
   }
+
+  const fetchQuestion = async () => {
+    setSecurityQuestion('')
+    const bandFound = props.bands.filter((band) => {
+      return band.username === username.value
+    })
+    console.log(bandFound.length)
+    console.log(JSON.stringify(bandFound))
+    if (bandFound.length > 0) {
+      console.log(JSON.stringify(bandFound[0]))
+      console.log(bandFound[0].securityQuestion)
+      setSecurityQuestion(bandFound[0].securityQuestion)
+    }
+  }
+
   const handleCancel = async (event) => {
     event.preventDefault()
     props.history.push('/')
@@ -45,9 +55,9 @@ export const SignUpFormNoHistory = (props) => {
 
   return (
     <div className="container">
-      <form onSubmit={handleSignUp}>
+      <form onSubmit={handleReset}>
         <div className="form-group row">
-          <h3 className="col-sm-5 px-0">Sign up to Setlist</h3>
+          <h3 className="col-sm-5 px-0">Reset password</h3>
         </div>
         <div className="form-group row">
           <label htmlFor="Username" className="col-sm-2 col-form-label px-0">
@@ -61,30 +71,27 @@ export const SignUpFormNoHistory = (props) => {
               {...removeReset(username)}
             />
           </div>
-        </div>
-        <div className="form-group row">
-          <label htmlFor="Username" className="col-sm-2 col-form-label px-0">
-            Band name
-          </label>
-          <div className="col-sm-3">
-            <input
-              className="form-control"
-              data-cy="name"
-              autoComplete="new-password"
-              {...removeReset(bandName)}
-            />
+          <div className="col-sm-2">
+            <button
+              type="button"
+              onClick={fetchQuestion}
+              className="btn btn-primary mx-1"
+              data-cy="cancel"
+            >
+              Fetch question
+            </button>
           </div>
         </div>
         <div className="form-group row">
           <label htmlFor="Password" className="col-sm-2 col-form-label px-0">
-            Password
+            New password
           </label>
           <div className="col-sm-3">
             <input
               className="form-control"
-              data-cy="password"
+              data-cy="newPassword"
               autoComplete="new-password"
-              {...removeReset(bandPassword)}
+              {...removeReset(newPassword)}
             />
           </div>
         </div>
@@ -95,17 +102,7 @@ export const SignUpFormNoHistory = (props) => {
           >
             Security question
           </label>
-          <div className="col-sm-3">
-            <input
-              className="form-control"
-              data-cy="securityQuestion"
-              autoComplete="new-password"
-              {...removeReset(securityQuestion)}
-            />
-          </div>
-          <div className="col-sm-5">
-            Security question and answer are used to reset password
-          </div>
+          <div className="col-sm-3">{securityQuestion}</div>
         </div>
         <div className="form-group row">
           <label
@@ -127,9 +124,9 @@ export const SignUpFormNoHistory = (props) => {
           <button
             type="submit"
             className="col-sm-2 btn btn-primary mx-1"
-            data-cy="signup"
+            data-cy="reset-password"
           >
-            sign up
+            reset password
           </button>
           <button
             type="button"
@@ -145,12 +142,19 @@ export const SignUpFormNoHistory = (props) => {
   )
 }
 
+const mapStateToProps = (state) => {
+  return {
+    bands: state.bands,
+  }
+}
+
 const mapDispatchToProps = {
   showInfo,
   showError,
-  signUpBand,
+  resetPassword,
+  fetchBands,
 }
 
-const SignUpForm = withRouter(SignUpFormNoHistory)
+const ResetPasswordForm = withRouter(ResetPasswordNoHistory)
 
-export default connect(null, mapDispatchToProps)(SignUpForm)
+export default connect(mapStateToProps, mapDispatchToProps)(ResetPasswordForm)

@@ -8,6 +8,7 @@ const bandsRouter = require('./controllers/bands')
 const analyzeRouter = require('./controllers/analyze')
 const loginRouter = require('./controllers/login')
 const resetRouter = require('./controllers/reset')
+const setlistRouter = require('./controllers/setlists')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 const logger = require('./utils/logger')
@@ -36,6 +37,7 @@ app.use('/api/bands', bandsRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/analyze', analyzeRouter)
 app.use('/api/reset', resetRouter)
+app.use('/api/setlist', setlistRouter)
 
 // Add testing router (reset database) in test env
 if (process.env.NODE_ENV === 'test') {

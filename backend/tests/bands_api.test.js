@@ -9,7 +9,7 @@ const Band = require('../models/band')
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }
 
 const api = supertest(app)
@@ -18,10 +18,11 @@ describe('when there is initially one band at db', () => {
   beforeEach(async () => {
     await Band.deleteMany({})
     const band = new Band({
+      name: 'Roots',
       username: 'root',
       password: 'sekret',
       securityQuestion: 'Question',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     })
     await band.save()
   })
@@ -51,7 +52,7 @@ describe('when there is initially one band at db', () => {
       name: 'Superuser',
       password: 'salainen',
       securityQuestion: 'Question 1',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -69,7 +70,7 @@ describe('when there is initially one band at db', () => {
       name: 'Superuser',
       password: 'salainen',
       securityQuestion: 'Question 1',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -88,7 +89,7 @@ describe('when there is initially one band at db', () => {
       name: 'Superuser',
       password: 'salainen',
       securityQuestion: 'Question 1',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -108,7 +109,7 @@ describe('when there is initially one band at db', () => {
       username: 'root2',
       name: 'Superuser',
       securityQuestion: 'Question 1',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -127,7 +128,7 @@ describe('when there is initially one band at db', () => {
       name: 'Superuser',
       password: 'sa',
       securityQuestion: 'Question 1',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -147,7 +148,7 @@ describe('when there is initially one band at db', () => {
       username: 'root2',
       name: 'Superuser',
       password: 'salainen',
-      securityAnswer: 'Answer 1'
+      securityAnswer: 'Answer 1',
     }
     const result = await api
       .post('/api/bands')
@@ -165,7 +166,7 @@ describe('when there is initially one band at db', () => {
       username: 'root2',
       name: 'Superuser',
       password: 'salainen',
-      securityQuestion: 'Question 1'
+      securityQuestion: 'Question 1',
     }
     const result = await api
       .post('/api/bands')

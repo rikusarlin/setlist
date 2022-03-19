@@ -2,6 +2,10 @@ const mongoose = require('mongoose')
 
 const setlistSchema = mongoose.Schema({
   name: String,
+  band: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Band',
+  },
   pieces: [
     {
       type: mongoose.Schema.Types.ObjectId,

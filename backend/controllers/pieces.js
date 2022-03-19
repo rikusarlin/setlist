@@ -17,9 +17,9 @@ piecesRouter.get('/', async (request, response, next) => {
       'artist',
       'bpm',
     ])
-    logger.info(`In piecesRouter.getAll, found:${pieces.length} pieces`)
     response.json(pieces)
   } catch (error) {
+    logger.error('error: ' + error)
     next(error)
   }
 })

@@ -52,7 +52,7 @@ setlistRouter.post('/', async (request, response, next) => {
   }
 })
 
-setlistRouter.post('/:setlistid/:pieceid', async (request, response, next) => {
+setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
   try {
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     if (!request.token || !decodedToken.id) {
@@ -83,7 +83,7 @@ setlistRouter.post('/:setlistid/:pieceid', async (request, response, next) => {
       name: 1,
     }).populate('pieces', { title: 1, artist: 1, id: 1 })
 
-    response.status(201).json(updatedSetlist)
+    response.status(200).json(updatedSetlist)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)

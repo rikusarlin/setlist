@@ -5,6 +5,7 @@ import notificationReducer from './reducers/notificationReducer'
 import loginReducer from './reducers/loginReducer'
 import bandReducer from './reducers/bandReducer'
 import pieceReducer from './reducers/pieceReducer'
+import setlistReducer from './reducers/setlistReducer'
 
 const reducer = combineReducers({
   pieces: piecesReducer,
@@ -12,6 +13,7 @@ const reducer = combineReducers({
   band: loginReducer,
   bands: bandReducer,
   piece: pieceReducer,
+  setlists: setlistReducer,
 })
 
 const store = createStore(reducer, applyMiddleware(thunk))

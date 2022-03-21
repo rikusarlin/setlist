@@ -2,8 +2,8 @@ import React from 'react'
 import './App.css'
 import Pieces from './components/Pieces'
 import Piece from './components/Piece'
-import Bands from './components/Bands'
-import Band from './components/Band'
+import Setlists from './components/Setlists'
+import Setlist from './components/Setlist'
 import LoginForm from './components/LoginForm'
 import SignUpForm from './components/SignUpForm'
 import Notification from './components/Notification'
@@ -39,9 +39,9 @@ export const App = (props) => {
     </button>
   )
 
-  const bandById = (id) => {
-    if (props.band !== null) {
-      return props.bands.find((a) => a.id === id)
+  const setlistById = (id) => {
+    if (props.setlists !== null) {
+      return props.setlists.find((a) => a.id === id)
     } else {
       return null
     }
@@ -60,8 +60,8 @@ export const App = (props) => {
                   </Link>
                 </div>
                 <div className="nav-item">
-                  <Link className="nav-link" to="/bands">
-                    bands
+                  <Link className="nav-link" to="/setlists">
+                    setlists
                   </Link>
                 </div>
                 <div className="nav-item">{logoutForm()}</div>
@@ -100,11 +100,13 @@ export const App = (props) => {
                 </div>
               )}
             />
-            <Route exact path="/bands" render={() => <Bands />} />
+            <Route exact path="/setlists" render={() => <Setlists />} />
             <Route
               exact
-              path="/bands/:id"
-              render={({ match }) => <Band band={bandById(match.params.id)} />}
+              path="/setlists/:id"
+              render={({ match }) => (
+                <Setlist setlistId={setlistById(match.params.id)} />
+              )}
             />
             <Route
               exact
@@ -161,7 +163,7 @@ export const App = (props) => {
 const mapStateToProps = (state) => {
   return {
     band: state.band,
-    bands: state.bands,
+    setlists: state.setlists,
     pieces: state.pieces,
   }
 }

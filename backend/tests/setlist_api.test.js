@@ -139,9 +139,9 @@ describe('insert piece to setlist', () => {
   test('number of pieces in setlist increases when a new piece is added', async () => {
     const setlistsAtBeginning = await setlistsInDb()
     await api
-      .post(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
     const setlistsAtEnd = await setlistsInDb()
     expect(setlistsAtEnd[0].pieces.length).toBe(
@@ -151,9 +151,9 @@ describe('insert piece to setlist', () => {
   test('an inserted piece in setlist can be found after addition', async () => {
     const setlistsAtBeginning = await setlistsInDb()
     const response = await api
-      .post(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
     const pieceTitles = response.body.pieces.map((piece) => piece.title)
     expect(pieceTitles).toContain(piece2.title)
@@ -161,7 +161,7 @@ describe('insert piece to setlist', () => {
   test('addition fails with 404 and message if setlist is not found', async () => {
     var randomId = mongoose.Types.ObjectId()
     const response = await api
-      .post(`/api/setlist/${randomId}/${piece2.id}`)
+      .put(`/api/setlist/${randomId}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(404)
     expect(response.body.error).toContain('setlist not found')
@@ -170,7 +170,7 @@ describe('insert piece to setlist', () => {
     const setlistsAtBeginning = await setlistsInDb()
     var randomId = mongoose.Types.ObjectId()
     const response = await api
-      .post(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}`)
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}`)
       .set('Authorization', `bearer ${token}`)
       .expect(404)
     expect(response.body.error).toContain('piece not found')
@@ -178,7 +178,7 @@ describe('insert piece to setlist', () => {
   test('cannot add a piece to setlist if it already has been added', async () => {
     const setlistsAtBeginning = await setlistsInDb()
     const response = await api
-      .post(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(400)
     expect(response.body.error).toContain('piece is already in setlist')
@@ -186,7 +186,7 @@ describe('insert piece to setlist', () => {
   test('need to be authorized', async () => {
     const setlistsAtBeginning = await setlistsInDb()
     await api
-      .post(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
       .expect(401)
   })
 })

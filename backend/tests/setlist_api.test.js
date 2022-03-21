@@ -293,6 +293,125 @@ describe('delete setlist', () => {
   })
 })
 
+describe('move pieces in setlist', () => {
+  test('2nd piece in list becomes 1st when moved up', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistsBeforeUpdate = await setlistsInDb()
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
+      (item) => item.id === piece2.id
+    )
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/up`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+    const setlistsAfterUpdate = await setlistsInDb()
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
+      (item) => item.id === piece2.id
+    )
+    expect(indexBeforeUpdate).toBe(indexAfterUpdate + 1)
+  })
+  test('1st piece in list stays 1st when moved up', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistsBeforeUpdate = await setlistsInDb()
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
+      (item) => item.id === piece.id
+    )
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/up`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+    const setlistsAfterUpdate = await setlistsInDb()
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
+      (item) => item.id === piece.id
+    )
+    expect(indexBeforeUpdate).toBe(indexAfterUpdate)
+  })
+  test('1st piece in list becomes 2nd when moved down', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistsBeforeUpdate = await setlistsInDb()
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
+      (item) => item.id === piece.id
+    )
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/down`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+    const setlistsAfterUpdate = await setlistsInDb()
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
+      (item) => item.id === piece.id
+    )
+    expect(indexBeforeUpdate).toBe(indexAfterUpdate - 1)
+  })
+  test('last piece in list stays last when moved down', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistsBeforeUpdate = await setlistsInDb()
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
+      (item) => item.id === piece2.id
+    )
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/down`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+    const setlistsAfterUpdate = await setlistsInDb()
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
+      (item) => item.id === piece2.id
+    )
+    expect(indexBeforeUpdate).toBe(indexAfterUpdate)
+  })
+  test('moving fails with 404 and message if setlist is not found', async () => {
+    var randomId = mongoose.Types.ObjectId()
+    const response = await api
+      .put(`/api/setlist/${randomId}/${piece2.id}/up`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(404)
+    expect(response.body.error).toContain('setlist not found')
+  })
+  test('addition fails with 404 and message if piece is not found', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    var randomId = mongoose.Types.ObjectId()
+    const response = await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}/down`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(404)
+    expect(response.body.error).toContain('piece not found')
+  })
+  test('fail with 404 if moving a piece that is not in setlist', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    const response = await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/down`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(404)
+    expect(response.body.error).toContain('piece not in setlist')
+  })
+  test('fails with 400 if moving direction is not up or down', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    const response = await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/sideways`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(400)
+    expect(response.body.error).toContain(
+      'invalid direction, only up and down are allowed'
+    )
+  })
+  test('need to be authorized', async () => {
+    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .expect(401)
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()

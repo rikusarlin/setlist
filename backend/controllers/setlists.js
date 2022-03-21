@@ -64,12 +64,12 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       response.status(404).json({ error: `piece not found` })
     }
 
-    const setlist = await Setlist.findById(request.params.setlistid)
+    var setlist = await Setlist.findById(request.params.setlistid)
     if (!setlist) {
       response.status(404).json({ error: `setlist not found` })
     }
 
-    var pieceIndex = setlist.pieces.indexOf(piece.id)
+    const pieceIndex = setlist.pieces.indexOf(piece.id)
     if (pieceIndex >= 0) {
       response.status(400).json({
         error: `piece is already in setlist`,
@@ -90,43 +90,65 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
   }
 })
 
-setlistRouter.post('/:setlistid/:pieceid/up', async (request, response, next) => {
-  try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!request.token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
+const arraymove = (arr, fromIndex, toIndex) => {
+  var element = arr[fromIndex]
+  arr.splice(fromIndex, 1)
+  arr.splice(toIndex, 0, element)
+}
+
+setlistRouter.put(
+  '/:setlistid/:pieceid/:dir',
+  async (request, response, next) => {
+    try {
+      const decodedToken = jwt.verify(request.token, process.env.SECRET)
+      if (!request.token || !decodedToken.id) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+      }
+
+      const piece = await Piece.findById(request.params.pieceid)
+      if (!piece) {
+        response.status(404).json({ error: `piece not found` })
+      }
+
+      var setlist = await Setlist.findById(request.params.setlistid)
+      if (!setlist) {
+        response.status(404).json({ error: `setlist not found` })
+      }
+
+      const pieceIndex = setlist.pieces.indexOf(piece.id)
+      if (pieceIndex < 0) {
+        response.status(404).json({
+          error: `piece not in setlist`,
+        })
+      }
+
+      if (request.params.dir == 'up') {
+        if (pieceIndex > 0) {
+          arraymove(setlist.pieces, pieceIndex, pieceIndex - 1)
+          await setlist.save()
+        }
+      } else if (request.params.dir == 'down') {
+        if (pieceIndex < setlist.pieces.length - 1) {
+          arraymove(setlist.pieces, pieceIndex, pieceIndex + 1)
+          await setlist.save()
+        }
+      } else {
+        response.status(400).json({
+          error: `invalid direction, only up and down are allowed`,
+        })
+      }
+
+      const updatedSetlist = await Setlist.findById(setlist.id, {
+        name: 1,
+      }).populate('pieces', { title: 1, artist: 1, id: 1 })
+
+      response.status(200).json(updatedSetlist)
+    } catch (error) {
+      logger.error('error: ' + error)
+      next(error)
     }
-
-    const piece = await Piece.findById(request.params.pieceid)
-    if (!piece) {
-      response.status(404).json({ error: `piece not found` })
-    }
-
-    const setlist = await Setlist.findById(request.params.setlistid)
-    if (!setlist) {
-      response.status(404).json({ error: `setlist not found` })
-    }
-
-    var pieceIndex = setlist.pieces.indexOf(piece.id)
-    if (pieceIndex < 0) {
-      response.status(400).json({
-        error: `piece not in setlist`,
-      })
-    }
-
-    //setlist.pieces = setlist.pieces.concat(piece.id)
-    //await setlist.save()
-
-    const updatedSetlist = await Setlist.findById(setlist.id, {
-      name: 1,
-    }).populate('pieces', { title: 1, artist: 1, id: 1 })
-
-    response.status(201).json(updatedSetlist)
-  } catch (error) {
-    logger.error('error: ' + error)
-    next(error)
   }
-})
+)
 
 setlistRouter.delete(
   '/:setlistid/:pieceid',
@@ -142,12 +164,12 @@ setlistRouter.delete(
         response.status(404).json({ error: `piece not found` })
       }
 
-      const setlist = await Setlist.findById(request.params.setlistid)
+      var setlist = await Setlist.findById(request.params.setlistid)
       if (!setlist) {
         response.status(404).json({ error: `setlist not found` })
       }
 
-      var pieceIndex = setlist.pieces.indexOf(piece.id)
+      const pieceIndex = setlist.pieces.indexOf(piece.id)
       if (pieceIndex >= 0) {
         setlist.pieces.splice(pieceIndex, 1)
         await setlist.save()
@@ -178,7 +200,10 @@ setlistRouter.delete('/:id', async (req, res, next) => {
     }
 
     // Can delete setlist from own band only
-    if ((new String(setlistToDelete.band).valueOf()) != (new String(decodedToken.id).valueOf())) {
+    if (
+      new String(setlistToDelete.band).valueOf() !=
+      new String(decodedToken.id).valueOf()
+    ) {
       return res.status(404).end()
     }
 
@@ -196,6 +221,5 @@ setlistRouter.delete('/:id', async (req, res, next) => {
     next(error)
   }
 })
-
 
 module.exports = setlistRouter

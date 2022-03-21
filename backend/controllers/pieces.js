@@ -88,6 +88,11 @@ piecesRouter.delete('/:id', async (req, res, next) => {
       return res.status(204).end()
     }
 
+    // Can delete piece from own band only
+    if ((new String(pieceToDelete.band).valueOf()) != (new String(decodedToken.id).valueOf())) {
+      return res.status(404).end()
+    }
+
     // Delete piece from setlists, if any
     const setlistsWithPiece = await Setlist.find({
       pieces: { _id: req.params.id },

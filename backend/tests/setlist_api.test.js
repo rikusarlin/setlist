@@ -250,6 +250,50 @@ describe('delete piece from setlist', () => {
   })
 })
 
+describe('delete setlist', () => {
+  test('deletion succeeds with a valid id', async () => {
+    const setlistsAtStart = await setlistsInDb()
+    const setlistToDelete = setlistsAtStart[0]
+    await api
+      .delete(`/api/setlist/${setlistToDelete.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(204)
+    const setlistsAfterDelete = await setlistsInDb()
+    expect(setlistsAfterDelete.length).toBe(setlistsAtStart.length - 1)
+  })
+  test('succeeds with 204 status when called with non-existing but valid id', async () => {
+    await api
+      .delete('/api/setlist/5dfa698896cfe676450a2916')
+      .set('Authorization', `bearer ${token}`)
+      .expect(204)
+  })
+  test('fails with 404 status trying to delete other bands setlist', async () => {
+    var newBand2 = bandHelper.newBand
+    newBand2.username = testUtil.randomStr(16)
+    await api.post('/api/bands').send(newBand2)
+    const res = await api.post('/api/login').send({
+      username: newBand2.username,
+      password: bandHelper.newBand.password,
+    })
+    const token2 = res.body.token
+    const setlistsAtStart = await setlistsInDb()
+    const setlistToDelete = setlistsAtStart[0]
+    await api
+      .delete(`/api/setlist/${setlistToDelete.id}`)
+      .set('Authorization', `bearer ${token2}`)
+      .expect(404)
+    const setlistsAfterDelete = await setlistsInDb()
+    expect(setlistsAfterDelete.length).toBe(setlistsAtStart.length)
+  })
+  test('invalid id results in 400 status', async () => {
+    await api
+      .delete('/api/setlist/3457896543')
+      .set('Authorization', `bearer ${token}`)
+      .expect(400)
+  })
+})
+
+
 afterAll(() => {
   mongoose.connection.close()
 })

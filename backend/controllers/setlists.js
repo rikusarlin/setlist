@@ -90,6 +90,44 @@ setlistRouter.post('/:setlistid/:pieceid', async (request, response, next) => {
   }
 })
 
+setlistRouter.post('/:setlistid/:pieceid/up', async (request, response, next) => {
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!request.token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    const piece = await Piece.findById(request.params.pieceid)
+    if (!piece) {
+      response.status(404).json({ error: `piece not found` })
+    }
+
+    const setlist = await Setlist.findById(request.params.setlistid)
+    if (!setlist) {
+      response.status(404).json({ error: `setlist not found` })
+    }
+
+    var pieceIndex = setlist.pieces.indexOf(piece.id)
+    if (pieceIndex < 0) {
+      response.status(400).json({
+        error: `piece not in setlist`,
+      })
+    }
+
+    //setlist.pieces = setlist.pieces.concat(piece.id)
+    //await setlist.save()
+
+    const updatedSetlist = await Setlist.findById(setlist.id, {
+      name: 1,
+    }).populate('pieces', { title: 1, artist: 1, id: 1 })
+
+    response.status(201).json(updatedSetlist)
+  } catch (error) {
+    logger.error('error: ' + error)
+    next(error)
+  }
+})
+
 setlistRouter.delete(
   '/:setlistid/:pieceid',
   async (request, response, next) => {
@@ -126,5 +164,38 @@ setlistRouter.delete(
     }
   }
 )
+
+setlistRouter.delete('/:id', async (req, res, next) => {
+  try {
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    if (!req.token || !decodedToken.id) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+    let setlistToDelete = await Setlist.findById(req.params.id)
+
+    if (!setlistToDelete) {
+      return res.status(204).end()
+    }
+
+    // Can delete setlist from own band only
+    if ((new String(setlistToDelete.band).valueOf()) != (new String(decodedToken.id).valueOf())) {
+      return res.status(404).end()
+    }
+
+    // Delete setlist from band
+    const band = await Band.findById(setlistToDelete.band._id)
+    var setlistIndex = band.setlists.indexOf(req.params.id)
+    band.setlists.splice(setlistIndex, 1)
+    await band.save()
+    await Setlist.findByIdAndRemove(req.params.id).setOptions({
+      useFindAndModify: false,
+    })
+    return res.status(204).end()
+  } catch (error) {
+    logger.error('error: ' + error)
+    next(error)
+  }
+})
+
 
 module.exports = setlistRouter

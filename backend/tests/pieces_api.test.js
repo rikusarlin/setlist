@@ -165,6 +165,24 @@ describe('delete piece', () => {
       .set('Authorization', `bearer ${token}`)
       .expect(204)
   })
+  test('fails with 404 status trying to delete other bands piece', async () => {
+    var newBand2 = bandHelper.newBand
+    newBand2.username = testUtil.randomStr(16)
+    await api.post('/api/bands').send(newBand2)
+    const res = await api.post('/api/login').send({
+      username: newBand2.username,
+      password: bandHelper.newBand.password,
+    })
+    const token2 = res.body.token
+    const piecesAtStart = await helper.piecesInDb()
+    const pieceToDelete = piecesAtStart[0]
+    await api
+      .delete(`/api/pieces/${pieceToDelete.id}`)
+      .set('Authorization', `bearer ${token2}`)
+      .expect(404)
+    const piecesAfterDelete = await helper.piecesInDb()
+    expect(piecesAfterDelete.length).toBe(piecesAtStart.length)
+  })
   test('invalid id results in 400 status', async () => {
     await api
       .delete('/api/pieces/3457896543')

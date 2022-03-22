@@ -2,17 +2,30 @@ import React from 'react'
 import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import {
-  deletePieceFromSetlist,
-  movePieceDown,
-  movePieceUp,
-} from '../reducers/setlistReducer'
+import { deletePieceFromSetlist, movePiece } from '../reducers/setlistReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 export const SetlistNoHistory = (props) => {
-  if (props.piece === undefined || props.piece === null) {
-    return <div />
+  const setlistById = (id) => {
+    if (props.setlists !== null) {
+      var setlist = props.setlists.find((a) => a.id === id)
+      return setlist
+    } else {
+      return null
+    }
+  }
+
+  if (
+    setlistById(props.setlistId) === undefined ||
+    setlistById(props.setlistId) === null ||
+    setlistById(props.setlistId).pieces.length === 0
+  ) {
+    return (
+      <div>
+        <h2>Setlist is empty!</h2>
+      </div>
+    )
   }
 
   const handleDeleteFromSetlist = async () => {
@@ -25,24 +38,21 @@ export const SetlistNoHistory = (props) => {
     }
   }
 
-  const handleMovePieceDown = async (event) => {
-    props.movePieceDown(props.setlistId, event.target.value)
+  const handleMovePieceUp = async (event) => {
+    props.movePiece(props.setlistId, event.target.value, 'up', props.band.token)
   }
 
-  const handleMovePieceUp = async (event) => {
-    props.movePieceUp(props.setlistId, event.target.value)
+  const handleMovePieceDown = async (event) => {
+    props.movePiece(
+      props.setlistId,
+      event.target.value,
+      'down',
+      props.band.token
+    )
   }
 
   const returnToSetlists = () => {
     props.history.push('/setlists')
-  }
-
-  const setlistById = (id) => {
-    if (props.setlists !== null) {
-      return props.setlists.find((a) => a.id === id)
-    } else {
-      return null
-    }
   }
 
   const pieceList = setlistById(props.setlistId).pieces.map((piece) => (
@@ -116,8 +126,7 @@ const mapDispatchToProps = {
   showInfo,
   showError,
   deletePieceFromSetlist,
-  movePieceUp,
-  movePieceDown,
+  movePiece,
 }
 
 const Setlist = withRouter(SetlistNoHistory)

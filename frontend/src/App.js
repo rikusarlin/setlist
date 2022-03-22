@@ -9,6 +9,7 @@ import SignUpForm from './components/SignUpForm'
 import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
 import NewPiece from './components/NewPiece'
+import NewSetlist from './components/NewSetlist'
 import ResetPasswordForm from './components/ResetPasswordForm'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -100,12 +101,21 @@ export const App = (props) => {
                 </div>
               )}
             />
-            <Route exact path="/setlists" render={() => <Setlists />} />
             <Route
               exact
-              path="/setlists/:id"
+              path="/setlists"
+              render={() => (
+                <div>
+                  <NewSetlist />
+                  <Setlists />
+                </div>
+              )}
+            />
+            <Route
+              exact
+              path="/setlist/:id"
               render={({ match }) => (
-                <Setlist setlistId={setlistById(match.params.id)} />
+                <Setlist setlistId={setlistById(match.params.id).id} />
               )}
             />
             <Route

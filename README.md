@@ -10,11 +10,13 @@ Backend
 
 - adding bands
 - login
+- password reset
 - CRUD operations for pieces
 - transposing pieces
-- (CRUD operations for bands)
-- (CRUD operations for bands' setlists)
-- (Adding and removing pieces to/from setlists)
+- CRUD operations for bands
+- CRUD operations for bands' setlists
+- Adding and removing pieces to/from setlists
+- Moving pieces up/down in setlists
 
 Frontend
 
@@ -23,11 +25,12 @@ Frontend
 - adding and deleting pieces
 - modifying pieces
 - transposing pieces
-- (sign up / adding a band)
-- (adding and deleting setlists)
-- (adding and removing pieces to/from setlists)
+- sign up / adding a band
+- resettting band password
+- adding and deleting setlists
+- adding and removing pieces to/from setlists
 - ("playing" pieces with desired speed)
-- (ensure that view is changed if another band member changes view, such as selects another piece)
+- (ensure that view is changed if another band member changes view, such as selects next piece in setlist)
 
 It is assumed that pieces are represented in text files in the following style:
 

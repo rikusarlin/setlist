@@ -1,22 +1,22 @@
-
-import { createStore, combineReducers, applyMiddleware } from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import piecesReducer from './reducers/piecesReducer'
-import pieceReducer from './reducers/pieceReducer'
 import notificationReducer from './reducers/notificationReducer'
 import loginReducer from './reducers/loginReducer'
-import userReducer from './reducers/userReducer'
-import analyzeReducer from './reducers/analyzeReducer'
+import bandReducer from './reducers/bandReducer'
+import pieceReducer from './reducers/pieceReducer'
+import setlistReducer from './reducers/setlistReducer'
 
 const reducer = combineReducers({
   pieces: piecesReducer,
-  piece: pieceReducer,
   notification: notificationReducer,
-  user: loginReducer,
-  users: userReducer,
-  analyzedPiece: analyzeReducer
+  band: loginReducer,
+  bands: bandReducer,
+  piece: pieceReducer,
+  setlists: setlistReducer,
 })
 
-const store = createStore(reducer, applyMiddleware(thunk))
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)))
 
 export default store

@@ -1,230 +1,279 @@
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
+const bandHelper = require('./bands_test_helper')
+const testUtil = require('./test_utils')
+
+var token
 
 // Define console functions so that they exist...
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }
 
 const introInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': '[Intro]'
+  contents: '[Intro]',
 }
 const introOutput1 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[{
-        'rowNumber': 1,
-        'rowType': 'Label',
-        'contents': '[Intro]'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+      ],
+    },
   ],
 }
 
 const introInput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': '  begin with [Intro]'
+  contents: '  begin with [Intro]',
 }
 const introOutput2 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[{
-        'rowNumber': 1,
-        'rowType': 'Label',
-        'contents': '  begin with [Intro]'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '  begin with [Intro]',
+        },
+      ],
+    },
   ],
 }
 
 const chordInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': 'C Em G'
+  contents: 'C Em G',
 }
 const chordOutput1 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[{
-        'rowNumber': 1,
-        'rowType': 'Chords',
-        'contents': 'C Em G'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Chords',
+          contents: 'C Em G',
+        },
+      ],
+    },
   ],
 }
 
 const chordInput2 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': 'C Hm B'
+  contents: 'C Hm B',
 }
 const chordOutput2 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[{
-        'rowNumber': 1,
-        'rowType': 'Chords',
-        'contents': 'C Bm Bb'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Chords',
+          contents: 'C Bm Bb',
+        },
+      ],
+    },
   ],
 }
 
 const chordInput3 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': 'C Bm Bb'
+  contents: 'C Bm Bb',
 }
 const chordOutput3 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':  [{
-        'rowNumber': 1,
-        'rowType': 'Chords',
-        'contents': 'C Bm Bb'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Chords',
+          contents: 'C Bm Bb',
+        },
+      ],
+    },
   ],
 }
 
 const songInput1 = {
-  'title':'title1',
-  'artist':'artist1',
-  'bpm':60,
-  'pages': [
+  title: 'title1',
+  artist: 'artist1',
+  bpm: 60,
+  pages: [
     {
-      'pageNumber':1,
-      'rows':[]
-    }
+      pageNumber: 1,
+      rows: [],
+    },
   ],
-  'contents': '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine'
+  contents: '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine',
 }
 const songOutput1 = {
-  'pages': [
+  pages: [
     {
-      'pageNumber':1,
-      'rows':  [  {
-        'rowNumber': 1,
-        'rowType': 'Label',
-        'contents': '[Intro]'
-      },
-      {
-        'rowNumber': 2,
-        'rowType': 'Chords',
-        'contents': 'C Bm Bb'
-      },
-      {
-        'rowNumber': 3,
-        'rowType': 'Label',
-        'contents': '[Verse 1]'
-      },
-      {
-        'rowNumber': 4,
-        'rowType': 'Chords',
-        'contents': 'C Bm Bb'
-      },
-      {
-        'rowNumber': 5,
-        'rowType': 'Lyrics',
-        'contents': 'Hey mama doing fine'
-      }]
-    }
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+        {
+          rowNumber: 2,
+          rowType: 'Chords',
+          contents: 'C Bm Bb',
+        },
+        {
+          rowNumber: 3,
+          rowType: 'Label',
+          contents: '[Verse 1]',
+        },
+        {
+          rowNumber: 4,
+          rowType: 'Chords',
+          contents: 'C Bm Bb',
+        },
+        {
+          rowNumber: 5,
+          rowType: 'Lyrics',
+          contents: 'Hey mama doing fine',
+        },
+      ],
+    },
   ],
 }
 
+beforeAll(async () => {
+  var newBand = bandHelper.newBand
+  newBand.username = testUtil.randomStr(16)
+  await api.post('/api/bands').send(newBand)
+  const res = await api.post('/api/login').send({
+    username: newBand.username,
+    password: bandHelper.newBand.password,
+  })
+  token = res.body.token
+})
+
 describe('single rows', () => {
   test('single rows row beginning with angle bracket is recognized as label', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(introInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(introOutput1.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      introOutput1.pages[0].rows
+    )
     done()
   })
   test('single rows row having an angle bracket is recognized as label', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(introInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(introOutput2.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      introOutput2.pages[0].rows
+    )
     done()
   })
   test('row with chrods is recognised as chords', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(chordOutput1.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      chordOutput1.pages[0].rows
+    )
     done()
   })
   test('row with German chrods is recognised as chords and translated into English notation', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(chordOutput2.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      chordOutput2.pages[0].rows
+    )
     done()
   })
   test('English chords remain English chords', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(chordInput3)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(chordOutput3.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      chordOutput3.pages[0].rows
+    )
     done()
   })
 })
 
 describe('song analysis', () => {
   test('5 row piece is correctly analyzed', async (done) => {
-    const response = await api.post('/api/analyze')
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
       .send(songInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -234,5 +283,5 @@ describe('song analysis', () => {
 })
 
 afterAll(async () => {
-  await new Promise(resolve => setTimeout(() => resolve(), 500))
+  await new Promise((resolve) => setTimeout(() => resolve(), 500))
 })

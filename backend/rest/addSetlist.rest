@@ -1,0 +1,10 @@
+post http://localhost:3003/api/setlist
+Content-Type: application/json
+Accept: application/json
+Authorization: bearer xxx
+
+{
+    "name":"IT Christmas party 2021-11-26"
+}
+
+

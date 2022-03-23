@@ -1,65 +1,136 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { fetchPieces } from '../reducers/piecesReducer'
-import { clearAnalysis } from '../reducers/analyzeReducer'
+import { fetchSetlists, addPieceToSetlist } from '../reducers/setlistReducer'
+import { showInfo, showError } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 
 export const PiecesNoHistory = (props) => {
-  var token=props.user.token
-  var getPieces = props.fetchPieces
+  const [selectedSetlist, setSelectedSetlist] = useState('choose')
   useEffect(() => {
-    getPieces(props.id, token)
-  }, [token, getPieces])
+    const fetchData = async () => {
+      await props.fetchPieces(props.band.token)
+      await props.fetchSetlists(props.band.token)
+    }
+    fetchData()
+  }, [props.band.token])
 
   const moveToNewPiece = () => {
-    props.clearAnalysis()
     props.history.push('/newpiece')
   }
 
-  if(props.pieces !== null){
-    const sortedPieces = props.pieces.sort((a,b) => a.title.localeCompare(b.title) )
-    const pieceList = sortedPieces.map(piece =>
-      <tr key={piece.id}>
-        <td>
-          <Link data-cy="piece-link" to={`/piece/${piece.id}`}>{piece.title}</Link>
-        </td>
-      </tr>
-    )
+  const handleAdd = async (setlistId, pieceId) => {
+    try {
+      console.log(`addToSetList, setlistId: ${setlistId}, pieceId: ${pieceId}`)
+      if (setlistId !== 'choose') {
+        await props.addPieceToSetlist(setlistId, pieceId, props.band.token)
+        props.showInfo('added piece to setlist', 3)
+      }
+    } catch (exception) {
+      console.log('exception: ' + exception)
+      props.showError('error in adding piece to setlist', 3)
+    }
+  }
 
-    if(props.user.user !== null){
-      return(
+  if (props.pieces !== null) {
+    /*
+    const sortedPieces = props.pieces.sort((a, b) =>
+      a.title.localeCompare(b.title)
+    )
+    const sortedSetlists = props.setlists.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    )
+    */
+    const chooseOne = [
+      {
+        id: 'choose',
+        name: '(Choose)',
+      },
+    ]
+    const sortedSetlists2 = chooseOne.concat(props.setlists)
+
+    const setListOptions = sortedSetlists2.map((setlist, index) => {
+      const retVal = (
+        <option key={index} value={setlist.id}>
+          {setlist.name}
+        </option>
+      )
+      return retVal
+    })
+    const pieceList = props.pieces.map((piece, index) => (
+      <div key={index} className="row">
+        <div className="col-sm-4">
+          <Link data-cy="piece-link" to={`/piece/${piece.id}`}>
+            {piece.title}
+          </Link>
+        </div>
+        <div className="col-sm-1">
+          <Link data-cy="piece-link" to={`/editpiece/${piece.id}`}>
+            Edit
+          </Link>
+        </div>
+        <div className="col-sm-6">
+          <select
+            value={selectedSetlist.value}
+            data-cy="cy_id_setlist"
+            name="setlist"
+            onChange={(e) => {
+              console.log('Changing selected setlist to: ' + e.target.value)
+              setSelectedSetlist(e.target.value)
+            }}
+          >
+            {setListOptions}
+          </select>
+          <button
+            type="basic"
+            data-cy="add_to_setlist"
+            value={piece.id}
+            className="ml-2 py-0 btn btn-primary"
+            onClick={(e) => {
+              handleAdd(selectedSetlist, e.target.value)
+            }}
+          >
+            add to setlist
+          </button>
+        </div>
+      </div>
+    ))
+
+    if (props.band.username !== null) {
+      return (
         <div>
-          <button onClick={moveToNewPiece} data-cy="new-piece" className="btn btn-primary">New piece</button>
-          <Table striped>
-            <tbody>
-              {pieceList}
-            </tbody>
-          </Table>
+          <div className="container striped">{pieceList}</div>
+          <button
+            onClick={moveToNewPiece}
+            data-cy="new-piece"
+            className="btn btn-primary"
+          >
+            New piece
+          </button>
         </div>
       )
     }
   }
-  return(<div/>)
+  return <div />
 }
-
 
 const mapStateToProps = (state) => {
   return {
     pieces: state.pieces,
-    user: state.user
+    band: state.band,
+    setlists: state.setlists,
   }
 }
 
 const mapDispatchToProps = {
   fetchPieces,
-  clearAnalysis
+  addPieceToSetlist,
+  fetchSetlists,
+  showInfo,
+  showError,
 }
 
 const Pieces = withRouter(PiecesNoHistory)
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Pieces)
+export default connect(mapStateToProps, mapDispatchToProps)(Pieces)

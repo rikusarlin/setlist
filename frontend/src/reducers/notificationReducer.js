@@ -1,10 +1,10 @@
 const initialState = {
   type: 'EMPTY',
-  message: ''
+  message: '',
 }
 
 export const showInfo = (message, timeoutSec) => {
-  return async dispatch => {
+  return async (dispatch) => {
     await dispatch(showNotification(message, 'INFO'))
     setTimeout(() => {
       dispatch(hideNotification())
@@ -13,7 +13,7 @@ export const showInfo = (message, timeoutSec) => {
 }
 
 export const showError = (message, timeoutSec) => {
-  return async dispatch => {
+  return async (dispatch) => {
     await dispatch(showNotification(message, 'ERROR'))
     setTimeout(() => {
       dispatch(hideNotification())
@@ -24,7 +24,7 @@ export const showError = (message, timeoutSec) => {
 export const hideNotification = () => {
   return {
     type: 'HIDE',
-    data: { }
+    data: {},
   }
 }
 
@@ -33,8 +33,8 @@ export const showNotification = (message, type) => {
     type: 'SHOW',
     data: {
       message: message,
-      type: type
-    }
+      type: type,
+    },
   }
 }
 
@@ -42,15 +42,15 @@ const notificationReducer = (state = initialState, action) => {
   console.log('state before action in notificationReducer: ', state)
   console.log('action in notificationReducer', action)
 
-  switch(action.type) {
-  case 'SHOW':
-    state = action.data
-    return state
-  case 'HIDE':
-    state = initialState
-    return state
-  default:
-    return state
+  switch (action.type) {
+    case 'SHOW':
+      state = action.data
+      return state
+    case 'HIDE':
+      state = initialState
+      return state
+    default:
+      return state
   }
 }
 

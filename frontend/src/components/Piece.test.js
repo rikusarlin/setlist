@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/extend-expect'
 import { render, cleanup } from '@testing-library/react'
 import { PieceNoHistory as Piece } from './Piece'
 
-
 describe('<Piece />', () => {
   let component
 
@@ -15,30 +14,32 @@ describe('<Piece />', () => {
     let user = {
       name: 'Riku Sarlin',
       username: 'rikusarlin',
-      token: '438765436298'
+      token: '438765436298',
     }
     let piece = {
       id: '432342',
       title: 'Knocking on Heavens Door',
       artist: 'Bob Dylan',
       bpm: '60',
-      pages: [{
-        id: '32344',
-        rows: [
-          {
-            'id': '43434321',
-            'rowNumber': 1,
-            'rowType': 'Chords',
-            'contents': 'G              D            Am'
-          },
-          {
-            'id': '987438',
-            'rowNumber': 2,
-            'rowType': 'Lyrics',
-            'contents': 'Mama take this badge off of me'
-          },
-        ]
-      }]
+      pages: [
+        {
+          id: '32344',
+          rows: [
+            {
+              id: '43434321',
+              rowNumber: 1,
+              rowType: 'Chords',
+              contents: 'G              D            Am',
+            },
+            {
+              id: '987438',
+              rowNumber: 2,
+              rowType: 'Lyrics',
+              contents: 'Mama take this badge off of me',
+            },
+          ],
+        },
+      ],
     }
     component = render(
       <Piece
@@ -65,5 +66,4 @@ describe('<Piece />', () => {
     expect(div).toHaveTextContent('G              D            Am')
     expect(div).toHaveTextContent('Mama take this badge off of me')
   })
-
 })

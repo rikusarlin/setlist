@@ -1,11 +1,11 @@
 const user = {
   username: 'tester',
   token: '1231231214',
-  name: 'Donald Tester'
+  name: 'Donald Tester',
 }
 
 const login = (credentials) => {
-  console.log('credentials: ',credentials)
+  console.log('credentials: ', credentials)
   return Promise.resolve(user)
 }
 

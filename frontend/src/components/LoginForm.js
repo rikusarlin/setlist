@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { login } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import  { useField } from '../hooks'
+import { useField } from '../hooks'
 import { removeReset } from '../utils'
 import { withRouter } from 'react-router-dom'
 
@@ -22,40 +22,87 @@ export const LoginFormNoHistory = (props) => {
       // Always begin with a known address
       props.history.push('/pieces')
     } catch (exception) {
-      console.log('exception: '+exception)
-      props.showError('wrong username or password',3)
+      console.log('exception: ' + exception)
+      props.showError('wrong username or password', 3)
     }
   }
 
+  const handleSignUp = async () => {
+    props.history.push('/signup')
+  }
+
+  const handleResetPassword = async () => {
+    props.history.push('/reset-password')
+  }
+
   return (
-    <div>
-      <h3>Login</h3>
+    <div className="container">
       <form onSubmit={handleLogin}>
         <div className="form-group row">
-          <label htmlFor="Username" className="col-sm-1 col-form-label">Username</label>
+          <h3 className="col-sm-2 px-0">Setlist login</h3>
+        </div>
+        <div className="form-group row">
+          <label htmlFor="Username" className="col-sm-1 col-form-label px-0">
+            Username
+          </label>
           <div className="col-sm-3">
-            <input className="form-control" data-cy="username" {...removeReset(userName)} />
+            <input
+              className="form-control"
+              data-cy="username"
+              {...removeReset(userName)}
+            />
           </div>
         </div>
         <div className="form-group row">
-          <label htmlFor="Password" className="col-sm-1 col-form-label">Password</label>
+          <label htmlFor="Password" className="col-sm-1 col-form-label px-0">
+            Password
+          </label>
           <div className="col-sm-3">
-            <input className="form-control" data-cy="password" {...removeReset(passWord)} />
+            <input
+              className="form-control"
+              data-cy="password"
+              {...removeReset(passWord)}
+            />
           </div>
         </div>
-        <button type="submit" className="btn btn-primary" data-cy="login">login</button>
+        <div className="form-group row">
+          <button
+            type="submit"
+            className="col-sm-2 btn btn-primary mx-1"
+            data-cy="login"
+          >
+            login
+          </button>
+          <button
+            type="button"
+            onClick={handleResetPassword}
+            className="col-sm-2 btn btn-primary mx-1"
+            data-cy="reset password"
+          >
+            reset password
+          </button>
+        </div>
+        <div className="row">
+          <button
+            type="button"
+            onClick={handleSignUp}
+            className="col-sm-2 btn btn-primary mx-1 my-1"
+            data-cy="sign up"
+          >
+            sign up
+          </button>
+        </div>
       </form>
     </div>
   )
 }
 
 const mapDispatchToProps = {
-  login, showInfo, showError
+  login,
+  showInfo,
+  showError,
 }
 
 const LoginForm = withRouter(LoginFormNoHistory)
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(LoginForm)
+export default connect(null, mapDispatchToProps)(LoginForm)

@@ -4,7 +4,7 @@ Accept: application/json
 Authorization: bearer xxx
 
 {
-    "title":"Simple Man",
+    "title":"Simpler Man",
     "artist":"Lynyrd Skynyrd",
     "bpm":60,
     "pages":[

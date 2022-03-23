@@ -6,9 +6,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=prod node index.js",
     "watch": "cross-env NODE_ENV=dev nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles --collectCoverage",
     "start:test": "cross-env NODE_ENV=test node index.js",
-    "lint": "eslint ."
+    "eslint": "eslint .",
+    "format": "prettier --write"
   },
   "repository": {
     "type": "git",
@@ -30,8 +31,11 @@
   "devDependencies": {
     "cross-env": "^6.0.3",
     "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest": "^26.4.2",
     "nodemon": "^2.0.1",
+    "prettier": "^2.5.1",
     "supertest": "^4.0.2"
   },
   "jest": {

@@ -215,7 +215,7 @@ export const EditPieceNoHistory = (props) => {
     )
 
   return (
-    <div>
+    <div className="container">
       <h3>Edit piece</h3>
       <div className="form-group row">
         <label htmlFor="Title" className="col-sm-2 col-form-label">

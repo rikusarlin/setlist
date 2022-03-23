@@ -36,6 +36,13 @@ const deletePieceFromSetlist = async (setlistId, pieceId, token) => {
   return response.data
 }
 
+const deleteSetlist = async (setlistId, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  }
+  await axios.delete(`${baseUrl}/${setlistId}`, config)
+}
+
 const movePieceInSetlist = async (setlistId, pieceId, direction, token) => {
   const config = {
     headers: { Authorization: `bearer ${token}` },
@@ -53,4 +60,5 @@ export default {
   addPieceToSetlist,
   deletePieceFromSetlist,
   movePieceInSetlist,
+  deleteSetlist,
 }

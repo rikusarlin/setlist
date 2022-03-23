@@ -34,6 +34,19 @@ export const addPieceToSetlist = (setlistId, pieceId, token) => {
   }
 }
 
+export const deleteSetlist = (setlistId, token) => {
+  return async (dispatch) => {
+    await setlistService.deleteSetlist(setlistId, token)
+    const deleteData = {
+      id: setlistId,
+    }
+    dispatch({
+      type: 'DELETE_SETLIST',
+      data: deleteData,
+    })
+  }
+}
+
 export const deletePieceFromSetlist = (setlistId, pieceId, token) => {
   return async (dispatch) => {
     const updatedSetlist = await setlistService.deletePieceFromSetlist(
@@ -77,6 +90,9 @@ const reducer = (state = [], action) => {
         state.filter((setlist) => setlist.id !== action.data.id),
         action.data,
       ]
+    }
+    case 'DELETE_SETLIST': {
+      return [state.filter((setlist) => setlist.id !== action.data.id)]
     }
     case 'ADD_PIECE_TO_SETLIST':
       return [

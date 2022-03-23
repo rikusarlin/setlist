@@ -4,6 +4,7 @@ import Pieces from './components/Pieces'
 import Piece from './components/Piece'
 import Setlists from './components/Setlists'
 import Setlist from './components/Setlist'
+import SetlistPiece from './components/SetlistPiece'
 import LoginForm from './components/LoginForm'
 import SignUpForm from './components/SignUpForm'
 import Notification from './components/Notification'
@@ -116,6 +117,16 @@ export const App = (props) => {
               path="/setlist/:id"
               render={({ match }) => (
                 <Setlist setlistId={setlistById(match.params.id).id} />
+              )}
+            />
+            <Route
+              exact
+              path="/setlistpiece/:setlistid/:pieceid"
+              render={({ match }) => (
+                <SetlistPiece
+                  setlistId={setlistById(match.params.setlistid).id}
+                  pieceId={match.params.pieceid}
+                />
               )}
             />
             <Route

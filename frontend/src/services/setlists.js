@@ -24,7 +24,11 @@ const addPieceToSetlist = async (setlistId, pieceId, token) => {
   const config = {
     headers: { Authorization: `bearer ${token}` },
   }
-  const response = await axios.put(`${baseUrl}/${setlistId}/${pieceId}`, config)
+  const response = await axios.put(
+    `${baseUrl}/${setlistId}/${pieceId}`,
+    '',
+    config
+  )
   return response.data
 }
 
@@ -32,7 +36,10 @@ const deletePieceFromSetlist = async (setlistId, pieceId, token) => {
   const config = {
     headers: { Authorization: `bearer ${token}` },
   }
-  const response = await axios.put(`${baseUrl}/${setlistId}/${pieceId}`, config)
+  const response = await axios.delete(
+    `${baseUrl}/${setlistId}/${pieceId}`,
+    config
+  )
   return response.data
 }
 
@@ -49,6 +56,7 @@ const movePieceInSetlist = async (setlistId, pieceId, direction, token) => {
   }
   const response = await axios.put(
     `${baseUrl}/${setlistId}/${pieceId}/${direction}`,
+    '',
     config
   )
   return response.data

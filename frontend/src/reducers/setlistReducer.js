@@ -92,13 +92,18 @@ const reducer = (state = [], action) => {
       ]
     }
     case 'DELETE_SETLIST': {
-      return [state.filter((setlist) => setlist.id !== action.data.id)]
+      const newState = [
+        state.filter((setlist) => setlist.id !== action.data.id),
+      ]
+      return newState
     }
-    case 'ADD_PIECE_TO_SETLIST':
-      return [
+    case 'ADD_PIECE_TO_SETLIST': {
+      const newState = [
         state.filter((setlist) => setlist.id !== action.data.id),
         action.data,
       ]
+      return newState
+    }
     case 'DELETE_PIECE_FROM_SETLIST':
       return [
         state.filter((setlist) => setlist.id !== action.data.id),

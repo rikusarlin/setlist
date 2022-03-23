@@ -76,3 +76,7 @@ code {
   border-style: solid;
   border-radius: 5px;
 }
+
+.striped .row:nth-of-type(odd) {
+  background-color: #e9e9f9;
+}

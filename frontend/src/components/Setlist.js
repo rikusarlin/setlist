@@ -1,5 +1,4 @@
 import React from 'react'
-import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { deletePieceFromSetlist, movePiece } from '../reducers/setlistReducer'
@@ -30,7 +29,11 @@ export const SetlistNoHistory = (props) => {
 
   const handleDeleteFromSetlist = async () => {
     try {
-      props.deletePieceFromSetlist(props.setlistId, props.band.token)
+      props.deletePieceFromSetlist(
+        props.setlistId,
+        event.target.value,
+        props.band.token
+      )
       props.showInfo('piece deleted from setlist', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -55,54 +58,58 @@ export const SetlistNoHistory = (props) => {
     props.history.push('/setlists')
   }
 
-  const pieceList = setlistById(props.setlistId).pieces.map((piece) => (
-    <tr key={piece.id}>
-      <td>
-        <Link data-cy="piece-link" to={`/piece/${piece.id}`}>
+  const pieceList = setlistById(props.setlistId).pieces.map((piece, index) => (
+    <div className="row" key={index}>
+      <div className="col-sm-6">
+        <Link
+          data-cy="piece-link"
+          to={`/setlistpiece/${props.setlistId}/${piece.id}`}
+        >
           {piece.title}
         </Link>
-      </td>
-      <td>
-        <button
-          onClick={handleDeleteFromSetlist}
-          data-cy="delete"
-          className="col-sm-2 mr-2 btn btn-danger"
-          type="button"
-        >
-          delete
-        </button>
-      </td>
-      <td>
+      </div>
+      <div className="col-sm-1">
         <button
           onClick={handleMovePieceUp}
           data-cy="move-piece-down"
-          className="col-sm-2 mr-2 btn btn-primary"
-          id={piece.id}
-          type="button"
-        >
-          down
-        </button>
-      </td>
-      <td>
-        <button
-          onClick={handleMovePieceDown}
-          data-cy="move-piece-down"
-          className="col-sm-2 mr-2 btn btn-primary"
-          id={piece.id}
-          type="button"
+          className="mr-2 py-0 btn btn-primary"
+          value={piece.id}
+          type="basic"
+          disabled={index === 0}
         >
           up
         </button>
-      </td>
-    </tr>
+      </div>
+      <div className="col-sm-1">
+        <button
+          onClick={handleMovePieceDown}
+          data-cy="move-piece-down"
+          className="mr-2 py-0 btn btn-primary"
+          value={piece.id}
+          type="basic"
+          disabled={index === setlistById(props.setlistId).pieces.length - 1}
+        >
+          down
+        </button>
+      </div>
+      <div className="col-sm-2">
+        <button
+          onClick={handleDeleteFromSetlist}
+          data-cy="delete-from-list"
+          className="mr-2 py-0 btn btn-danger"
+          value={piece.id}
+          type="basic"
+        >
+          delete from list
+        </button>
+      </div>
+    </div>
   ))
 
   return (
     <div>
       <h2>{setlistById(props.setlistId).name}</h2>
-      <Table striped>
-        <tbody>{pieceList}</tbody>
-      </Table>
+      <div className="container striped">{pieceList}</div>
 
       <button
         onClick={returnToSetlists}

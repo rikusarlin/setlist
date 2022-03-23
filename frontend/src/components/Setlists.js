@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react'
 import { fetchSetlists, deleteSetlist } from '../reducers/setlistReducer'
+import { showInfo, showError } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
 
 export const SetlistsNoHistory = (props) => {
   useEffect(() => {
-    props.fetchSetlists(props.band.token)
+    const fetchData = async () => {
+      await props.fetchSetlists(props.band.token)
+    }
+    fetchData()
   }, [props.band.token])
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const handleDelete = async (id) => {
     try {
-      await props.deleteSetlist(event.target.value, props.band.token)
+      await props.deleteSetlist(id, props.band.token)
+      await props.fetchSetlists(props.band.token)
       props.showInfo('deleted setlist', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -20,32 +24,46 @@ export const SetlistsNoHistory = (props) => {
     }
   }
 
+  const confirmDelete = (id) => {
+    if (window.confirm(`Really remove setlist?`)) {
+      handleDelete(id)
+    }
+  }
+
   if (props.setlists !== null) {
+    console.log('props.setlists: ' + JSON.stringify(props.setlists))
+    /*
     const sortedSetlists = props.setlists.sort((a, b) =>
       a.name.localeCompare(b.name)
     )
-    const setlistList = sortedSetlists.map((setlist) => (
-      <form key={setlist.id} className="row" submit={handleSubmit}>
-        <div className="col-sm-6">
-          <Link data-cy="setlist-link" to={`/setlist/${setlist.id}`}>
-            {setlist.name}
-          </Link>
+    */
+    const setlistList = props.setlists.map((setlist, index) => {
+      return (
+        <div className="row" key={index}>
+          <div className="col-sm-6">
+            <Link data-cy="setlist-link" to={`/setlist/${setlist.id}`}>
+              {setlist.name}
+            </Link>
+          </div>
+          <div className="col-sm-2">
+            <button
+              type="basic"
+              data-cy="delete_setlist"
+              value={setlist.id}
+              className="btn btn-danger py-0"
+              onClick={(e) => {
+                confirmDelete(e.target.value)
+              }}
+            >
+              delete setlist
+            </button>
+          </div>
         </div>
-        <div className="col-sm-2">
-          <button
-            type="submit"
-            data-cy="delete_setlist"
-            id={setlist.id}
-            className="btn btn-danger"
-          >
-            delete setlist
-          </button>
-        </div>
-      </form>
-    ))
+      )
+    })
 
     if (props.band.username !== null) {
-      return <div className="container">{setlistList}</div>
+      return <div className="container striped">{setlistList}</div>
     }
   }
   return <div />
@@ -61,6 +79,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   fetchSetlists,
   deleteSetlist,
+  showInfo,
+  showError,
 }
 
 const Setlists = withRouter(SetlistsNoHistory)

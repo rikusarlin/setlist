@@ -24,7 +24,7 @@ export const PiecesNoHistory = (props) => {
     try {
       console.log(`addToSetList, setlistId: ${setlistId}, pieceId: ${pieceId}`)
       if (setlistId !== 'choose') {
-        props.addPieceToSetlist(setlistId, pieceId, props.band.token)
+        await props.addPieceToSetlist(setlistId, pieceId, props.band.token)
         props.showInfo('added piece to setlist', 3)
       }
     } catch (exception) {
@@ -34,30 +34,32 @@ export const PiecesNoHistory = (props) => {
   }
 
   if (props.pieces !== null) {
+    /*
     const sortedPieces = props.pieces.sort((a, b) =>
       a.title.localeCompare(b.title)
     )
     const sortedSetlists = props.setlists.sort((a, b) =>
       a.name.localeCompare(b.name)
     )
+    */
     const chooseOne = [
       {
         id: 'choose',
         name: '(Choose)',
       },
     ]
-    const sortedSetlists2 = chooseOne.concat(sortedSetlists)
+    const sortedSetlists2 = chooseOne.concat(props.setlists)
 
-    const setListOptions = sortedSetlists2.map((setlist) => {
+    const setListOptions = sortedSetlists2.map((setlist, index) => {
       const retVal = (
-        <option key={setlist.id} value={setlist.id}>
+        <option key={index} value={setlist.id}>
           {setlist.name}
         </option>
       )
       return retVal
     })
-    const pieceList = sortedPieces.map((piece) => (
-      <div key={piece.id} className="row">
+    const pieceList = props.pieces.map((piece, index) => (
+      <div key={index} className="row">
         <div className="col-sm-4">
           <Link data-cy="piece-link" to={`/piece/${piece.id}`}>
             {piece.title}
@@ -84,7 +86,7 @@ export const PiecesNoHistory = (props) => {
             type="basic"
             data-cy="add_to_setlist"
             value={piece.id}
-            className="mr-2 btn btn-primary"
+            className="ml-2 py-0 btn btn-primary"
             onClick={(e) => {
               handleAdd(selectedSetlist, e.target.value)
             }}
@@ -98,7 +100,7 @@ export const PiecesNoHistory = (props) => {
     if (props.band.username !== null) {
       return (
         <div>
-          <div className="container">{pieceList}</div>
+          <div className="container striped">{pieceList}</div>
           <button
             onClick={moveToNewPiece}
             data-cy="new-piece"

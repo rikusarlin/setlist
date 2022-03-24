@@ -29,7 +29,7 @@ Frontend
 - resettting band password
 - adding and deleting setlists
 - adding and removing pieces to/from setlists
-- ("playing" pieces with desired speed)
+- "playing" pieces with desired speed based on piece length
 - (ensure that view is changed if another band member changes view, such as selects next piece in setlist)
 
 It is assumed that pieces are represented in text files in the following style:

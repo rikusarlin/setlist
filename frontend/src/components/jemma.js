@@ -9,13 +9,20 @@ import { Link, Element } from 'react-scroll'
 export const SetlistPieceNoHistory = (props) => {
   useEffect(() => {
     const fetchData = async () => {
+      console.log('In fetchData, pieceId: ' + props.pieceId)
       await props.fetchPiece(props.pieceId, props.band.token)
+      console.log('In fetchData, piece: ' + JSON.stringify(props.piece))
     }
     fetchData()
   }, [props.pieceId])
 
   if (props.piece === undefined || props.piece === null || props.piece === []) {
     return <div />
+  } else {
+    console.log(
+      'Props.piece is not null or undefined or empty array, but: ' +
+        JSON.stringify(props.piece)
+    )
   }
 
   const returnToSetlist = () => {
@@ -64,54 +71,60 @@ export const SetlistPieceNoHistory = (props) => {
     return lineHeight
   }
 
-  const calculateDuration = (piece) => {
-    const numberOfRows = getNumberOfRows(piece)
+  const calculateDuration = () => {
+    console.log('Piece: ' + JSON.stringify(props.piece))
+    const numberOfRows = getPieceRows().length
     const windowSize = window.innerHeight
-    const lineHeight = calculateLineHeight(document.querySelector('div'))
+    console.log('windowSize: ' + windowSize)
+    const lineHeight = calculateLineHeight(
+      document.querySelector('.cellStyles')
+    )
+    console.log('lineHeight: ' + lineHeight)
     const rowsPerWindow = windowSize / lineHeight
-    // assume reasonable default since bpm need not always be defined
-    let secondsPerRow = (numberOfRows * 1.0) / 180
-    if (parseInt(piece.bpm) !== null && piece.bpm !== 0) {
-      secondsPerRow = (numberOfRows * 1.0) / piece.bpm
+    console.log('rowsPerWindow: ' + rowsPerWindow)
+    const pages = (numberOfRows * 1.0) / rowsPerWindow
+    console.log('pages: ' + pages)
+    // piece.bpm is actually considered the number of seconds the piece is played in band's arrangement
+    const secondsPerRow = (numberOfRows * 1.0) / props.piece.bpm
+    console.log('secondsPerRow: ' + secondsPerRow)
+    const delay = 1000 * (rowsPerWindow * secondsPerRow)
+    console.log('delay: ' + delay)
+    var duration
+    if (pages > 1) {
+      duration = 1000 * (pages - 1 * (rowsPerWindow * secondsPerRow))
+    } else {
+      duration = 0
     }
-    // Have to substract some row because of menu, title, buttons and so on
-    let delay = (rowsPerWindow - 8) * secondsPerRow
-    if (delay < 0) {
-      delay = 0
-    }
-    // We should scroll so that we reach beginning of last page in time
-    const duration = piece.bpm - 2 * ((rowsPerWindow - 8) * secondsPerRow)
-    return [1000 * delay, 1000 * duration]
+    console.log('duration: ' + duration)
+    return [delay, duration]
   }
 
-  const getNumberOfRows = (piece) => {
-    if (piece.pages !== undefined) {
-      return piece.pages.reduce((sum, page) => sum + page.rows.length, 0)
-    } else {
-      // Reasonable default just in case
-      return 50
-    }
+  const getPieceRows = () => {
+    return props.piece.pages.map((page) => page.rows.map((row) => row.contents))
   }
 
   const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
 
-  if (props.band.username !== null) {
+  if (
+    props.band.username !== null &&
+    props.piece !== null &&
+    props.piece !== []
+  ) {
     return (
       <div>
         <Element name="topOfPage" />
         <h2>
           {props.piece.title} by {props.piece.artist}
         </h2>
-        Piece length {props.piece.bpm} seconds <br />
+        Played at {props.piece.bpm} bpm <br />
         <Link
-          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
           activeClass="active"
           to="bottomOfPage"
           smooth={true}
           offset={50}
           duration={pieceDuration}
           delay={pieceDelay}
-          isDynamic={true}
+          Piece
         >
           play
         </Link>
@@ -139,12 +152,7 @@ export const SetlistPieceNoHistory = (props) => {
           back
         </button>
         <PieceRows piece={props.piece} />
-        <Link
-          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
-          activeClass="active"
-          to="topOfPage"
-          smooth={true}
-        >
+        <Link activeClass="active" to="topOfPage" smooth={true}>
           top
         </Link>
         <button

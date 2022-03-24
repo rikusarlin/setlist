@@ -77,8 +77,8 @@ export const movePiece = (setlistId, pieceId, direction, token) => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in setlistReducer: ', state)
-  console.log('action in setlistReducer', action)
+  //console.log('state before action in setlistReducer: ', state)
+  //console.log('action in setlistReducer', action)
 
   switch (action.type) {
     case 'GET_SETLISTS':

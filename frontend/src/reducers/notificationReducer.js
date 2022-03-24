@@ -39,8 +39,8 @@ export const showNotification = (message, type) => {
 }
 
 const notificationReducer = (state = initialState, action) => {
-  console.log('state before action in notificationReducer: ', state)
-  console.log('action in notificationReducer', action)
+  //console.log('state before action in notificationReducer: ', state)
+  //console.log('action in notificationReducer', action)
 
   switch (action.type) {
     case 'SHOW':

@@ -66,7 +66,7 @@ export const App = (props) => {
                     setlists
                   </Link>
                 </div>
-                <div className="nav-item">{logoutForm()}</div>
+                <div className="nav-item ">{logoutForm()}</div>
               </div>
             </div>
             <Notification />

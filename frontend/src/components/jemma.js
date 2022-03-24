@@ -7,14 +7,22 @@ import PieceRows from './PieceRows'
 import { Link, Element } from 'react-scroll'
 
 export const SetlistPieceNoHistory = (props) => {
-  var token = props.band.token
-  var getPiece = props.fetchPiece
   useEffect(() => {
-    getPiece(props.pieceId, token)
-  }, [token, getPiece, props.pieceId])
+    const fetchData = async () => {
+      console.log('In fetchData, pieceId: ' + props.pieceId)
+      await props.fetchPiece(props.pieceId, props.band.token)
+      console.log('In fetchData, piece: ' + JSON.stringify(props.piece))
+    }
+    fetchData()
+  }, [props.pieceId])
 
-  if (props.piece === undefined || props.piece === null) {
+  if (props.piece === undefined || props.piece === null || props.piece === []) {
     return <div />
+  } else {
+    console.log(
+      'Props.piece is not null or undefined or empty array, but: ' +
+        JSON.stringify(props.piece)
+    )
   }
 
   const returnToSetlist = () => {
@@ -63,20 +71,21 @@ export const SetlistPieceNoHistory = (props) => {
     return lineHeight
   }
 
-  const calculateDuration = (piece) => {
-    console.log('Piece: ' + JSON.stringify(piece))
+  const calculateDuration = () => {
+    console.log('Piece: ' + JSON.stringify(props.piece))
     const numberOfRows = getPieceRows().length
-    console.log('Number of rows: ' + numberOfRows)
     const windowSize = window.innerHeight
     console.log('windowSize: ' + windowSize)
-    const lineHeight = calculateLineHeight(document.querySelector('div'))
+    const lineHeight = calculateLineHeight(
+      document.querySelector('.cellStyles')
+    )
     console.log('lineHeight: ' + lineHeight)
     const rowsPerWindow = windowSize / lineHeight
     console.log('rowsPerWindow: ' + rowsPerWindow)
     const pages = (numberOfRows * 1.0) / rowsPerWindow
     console.log('pages: ' + pages)
     // piece.bpm is actually considered the number of seconds the piece is played in band's arrangement
-    const secondsPerRow = (numberOfRows * 1.0) / piece.bpm
+    const secondsPerRow = (numberOfRows * 1.0) / props.piece.bpm
     console.log('secondsPerRow: ' + secondsPerRow)
     const delay = 1000 * (rowsPerWindow * secondsPerRow)
     console.log('delay: ' + delay)
@@ -90,13 +99,17 @@ export const SetlistPieceNoHistory = (props) => {
     return [delay, duration]
   }
 
-  const getPieceRows = (piece) => {
-    return piece.pages.map((page) => page.rows.map((row) => row.contents))
+  const getPieceRows = () => {
+    return props.piece.pages.map((page) => page.rows.map((row) => row.contents))
   }
 
   const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
 
-  if (props.band.username !== null) {
+  if (
+    props.band.username !== null &&
+    props.piece !== null &&
+    props.piece !== []
+  ) {
     return (
       <div>
         <Element name="topOfPage" />
@@ -111,6 +124,7 @@ export const SetlistPieceNoHistory = (props) => {
           offset={50}
           duration={pieceDuration}
           delay={pieceDelay}
+          Piece
         >
           play
         </Link>

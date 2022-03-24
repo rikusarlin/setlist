@@ -27,7 +27,8 @@ export const SetlistNoHistory = (props) => {
     )
   }
 
-  const handleDeleteFromSetlist = async () => {
+  const handleDeleteFromSetlist = async (event) => {
+    event.preventDefault()
     try {
       props.deletePieceFromSetlist(
         props.setlistId,

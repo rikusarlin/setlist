@@ -31,7 +31,6 @@ export const SetlistsNoHistory = (props) => {
   }
 
   if (props.setlists !== null) {
-    console.log('props.setlists: ' + JSON.stringify(props.setlists))
     /*
     const sortedSetlists = props.setlists.sort((a, b) =>
       a.name.localeCompare(b.name)

@@ -65,8 +65,12 @@ export const PiecesNoHistory = (props) => {
             {piece.title}
           </Link>
         </div>
-        <div className="col-sm-1">
-          <Link data-cy="piece-link" to={`/editpiece/${piece.id}`}>
+        <div className="col-sm-2">
+          <Link
+            className="mr-2 py-0 btn btn-primary white-color"
+            data-cy="piece-link"
+            to={`/editpiece/${piece.id}`}
+          >
             Edit
           </Link>
         </div>
@@ -104,7 +108,7 @@ export const PiecesNoHistory = (props) => {
           <button
             onClick={moveToNewPiece}
             data-cy="new-piece"
-            className="btn btn-primary"
+            className="btn btn-primary py-0"
           >
             New piece
           </button>

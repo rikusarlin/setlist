@@ -7,13 +7,14 @@ import PieceRows from './PieceRows'
 import { Link, Element } from 'react-scroll'
 
 export const SetlistPieceNoHistory = (props) => {
-  var token = props.band.token
-  var getPiece = props.fetchPiece
   useEffect(() => {
-    getPiece(props.pieceId, token)
-  }, [token, getPiece, props.pieceId])
+    const fetchData = async () => {
+      await props.fetchPiece(props.pieceId, props.band.token)
+    }
+    fetchData()
+  }, [props.pieceId])
 
-  if (props.piece === undefined || props.piece === null) {
+  if (props.piece === undefined || props.piece === null || props.piece === []) {
     return <div />
   }
 
@@ -64,34 +65,32 @@ export const SetlistPieceNoHistory = (props) => {
   }
 
   const calculateDuration = (piece) => {
-    console.log('Piece: ' + JSON.stringify(piece))
-    const numberOfRows = getPieceRows().length
-    console.log('Number of rows: ' + numberOfRows)
+    const numberOfRows = getNumberOfRows(piece)
     const windowSize = window.innerHeight
-    console.log('windowSize: ' + windowSize)
     const lineHeight = calculateLineHeight(document.querySelector('div'))
-    console.log('lineHeight: ' + lineHeight)
     const rowsPerWindow = windowSize / lineHeight
-    console.log('rowsPerWindow: ' + rowsPerWindow)
-    const pages = (numberOfRows * 1.0) / rowsPerWindow
-    console.log('pages: ' + pages)
-    // piece.bpm is actually considered the number of seconds the piece is played in band's arrangement
-    const secondsPerRow = (numberOfRows * 1.0) / piece.bpm
-    console.log('secondsPerRow: ' + secondsPerRow)
-    const delay = 1000 * (rowsPerWindow * secondsPerRow)
-    console.log('delay: ' + delay)
-    var duration
-    if (pages > 1) {
-      duration = 1000 * (pages - 1 * (rowsPerWindow * secondsPerRow))
-    } else {
-      duration = 0
+    // assume reasonable default since bpm need not always be defined
+    let secondsPerRow = (numberOfRows * 1.0) / 180
+    if (parseInt(piece.bpm) !== null && piece.bpm !== 0) {
+      secondsPerRow = (numberOfRows * 1.0) / piece.bpm
     }
-    console.log('duration: ' + duration)
-    return [delay, duration]
+    // Have to substract some row because of menu, title, buttons and so on
+    let delay = (rowsPerWindow - 8) * secondsPerRow
+    if (delay < 0) {
+      delay = 0
+    }
+    // We should scroll so that we reach beginning of last page in time
+    const duration = piece.bpm - 2 * ((rowsPerWindow - 8) * secondsPerRow)
+    return [1000 * delay, 1000 * duration]
   }
 
-  const getPieceRows = (piece) => {
-    return piece.pages.map((page) => page.rows.map((row) => row.contents))
+  const getNumberOfRows = (piece) => {
+    if (piece.pages !== undefined) {
+      return piece.pages.reduce((sum, page) => sum + page.rows.length, 0)
+    } else {
+      // Reasonable default just in case
+      return 50
+    }
   }
 
   const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
@@ -103,14 +102,16 @@ export const SetlistPieceNoHistory = (props) => {
         <h2>
           {props.piece.title} by {props.piece.artist}
         </h2>
-        Played at {props.piece.bpm} bpm <br />
+        Piece length {props.piece.bpm} seconds <br />
         <Link
+          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
           activeClass="active"
           to="bottomOfPage"
           smooth={true}
           offset={50}
           duration={pieceDuration}
           delay={pieceDelay}
+          isDynamic={true}
         >
           play
         </Link>
@@ -138,7 +139,12 @@ export const SetlistPieceNoHistory = (props) => {
           back
         </button>
         <PieceRows piece={props.piece} />
-        <Link activeClass="active" to="topOfPage" smooth={true}>
+        <Link
+          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
+          activeClass="active"
+          to="topOfPage"
+          smooth={true}
+        >
           top
         </Link>
         <button

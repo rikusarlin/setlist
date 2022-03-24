@@ -64,19 +64,6 @@ export const transposeDown = (piece, token) => {
   }
 }
 
-export const changeRowType = (page, row, newRowType) => {
-  return async (dispatch) => {
-    dispatch({
-      type: 'CHANGE_ROW_TYPE',
-      data: {
-        page: page,
-        row: row,
-        rowType: newRowType,
-      },
-    })
-  }
-}
-
 export const changeContents = (page, row, newContents) => {
   return async (dispatch) => {
     dispatch({
@@ -100,8 +87,8 @@ export const clearAnalysis = () => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in pieceReducer: ', state)
-  console.log('action in pieceReducer', action)
+  //console.log('state before action in pieceReducer: ', state)
+  //console.log('action in pieceReducer', action)
 
   switch (action.type) {
     case 'GET_PIECE':
@@ -114,38 +101,6 @@ const reducer = (state = [], action) => {
       return action.data
     case 'TRANSPOSE_PIECE':
       return action.data
-    case 'CHANGE_ROW_TYPE': {
-      const pages = state.pages.map((page) =>
-        page.pageNumber === action.data.page
-          ? {
-              ...page,
-              rows: page.rows.map((row) =>
-                row.rowNumber === action.data.row
-                  ? { ...row, rowType: action.data.rowType }
-                  : row
-              ),
-            }
-          : page
-      )
-      console.log('New value for pages: ' + JSON.stringify(pages))
-      return { ...state, pages }
-    }
-    case 'CHANGE_CONTENTS': {
-      const pages = state.pages.map((page) =>
-        page.pageNumber === action.data.page
-          ? {
-              ...page,
-              rows: page.rows.map((row) =>
-                row.rowNumber === action.data.row
-                  ? { ...row, contents: action.data.contents }
-                  : row
-              ),
-            }
-          : page
-      )
-      console.log('New value for pages: ' + JSON.stringify(pages))
-      return { ...state, pages }
-    }
     case 'CLEAR_ANALYSIS':
       return null
     default:

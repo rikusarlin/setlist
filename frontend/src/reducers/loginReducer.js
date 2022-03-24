@@ -71,8 +71,8 @@ export const logout = () => {
 }
 
 const reducer = (state = initialState, action) => {
-  console.log('state before action in loginReducer: ', state)
-  console.log('action in login Reducer', action)
+  //console.log('state before action in loginReducer: ', state)
+  //console.log('action in login Reducer', action)
 
   switch (action.type) {
     case 'LOGIN':

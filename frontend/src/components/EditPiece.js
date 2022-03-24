@@ -245,7 +245,7 @@ export const EditPieceNoHistory = (props) => {
       </div>
       <div className="form-group row">
         <label htmlFor="Bpm" className="col-sm-2 col-form-label">
-          Bpm
+          Length (seconds)
         </label>
         <input
           className="col-sm-5"

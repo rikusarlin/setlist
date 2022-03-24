@@ -69,7 +69,7 @@ export const PieceNoHistory = (props) => {
         <h2>
           {props.piece.title} by {props.piece.artist}
         </h2>
-        Played at {props.piece.bpm} bpm <br />
+        Piece length {props.piece.bpm} seconds <br />
         <PieceRows piece={props.piece} />
         <button
           onClick={transposeUp}

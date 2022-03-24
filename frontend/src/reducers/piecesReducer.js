@@ -41,8 +41,8 @@ export const emptyPieceList = () => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in piecesReducer: ', state)
-  console.log('action in piecesReducer', action)
+  //console.log('state before action in piecesReducer: ', state)
+  //console.log('action in piecesReducer', action)
 
   switch (action.type) {
     case 'NEW_PIECE':

@@ -11,8 +11,8 @@ export const fetchBands = () => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in bandReducer: ', state)
-  console.log('action in bandReducer', action)
+  //console.log('state before action in bandReducer: ', state)
+  //console.log('action in bandReducer', action)
 
   switch (action.type) {
     case 'FETCH_BANDS':

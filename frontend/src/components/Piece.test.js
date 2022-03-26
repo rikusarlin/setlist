@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import { render, cleanup } from '@testing-library/react'
@@ -8,7 +11,10 @@ describe('<Piece />', () => {
 
   const mockHandler1 = jest.fn()
   const mockHandler2 = jest.fn()
+  const mockHandler3 = jest.fn()
   const mockHandler4 = jest.fn()
+  const mockHandler5 = jest.fn()
+  const mockHandler6 = jest.fn()
 
   beforeEach(() => {
     let band = {
@@ -20,7 +26,7 @@ describe('<Piece />', () => {
       id: '432342',
       title: 'Knocking on Heavens Door',
       artist: 'Bob Dylan',
-      bpm: '60',
+      bpm: '180',
       pages: [
         {
           id: '32344',
@@ -29,7 +35,7 @@ describe('<Piece />', () => {
               id: '43434321',
               rowNumber: 1,
               rowType: 'Chords',
-              contents: 'G              D            Am',
+              contents: 'G D Am',
             },
             {
               id: '987438',
@@ -47,7 +53,10 @@ describe('<Piece />', () => {
         band={band}
         showInfo={mockHandler1}
         showError={mockHandler2}
-        deletePiece={mockHandler4}
+        deletePiece={mockHandler3}
+        fetchPiece={mockHandler4}
+        transposeUp={mockHandler5}
+        transposeDown={mockHandler6}
       />
     )
   })
@@ -60,10 +69,9 @@ describe('<Piece />', () => {
 
   test('all piece details are displayed', () => {
     const div = component.container.querySelector('.piece')
-    expect(div).toHaveTextContent('Knocking on Heavens Door')
-    expect(div).toHaveTextContent('Bob Dylan')
-    expect(div).toHaveTextContent('Play at 80 bpm')
-    expect(div).toHaveTextContent('G              D            Am')
+    expect(div).toHaveTextContent('Knocking on Heavens Door by Bob Dylan')
+    expect(div).toHaveTextContent('Piece length 180 seconds')
+    expect(div).toHaveTextContent('G D Am')
     expect(div).toHaveTextContent('Mama take this badge off of me')
   })
 })

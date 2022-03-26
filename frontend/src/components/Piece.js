@@ -66,40 +66,44 @@ export const PieceNoHistory = (props) => {
   if (props.band.username !== null) {
     return (
       <div>
-        <h2>
-          {props.piece.title} by {props.piece.artist}
-        </h2>
-        Piece length {props.piece.bpm} seconds <br />
-        <PieceRows piece={props.piece} />
-        <button
-          onClick={transposeUp}
-          data-cy="transposeUp"
-          className="col-sm-2 mr-2 btn btn-primary"
-        >
-          transpose up
-        </button>
-        <button
-          onClick={transposeDown}
-          data-cy="transposeDown"
-          className="col-sm-2 mr-2 btn btn-primary"
-        >
-          transpose down
-        </button>
-        <button
-          onClick={confirmDelete}
-          data-cy="delete"
-          className="col-sm-2 mr-2 btn btn-danger"
-          type="button"
-        >
-          delete
-        </button>
-        <button
-          onClick={returnToPieces}
-          data-cy="back"
-          className="col-sm-1 mr-2 my-2 btn btn-primary"
-        >
-          back
-        </button>
+        <div className="piece">
+          <h2>
+            {props.piece.title} by {props.piece.artist}
+          </h2>
+          Piece length {props.piece.bpm} seconds <br />
+          <PieceRows piece={props.piece} />
+        </div>
+        <div className="commands">
+          <button
+            onClick={transposeUp}
+            data-cy="transposeUp"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            transpose up
+          </button>
+          <button
+            onClick={transposeDown}
+            data-cy="transposeDown"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            transpose down
+          </button>
+          <button
+            onClick={confirmDelete}
+            data-cy="delete"
+            className="col-sm-2 mr-2 btn btn-danger"
+            type="button"
+          >
+            delete
+          </button>
+          <button
+            onClick={returnToPieces}
+            data-cy="back"
+            className="col-sm-1 mr-2 my-2 btn btn-primary"
+          >
+            back
+          </button>
+        </div>
       </div>
     )
   }

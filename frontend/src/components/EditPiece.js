@@ -121,9 +121,12 @@ export const EditPieceNoHistory = (props) => {
   }
 
   const getRowContents = () => {
-    const rowContents = props.piece.pages.map((page) =>
-      page.rows.map((row) => row.contents).join('\n')
-    )
+    let rowContents = []
+    if (props.piece.pages !== null && props.piece.pages !== undefined) {
+      rowContents = props.piece.pages.map((page) =>
+        page.rows.map((row) => row.contents).join('\n')
+      )
+    }
     return rowContents[0]
   }
 

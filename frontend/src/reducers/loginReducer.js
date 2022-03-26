@@ -89,3 +89,142 @@ const reducer = (state = initialState, action) => {
 }
 
 export default reducer
+/*
+import loginService from '../services/login'
+import bandService from '../services/bands'
+import resetService from '../services/reset'
+import { createAsyncThunk, createSlice, createAction } from '@reduxjs/toolkit'
+
+export const login = createAction('login/login')
+export const logout = createAction('login/logut')
+export const signUpBand = createAction('login/signup')
+export const resetPassword = createAction('login/reset')
+
+const initialState = {
+  username: null,
+  name: null,
+  token: null,
+  loading: 'idle',
+  error: null,
+  currentRequestId: undefined,
+}
+
+const loginThunk = createAsyncThunk(
+  'login/login',
+  async (username, password) => {
+    return await loginService.login({
+      username: username,
+      password: password,
+    })
+  }
+)
+
+const signUpThunk = createAsyncThunk('login/signup', async (bandData) => {
+  await bandService.signUp(bandData)
+  return await loginService.login({
+    username: bandData.username,
+    password: bandData.password,
+  })
+})
+
+const resetPasswordThunk = createAsyncThunk(
+  'login/reset',
+  async (resetInfo) => {
+    await resetService.reset(resetInfo)
+    return await loginService.login({
+      username: resetInfo.username,
+      password: resetInfo.newPassword,
+    })
+  }
+)
+
+const loginSlice = createSlice({
+  name: 'login',
+  initialState: initialState,
+  reducers: {
+    logout: {
+      reducer: (state) => {
+        state.username = null
+        state.name = null
+        state.token = null
+      },
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginThunk.pending, (state, action) => {
+        console.log('loginThunk.pending')
+        if (state.loading === 'idle') {
+          state.loading = 'pending'
+          state.error = null
+          state.currentRequestId = action.meta.requestId
+        }
+      })
+      .addCase(loginThunk.fulfilled, (state, action) => {
+        console.log('loginThunk.fulfilled')
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.username = action.payload.username
+          state.name = action.payload.name
+          state.token = action.payload.token
+          state.currentRequestId = undefined
+          state.error = null
+        }
+      })
+      .addCase(loginThunk.rejected, (state, action) => {
+        console.log('loginThunk.rejected')
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.error = action.error
+          state.currentRequestId = undefined
+        }
+      })
+      .addCase(signUpThunk.pending, (state, action) => {
+        if (state.loading === 'idle') {
+          state.loading = 'pending'
+          state.currentRequestId = action.meta.requestId
+        }
+      })
+      .addCase(signUpThunk.fulfilled, (state, action) => {
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.username = action.payload.username
+          state.name = action.payload.name
+          state.token = action.payload.token
+          state.currentRequestId = undefined
+        }
+      })
+      .addCase(signUpThunk.rejected, (state, action) => {
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.error = action.error
+          state.currentRequestId = undefined
+        }
+      })
+      .addCase(resetPasswordThunk.pending, (state, action) => {
+        if (state.loading === 'idle') {
+          state.loading = 'pending'
+          state.currentRequestId = action.meta.requestId
+        }
+      })
+      .addCase(resetPasswordThunk.fulfilled, (state, action) => {
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.username = action.payload.username
+          state.name = action.payload.name
+          state.token = action.payload.token
+          state.currentRequestId = undefined
+        }
+      })
+      .addCase(resetPasswordThunk.rejected, (state, action) => {
+        if (state.loading === 'pending') {
+          state.loading = 'idle'
+          state.error = action.error
+          state.currentRequestId = undefined
+        }
+      })
+  },
+})
+
+export default loginSlice.reducer
+*/

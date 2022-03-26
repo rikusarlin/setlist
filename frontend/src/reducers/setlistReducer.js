@@ -20,6 +20,15 @@ export const createSetlist = (name, token) => {
   }
 }
 
+export const emptySetlist = () => {
+  return async (dispatch) => {
+    dispatch({
+      type: 'EMPTY_SETLISTS',
+      data: null,
+    })
+  }
+}
+
 export const addPieceToSetlist = (setlistId, pieceId, token) => {
   return async (dispatch) => {
     const updatedSetlist = await setlistService.addPieceToSetlist(
@@ -81,6 +90,8 @@ const reducer = (state = [], action) => {
   //console.log('action in setlistReducer', action)
 
   switch (action.type) {
+    case 'EMPTY_SETLISTS':
+      return null
     case 'GET_SETLISTS':
       return action.data
     case 'ADD_SETLIST':

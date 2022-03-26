@@ -11,9 +11,9 @@ describe('<Piece />', () => {
   const mockHandler4 = jest.fn()
 
   beforeEach(() => {
-    let user = {
-      name: 'Riku Sarlin',
-      username: 'rikusarlin',
+    let band = {
+      name: 'Kyarhem',
+      username: 'kyarhem',
       token: '438765436298',
     }
     let piece = {
@@ -44,7 +44,7 @@ describe('<Piece />', () => {
     component = render(
       <Piece
         piece={piece}
-        user={user}
+        band={band}
         showInfo={mockHandler1}
         showError={mockHandler2}
         deletePiece={mockHandler4}

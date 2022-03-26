@@ -11,36 +11,12 @@ import Notification from './components/Notification'
 import EditPiece from './components/EditPiece'
 import NewPiece from './components/NewPiece'
 import NewSetlist from './components/NewSetlist'
+import Logout from './components/Logout'
 import ResetPasswordForm from './components/ResetPasswordForm'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { logout } from './reducers/loginReducer'
-import { showInfo, showError } from './reducers/notificationReducer'
-import { emptyPieceList } from './reducers/piecesReducer'
 
 export const App = (props) => {
-  const handleLogout = async (event) => {
-    event.preventDefault()
-    try {
-      props.logout()
-      props.emptyPieceList()
-      props.showInfo('logout successful', 3)
-    } catch (exception) {
-      console.log('exception: ' + exception)
-      props.showError('error in logout', 3)
-    }
-  }
-
-  const logoutForm = () => (
-    <button
-      type="button"
-      onClick={handleLogout}
-      className="btn btn-primary mr-2 my-2 my-sm-0"
-    >
-      logout
-    </button>
-  )
-
   const setlistById = (id) => {
     if (props.setlists !== null) {
       return props.setlists.find((a) => a.id === id)
@@ -66,7 +42,9 @@ export const App = (props) => {
                     setlists
                   </Link>
                 </div>
-                <div className="nav-item ">{logoutForm()}</div>
+                <div className="nav-item ">
+                  <Logout />
+                </div>
               </div>
             </div>
             <Notification />
@@ -185,15 +163,7 @@ const mapStateToProps = (state) => {
   return {
     band: state.band,
     setlists: state.setlists,
-    pieces: state.pieces,
   }
 }
 
-const mapDispatchToProps = {
-  logout,
-  showInfo,
-  showError,
-  emptyPieceList,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(mapStateToProps, null)(App)

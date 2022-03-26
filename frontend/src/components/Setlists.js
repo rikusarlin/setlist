@@ -31,11 +31,6 @@ export const SetlistsNoHistory = (props) => {
   }
 
   if (props.setlists !== null) {
-    /*
-    const sortedSetlists = props.setlists.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    )
-    */
     const setlistList = props.setlists.map((setlist, index) => {
       return (
         <div className="row" key={index}>

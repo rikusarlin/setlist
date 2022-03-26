@@ -34,30 +34,20 @@ export const PiecesNoHistory = (props) => {
   }
 
   if (props.pieces !== null) {
-    /*
-    const sortedPieces = props.pieces.sort((a, b) =>
-      a.title.localeCompare(b.title)
-    )
-    const sortedSetlists = props.setlists.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    )
-    */
-    const chooseOne = [
+    var setLists = [
       {
         id: 'choose',
         name: '(Choose)',
       },
     ]
-    const sortedSetlists2 = chooseOne.concat(props.setlists)
-
-    const setListOptions = sortedSetlists2.map((setlist, index) => {
-      const retVal = (
-        <option key={index} value={setlist.id}>
-          {setlist.name}
-        </option>
-      )
-      return retVal
-    })
+    if (props.setlists !== null) {
+      setLists = setLists.concat(props.setlists)
+    }
+    const setListOptions = setLists.map((setlist, index) => (
+      <option key={index} value={setlist.id}>
+        {setlist.name}
+      </option>
+    ))
     const pieceList = props.pieces.map((piece, index) => (
       <div key={index} className="row">
         <div className="col-sm-4">

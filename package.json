@@ -4,7 +4,7 @@
   "description": "Software for managing bands pieces and setlists",
   "main": "index.js",
   "scripts": {
-    "start": "cd ./backend && cross-env NODE_ENV=prod node index.js",
+    "start": "cd ./backend && NODE_ENV=prod node index.js",
     "watch": "cd ./backend && cross-env NODE_ENV=dev nodemon index.js",
     "test": "cd ./backend && cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles --collectCoverage",
     "start:test": "cd ./backend && cross-env NODE_ENV=test node index.js",

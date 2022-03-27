@@ -71,6 +71,7 @@ export const NewPieceNoHistory = (props) => {
           className="col-sm-12"
           rows="20"
           data-cy="contents"
+          style="font-family:monospace;"
           {...removeReset(contents)}
         />
       </div>

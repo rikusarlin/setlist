@@ -27,14 +27,6 @@ export const LoginFormNoHistory = (props) => {
     }
   }
 
-  const handleSignUp = async () => {
-    props.history.push('/signup')
-  }
-
-  const handleResetPassword = async () => {
-    props.history.push('/reset-password')
-  }
-
   return (
     <div className="container">
       <form onSubmit={handleLogin}>
@@ -72,24 +64,6 @@ export const LoginFormNoHistory = (props) => {
             data-cy="login"
           >
             login
-          </button>
-          <button
-            type="button"
-            onClick={handleResetPassword}
-            className="col-sm-2 btn btn-primary mx-1"
-            data-cy="reset password"
-          >
-            reset password
-          </button>
-        </div>
-        <div className="row">
-          <button
-            type="button"
-            onClick={handleSignUp}
-            className="col-sm-2 btn btn-primary mx-1 my-1"
-            data-cy="sign up"
-          >
-            sign up
           </button>
         </div>
       </form>

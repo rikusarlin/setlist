@@ -29,6 +29,65 @@ const major7Chords = [
   'B7 ',
   'H7 ',
 ]
+const major6Chords = [
+  'C6 ',
+  'C#6 ',
+  'D6 ',
+  'D#6 ',
+  'E6 ',
+  'F6 ',
+  'F#6 ',
+  'G6 ',
+  'G#6 ',
+  'A6 ',
+  'Bb6 ',
+  'B6 ',
+  'H6 ',
+]
+const major11Chords = [
+  'C11 ',
+  'C#11 ',
+  'D11 ',
+  'D#11 ',
+  'E11 ',
+  'F11 ',
+  'F#11 ',
+  'G11 ',
+  'G#11 ',
+  'A11 ',
+  'Bb11 ',
+  'B11 ',
+  'H11 ',
+]
+const majorSus2Chords = [
+  'Csus2 ',
+  'C#sus2 ',
+  'Dsus2 ',
+  'D#sus2 ',
+  'Esus2 ',
+  'Fsus2 ',
+  'F#sus2 ',
+  'Gsus2 ',
+  'G#sus2 ',
+  'Bbsus2 ',
+  'Bsus2 ',
+  'Hsus2 ',
+]
+const majorSus4Chords = [
+  'Csus4 ',
+  'C#sus4 ',
+  'Dsus4 ',
+  'D#sus4 ',
+  'Esus4 ',
+  'Fsus4 ',
+  'F#sus4 ',
+  'Gsus4 ',
+  'G#sus4 ',
+  'Bbsus4 ',
+  'Bsus4 ',
+  'Hsus4 ',
+]
+
 const majormaj7Chords = [
   'Cmaj7 ',
   'C#maj7 ',
@@ -73,6 +132,64 @@ const minor7Chords = [
   'Bm7 ',
   'Hm7 ',
 ]
+const minor6Chords = [
+  'Cm6 ',
+  'C#m6 ',
+  'Dm6 ',
+  'D#m6 ',
+  'Em6 ',
+  'Fm6 ',
+  'F#m6 ',
+  'Gm6 ',
+  'G#m6 ',
+  'Am6 ',
+  'Bbm6 ',
+  'Bm6 ',
+  'Hm6 ',
+]
+const minor11Chords = [
+  'Cm11 ',
+  'C#m11 ',
+  'Dm11 ',
+  'D#m11 ',
+  'Em11 ',
+  'Fm11 ',
+  'F#m11 ',
+  'Gm11 ',
+  'G#m11 ',
+  'Am11 ',
+  'Bbm11 ',
+  'Bm11 ',
+  'Hm11 ',
+]
+const minorSus2Chords = [
+  'Cmsus2 ',
+  'C#msus2 ',
+  'Dmsus2 ',
+  'D#msus2 ',
+  'Emsus2 ',
+  'Fmsus2 ',
+  'F#msus2 ',
+  'Gmsus2 ',
+  'G#msus2 ',
+  'Bbmsus2 ',
+  'Bmsus2 ',
+  'Hmsus2 ',
+]
+const minorSus4Chords = [
+  'Cmsus4 ',
+  'C#msus4 ',
+  'Dmsus4 ',
+  'D#msus4 ',
+  'Emsus4 ',
+  'Fmsus4 ',
+  'F#msus4 ',
+  'Gmsus4 ',
+  'G#msus4 ',
+  'Bbmsus4 ',
+  'Bmsus4 ',
+  'Hmsus4 ',
+]
 const minormaj7Chords = [
   'Cmmaj7 ',
   'C#mmaj7 ',
@@ -91,11 +208,17 @@ const minormaj7Chords = [
 const chordTest = new RegExp(
   majorChords
     .concat(major7Chords)
-    .concat(major7Chords)
+    .concat(major6Chords)
+    .concat(major11Chords)
+    .concat(majorSus2Chords)
+    .concat(majorSus4Chords)
     .concat(majormaj7Chords)
     .concat(minorChords)
     .concat(minor7Chords)
-    .concat(minormaj7Chords)
+    .concat(minor6Chords)
+    .concat(minor11Chords)
+    .concat(minorSus2Chords)
+    .concat(minorSus4Chords)
     .concat(minormaj7Chords)
     .join('|')
 )
@@ -189,27 +312,6 @@ const transpose = (chords, isUp) => {
       }
     }
   }
-  /*
-  for(let note=notes.length-1; note>=0; note--){
-    if(isUp){
-      if(note === (notes.length-1)){
-        logger.info(`Before transpose: ${transposedChords}`)
-        transposedChords = transposedChords.replace(notes[note], notes[0])
-        logger.info(`Replacing ${notes[note]} with ${notes[0]}, result: ${transposedChords}`)
-      } else {
-        logger.info(`Before transpose: ${transposedChords}`)
-        transposedChords = transposedChords.replace(notes[note], notes[note+1])
-        logger.info(`Replacing ${notes[note]} with ${notes[note+1]}, result: ${transposedChords}`)
-      }
-    } else {
-      if(note === 0){
-        transposedChords = transposedChords.replace(notes[note], notes[notes.length-1])
-      } else {
-        transposedChords = transposedChords.replace(notes[note], notes[note-1])
-      }
-    }
-  }
-  */
   logger.info(`Chords after transpose: ${transposedChords}`)
   return transposedChords
 }

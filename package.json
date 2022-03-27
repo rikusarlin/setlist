@@ -1,20 +1,18 @@
 {
   "name": "setlist",
   "version": "1.0.0",
-  "description": "Software for managing bands' pieces and setlists",
+  "description": "Software for managing bands pieces and setlists",
   "main": "index.js",
   "scripts": {
     "start": "cd ./backend && cross-env NODE_ENV=prod node index.js",
     "watch": "cd ./backend && cross-env NODE_ENV=dev nodemon index.js",
-    "test": "cd ./backend && cross-env NODE_ENV=test jest --verbose --runInBand 
---detectOpenHandles --collectCoverage",
+    "test": "cd ./backend && cross-env NODE_ENV=test jest --verbose --runInBand --detectOpenHandles --collectCoverage",
     "start:test": "cd ./backend && cross-env NODE_ENV=test node index.js",
     "eslint": "cd ./backend && eslint .",
     "format": "cd ./backend && prettier --write",
-    "build:ui": "rm -rf ./backend/build && cd ./frontend/ && npm run build:prod 
-&& cp -r build ../backend",
+    "build:ui": "rm -rf ./backend/build && cd ./frontend/ && npm run build:prod && cp -r build ../backend",
     "deploy": "git push heroku main",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",    
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
     "logs:prod": "heroku logs --tail"
   },
   "repository": {

@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+textarea {
+  font-family: 'Courier New', Courier, monospace;
+}
+
 .error {
   color: red;
   background: lightgrey;

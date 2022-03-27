@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 import { Link, Element } from 'react-scroll'
+import { calculateDuration } from '../utils'
 
 export const SetlistPieceNoHistory = (props) => {
   useEffect(() => {
@@ -46,53 +47,6 @@ export const SetlistPieceNoHistory = (props) => {
     }
   }
 
-  const calculateLineHeight = (element) => {
-    var lineHeight = parseInt(getComputedStyle(element, 'line-height'), 10)
-    var clone
-    var singleLineHeight
-    var doubleLineHeight
-    if (isNaN(lineHeight)) {
-      clone = element.cloneNode()
-      clone.innerHTML = '<br>'
-      element.appendChild(clone)
-      singleLineHeight = clone.offsetHeight
-      clone.innerHTML = '<br><br>'
-      doubleLineHeight = clone.offsetHeight
-      element.removeChild(clone)
-      lineHeight = doubleLineHeight - singleLineHeight
-    }
-    return lineHeight
-  }
-
-  const calculateDuration = (piece) => {
-    const numberOfRows = getNumberOfRows(piece)
-    const windowSize = window.innerHeight
-    const lineHeight = calculateLineHeight(document.querySelector('div'))
-    const rowsPerWindow = windowSize / lineHeight
-    // assume reasonable default since bpm need not always be defined
-    let secondsPerRow = (numberOfRows * 1.0) / 180
-    if (parseInt(piece.bpm) !== null && piece.bpm !== 0) {
-      secondsPerRow = (numberOfRows * 1.0) / piece.bpm
-    }
-    // Have to substract some row because of menu, title, buttons and so on
-    let delay = (rowsPerWindow - 8) * secondsPerRow
-    if (delay < 0) {
-      delay = 0
-    }
-    // We should scroll so that we reach beginning of last page in time
-    const duration = piece.bpm - 2 * ((rowsPerWindow - 8) * secondsPerRow)
-    return [1000 * delay, 1000 * duration]
-  }
-
-  const getNumberOfRows = (piece) => {
-    if (piece.pages !== undefined) {
-      return piece.pages.reduce((sum, page) => sum + page.rows.length, 0)
-    } else {
-      // Reasonable default just in case
-      return 50
-    }
-  }
-
   const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
 
   if (props.band.username !== null) {
@@ -104,7 +58,7 @@ export const SetlistPieceNoHistory = (props) => {
         </h2>
         Piece length {props.piece.bpm} seconds <br />
         <Link
-          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
+          className="col-sm-2 mr-2 btn btn-primary white-color"
           activeClass="active"
           to="bottomOfPage"
           smooth={true}
@@ -140,7 +94,7 @@ export const SetlistPieceNoHistory = (props) => {
         </button>
         <PieceRows piece={props.piece} />
         <Link
-          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
+          className="col-sm-2 mr-2 btn btn-primary white-color"
           activeClass="active"
           to="topOfPage"
           smooth={true}

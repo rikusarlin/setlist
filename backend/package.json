@@ -1,7 +1,7 @@
 {
-  "name": "blogilista",
+  "name": "setlist",
   "version": "1.0.0",
-  "description": "Fullstack open part 4 blog list app",
+  "description": "Software for managing bands' pieces and setlists",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=prod node index.js",

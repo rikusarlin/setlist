@@ -9,6 +9,8 @@ import {
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
+import { Link, Element } from 'react-scroll'
+import { calculateDuration } from '../utils'
 
 export const PieceNoHistory = (props) => {
   var token = props.band.token
@@ -63,17 +65,25 @@ export const PieceNoHistory = (props) => {
     props.history.push('/pieces')
   }
 
+  const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
+
   if (props.band.username !== null) {
     return (
       <div>
-        <div className="piece">
-          <h2>
-            {props.piece.title} by {props.piece.artist}
-          </h2>
-          Piece length {props.piece.bpm} seconds <br />
-          <PieceRows piece={props.piece} />
-        </div>
         <div className="commands">
+          <Element name="topOfPage" />
+          <Link
+            className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+            activeClass="active"
+            to="bottomOfPage"
+            smooth={true}
+            offset={50}
+            duration={pieceDuration}
+            delay={pieceDelay}
+            isDynamic={true}
+          >
+            play
+          </Link>
           <button
             onClick={transposeUp}
             data-cy="transposeUp"
@@ -103,6 +113,52 @@ export const PieceNoHistory = (props) => {
           >
             back
           </button>
+          <Element name="bottomOfPage" />
+        </div>
+        <div className="piece">
+          <h2>
+            {props.piece.title} by {props.piece.artist}
+          </h2>
+          Piece length {props.piece.bpm} seconds <br />
+          <PieceRows piece={props.piece} />
+          <Link
+            className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+            activeClass="active"
+            to="topOfPage"
+            smooth={true}
+          >
+            top
+          </Link>
+          <button
+            onClick={transposeUp}
+            data-cy="transposeUp"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            transpose up
+          </button>
+          <button
+            onClick={transposeDown}
+            data-cy="transposeDown"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            transpose down
+          </button>
+          <button
+            onClick={confirmDelete}
+            data-cy="delete"
+            className="col-sm-2 mr-2 btn btn-danger"
+            type="button"
+          >
+            delete
+          </button>
+          <button
+            onClick={returnToPieces}
+            data-cy="back"
+            className="col-sm-1 mr-2 my-2 btn btn-primary"
+          >
+            back
+          </button>
+          <Element name="bottomOfPage" />
         </div>
       </div>
     )

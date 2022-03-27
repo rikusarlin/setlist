@@ -89,7 +89,10 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     }
 
     // Can delete piece from own band only
-    if ((new String(pieceToDelete.band).valueOf()) != (new String(decodedToken.id).valueOf())) {
+    if (
+      new String(pieceToDelete.band).valueOf() !=
+      new String(decodedToken.id).valueOf()
+    ) {
       return res.status(404).end()
     }
 
@@ -203,6 +206,4 @@ piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
   }
 })
 
-module.exports = {
-  piecesRouter,
-}
+module.exports = piecesRouter

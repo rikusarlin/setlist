@@ -1,0 +1,69 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: npm install 
+        working-directory: ./backend
+        run: npm install
+      - name: eslint
+        working-directory: ./backend
+        run: npm run eslint
+      - name: run tests
+        working-directory: ./backend
+        run: npm run test
+      - name: Install to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "band-setlist-backend"
+          heroku_email: "riku.sarlin@gmail.com"
+          healthcheck: "https://band-setlist-backend.herokuapp.com/health"
+          checkstring: "OK"
+          rollbackonhealthcheckfailed: true
+        if: ${{ ((github.event_name == 'push') && (!contains(join(github.event.commits.*.message), '#skip')))}}
+      - name: npm install 
+        working-directory: ./frontend
+        run: npm install
+      - name: eslint
+        working-directory: ./frontend
+        run: npm run eslint
+      - name: run tests
+        working-directory: ./frontend
+        run: npm run test
+      - name: run build
+        working-directory: ./frontend
+        run: npm run build
+      - name: Install to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "band-setlist"
+          heroku_email: "riku.sarlin@gmail.com"
+          healthcheck: "https://band-setlist-backend.herokuapp.com/health"
+          checkstring: "OK"
+          rollbackonhealthcheckfailed: true
+        if: ${{ ((github.event_name == 'push') && (!contains(join(github.event.commits.*.message), '#skip')))}}
+      - name: Another checkout for tagging to work
+        uses: actions/checkout@v2
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: "patch"
+        if: ${{ ((github.event_name == 'push') && (!contains(join(github.event.commits.*.message), '#skip')))}}

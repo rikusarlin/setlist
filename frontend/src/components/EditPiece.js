@@ -19,7 +19,8 @@ export const EditPieceNoHistory = (props) => {
   const [formData, setFormData] = useState({
     title: '',
     artist: '',
-    bpm: 0,
+    duration: 0,
+    delay: 0,
     contents: '',
   })
   useEffect(() => {
@@ -34,7 +35,8 @@ export const EditPieceNoHistory = (props) => {
       const startFormData = {
         title: props.piece.title,
         artist: props.piece.artist,
-        bpm: props.piece.bpm,
+        duration: props.piece.duration,
+        delay: props.piece.delay,
         contents: getRowContents(props.pages),
       }
       setFormData(startFormData)
@@ -46,7 +48,8 @@ export const EditPieceNoHistory = (props) => {
       let newPiece = props.piece
       newPiece.title = formData.title
       newPiece.artist = formData.artist
-      newPiece.bpm = formData.bpm
+      newPiece.duration = formData.duration
+      newPiece.delay = formData.delay
 
       props.updatePiece(newPiece, props.band.token)
       props.showInfo('piece updated', 3)
@@ -105,7 +108,8 @@ export const EditPieceNoHistory = (props) => {
     let newPiece = {
       title: formData.title,
       artist: formData.artist,
-      bpm: formData.bpm,
+      duration: formData.duration,
+      delay: formData.delay,
       pages: [page],
       contents: formData.contents,
     }
@@ -166,14 +170,14 @@ export const EditPieceNoHistory = (props) => {
           data-cy="transposeUp"
           className="col-sm-2 mr-2 btn btn-primary"
         >
-          transpose up
+          trans up
         </button>
         <button
           onClick={transposeDown}
           data-cy="transposeDown"
           className="col-sm-2 mr-2 btn btn-primary"
         >
-          transpose down
+          trans down
         </button>
         <button
           onClick={confirmDelete}
@@ -247,16 +251,31 @@ export const EditPieceNoHistory = (props) => {
         />
       </div>
       <div className="form-group row">
-        <label htmlFor="Bpm" className="col-sm-2 col-form-label">
+        <label htmlFor="Duration" className="col-sm-2 col-form-label">
           Length (seconds)
         </label>
         <input
           className="col-sm-5"
-          name="bpm"
-          id="bpm"
-          data-cy="bpm"
-          value={formData.bpm}
-          onChange={(e) => setFormData({ ...formData, bpm: e.target.value })}
+          name="duration"
+          id="duration"
+          data-cy="duration"
+          value={formData.duration}
+          onChange={(e) =>
+            setFormData({ ...formData, duration: e.target.value })
+          }
+        />
+      </div>
+      <div className="form-group row">
+        <label htmlFor="Delay" className="col-sm-2 col-form-label">
+          Delay (seconds)
+        </label>
+        <input
+          className="col-sm-5"
+          name="delay"
+          id="delay"
+          data-cy="delay"
+          value={formData.delay}
+          onChange={(e) => setFormData({ ...formData, delay: e.target.value })}
         />
       </div>
       <div className="form-group row">{analyzedOrRaw}</div>

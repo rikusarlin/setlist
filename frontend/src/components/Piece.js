@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 import { Link, Element } from 'react-scroll'
-import { calculateDuration } from '../utils'
 
 export const PieceNoHistory = (props) => {
   var token = props.band.token
@@ -65,8 +64,6 @@ export const PieceNoHistory = (props) => {
     props.history.push('/pieces')
   }
 
-  const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
-
   if (props.band.username !== null) {
     return (
       <div>
@@ -77,10 +74,8 @@ export const PieceNoHistory = (props) => {
             activeClass="active"
             to="bottomOfPage"
             smooth={true}
-            offset={50}
-            duration={pieceDuration}
-            delay={pieceDelay}
-            isDynamic={true}
+            delay={props.piece.delay * 1000}
+            duration={props.piece.duration * 0.7 * 1000}
           >
             play
           </Link>
@@ -89,14 +84,14 @@ export const PieceNoHistory = (props) => {
             data-cy="transposeUp"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            transpose up
+            trans up
           </button>
           <button
             onClick={transposeDown}
             data-cy="transposeDown"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            transpose down
+            trans down
           </button>
           <button
             onClick={confirmDelete}
@@ -119,7 +114,8 @@ export const PieceNoHistory = (props) => {
           <h2>
             {props.piece.title} by {props.piece.artist}
           </h2>
-          Piece length {props.piece.bpm} seconds <br />
+          Piece length {props.piece.duration} seconds <br />
+          Delay before start of scroll {props.piece.delay} seconds <br />
           <PieceRows piece={props.piece} />
           <Link
             className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
@@ -134,14 +130,14 @@ export const PieceNoHistory = (props) => {
             data-cy="transposeUp"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            transpose up
+            trans up
           </button>
           <button
             onClick={transposeDown}
             data-cy="transposeDown"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            transpose down
+            trans down
           </button>
           <button
             onClick={confirmDelete}

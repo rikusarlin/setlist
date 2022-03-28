@@ -29,12 +29,16 @@ analyzeRouter.post('/', async (req, res, next) => {
     let piece = {
       title: req.body.title,
       artist: req.body.artist,
-      bpm: req.body.bpm,
+      duration: req.body.duration,
+      delay: req.body.delay,
       pages: req.body.pages,
       band: decodedToken.id,
     }
-    if (typeof req.body.bpm === 'undefined') {
-      piece.bpm = 0
+    if (typeof req.body.delay === 'undefined') {
+      piece.delay = 0
+    }
+    if (typeof req.body.duration === 'undefined') {
+      piece.duration = 0
     }
 
     let contents = req.body.contents

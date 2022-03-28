@@ -44,6 +44,21 @@ const major6Chords = [
   'B6 ',
   'H6 ',
 ]
+const majorAdd9Chords = [
+  'Cadd9 ',
+  'C#add9 ',
+  'Dadd9 ',
+  'D#add9 ',
+  'Eadd9 ',
+  'Fadd9 ',
+  'F#add9 ',
+  'Gadd9 ',
+  'G#add9 ',
+  'Aadd9 ',
+  'Bbadd9 ',
+  'Badd9 ',
+  'Hadd9 ',
+]
 const major11Chords = [
   'C11 ',
   'C#11 ',
@@ -87,7 +102,6 @@ const majorSus4Chords = [
   'Bsus4 ',
   'Hsus4 ',
 ]
-
 const majormaj7Chords = [
   'Cmaj7 ',
   'C#maj7 ',
@@ -146,6 +160,21 @@ const minor6Chords = [
   'Bbm6 ',
   'Bm6 ',
   'Hm6 ',
+]
+const minorAdd9Chords = [
+  'Cmadd9 ',
+  'C#madd9 ',
+  'Dmadd9 ',
+  'D#madd9 ',
+  'Emadd9 ',
+  'Fmadd9 ',
+  'F#madd9 ',
+  'Gmadd9 ',
+  'G#madd9 ',
+  'Amadd9 ',
+  'Bbmadd9 ',
+  'Bmadd9 ',
+  'Hmadd9 ',
 ]
 const minor11Chords = [
   'Cm11 ',
@@ -209,6 +238,7 @@ const chordTest = new RegExp(
   majorChords
     .concat(major7Chords)
     .concat(major6Chords)
+    .concat(majorAdd9Chords)
     .concat(major11Chords)
     .concat(majorSus2Chords)
     .concat(majorSus4Chords)
@@ -216,6 +246,7 @@ const chordTest = new RegExp(
     .concat(minorChords)
     .concat(minor7Chords)
     .concat(minor6Chords)
+    .concat(minorAdd9Chords)
     .concat(minor11Chords)
     .concat(minorSus2Chords)
     .concat(minorSus4Chords)

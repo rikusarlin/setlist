@@ -26,7 +26,8 @@ describe('<Piece />', () => {
       id: '432342',
       title: 'Knocking on Heavens Door',
       artist: 'Bob Dylan',
-      bpm: '180',
+      duration: '150',
+      delay: '35',
       pages: [
         {
           id: '32344',
@@ -70,7 +71,8 @@ describe('<Piece />', () => {
   test('all piece details are displayed', () => {
     const div = component.container.querySelector('.piece')
     expect(div).toHaveTextContent('Knocking on Heavens Door by Bob Dylan')
-    expect(div).toHaveTextContent('Piece length 180 seconds')
+    expect(div).toHaveTextContent('Piece length 150 seconds')
+    expect(div).toHaveTextContent('Delay before scroll 35 seconds')
     expect(div).toHaveTextContent('G D Am')
     expect(div).toHaveTextContent('Mama take this badge off of me')
   })

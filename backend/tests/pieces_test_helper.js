@@ -4,7 +4,8 @@ const initialPieces = [
   {
     title: 'Knockin on Heavens Door',
     artist: 'Bob Dylan',
-    bpm: 80,
+    duration: 150,
+    delay: 35,
     pages: [
       {
         pageNumber: 1,
@@ -46,7 +47,8 @@ const initialPieces = [
   {
     title: 'Here Comes The Sun',
     artist: 'Beatles',
-    bpm: 70,
+    duration: 185,
+    delay: 35,
     pages: [
       {
         pageNumber: 1,
@@ -95,7 +97,8 @@ const initialPieces = [
 var newPiece = {
   title: 'Simple Man',
   artist: 'Lynyrd Skynyrd',
-  bpm: 60,
+  duration: 356,
+  delay: 40,
   pages: [
     {
       pageNumber: 1,

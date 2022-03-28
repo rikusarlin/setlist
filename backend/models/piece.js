@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const pieceSchema = mongoose.Schema({
   title: String,
   artist: String,
-  bpm: Number,
+  duration: Number,
+  delay: Number,
   band: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Band',
@@ -11,7 +12,8 @@ const pieceSchema = mongoose.Schema({
   pages: [
     {
       pageNumber: Number,
-      playDuration: Number,
+      duration: Number,
+      delay: Number,
       rows: [
         {
           rowNumber: Number,

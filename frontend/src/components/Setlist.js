@@ -59,66 +59,71 @@ export const SetlistNoHistory = (props) => {
     props.history.push('/setlists')
   }
 
-  const pieceList = setlistById(props.setlistId).pieces.map((piece, index) => (
-    <div className="row" key={index}>
-      <div className="col-sm-6">
-        <Link
-          data-cy="piece-link"
-          to={`/setlistpiece/${props.setlistId}/${piece.id}`}
-        >
-          {piece.title}
-        </Link>
+  const pieceList = setlistById(props.setlistId).pieces.map((piece, index) => {
+    return (
+      <div className="row" key={index}>
+        <div className="col-sm-6">
+          <Link
+            data-cy="piece-link"
+            to={`/setlistpiece/${props.setlistId}/${piece.id}`}
+          >
+            {piece.title}
+          </Link>
+        </div>
+        <div className="col-sm-1">
+          <button
+            onClick={handleMovePieceUp}
+            data-cy="move-piece-down"
+            className="mr-2 py-0 btn btn-primary"
+            value={piece.id}
+            type="basic"
+            disabled={index === 0}
+          >
+            up
+          </button>
+        </div>
+        <div className="col-sm-1">
+          <button
+            onClick={handleMovePieceDown}
+            data-cy="move-piece-down"
+            className="mr-2 py-0 btn btn-primary"
+            value={piece.id}
+            type="basic"
+            disabled={index === setlistById(props.setlistId).pieces.length - 1}
+          >
+            down
+          </button>
+        </div>
+        <div className="col-sm-2">
+          <button
+            onClick={handleDeleteFromSetlist}
+            data-cy="delete-from-list"
+            className="mr-2 py-0 btn btn-danger"
+            value={piece.id}
+            type="basic"
+          >
+            delete
+          </button>
+        </div>
       </div>
-      <div className="col-sm-1">
-        <button
-          onClick={handleMovePieceUp}
-          data-cy="move-piece-down"
-          className="mr-2 py-0 btn btn-primary"
-          value={piece.id}
-          type="basic"
-          disabled={index === 0}
-        >
-          up
-        </button>
-      </div>
-      <div className="col-sm-1">
-        <button
-          onClick={handleMovePieceDown}
-          data-cy="move-piece-down"
-          className="mr-2 py-0 btn btn-primary"
-          value={piece.id}
-          type="basic"
-          disabled={index === setlistById(props.setlistId).pieces.length - 1}
-        >
-          down
-        </button>
-      </div>
-      <div className="col-sm-2">
-        <button
-          onClick={handleDeleteFromSetlist}
-          data-cy="delete-from-list"
-          className="mr-2 py-0 btn btn-danger"
-          value={piece.id}
-          type="basic"
-        >
-          delete from list
-        </button>
-      </div>
-    </div>
-  ))
+    )
+  })
 
   return (
-    <div>
-      <h2>{setlistById(props.setlistId).name}</h2>
-      <div className="container striped">{pieceList}</div>
-
-      <button
-        onClick={returnToSetlists}
-        data-cy="back"
-        className="col-sm-1 mr-2 my-2 btn btn-primary"
-      >
-        back
-      </button>
+    <div className="container">
+      <div className="row">
+        <h2>{setlistById(props.setlistId).name}</h2>
+      </div>
+      <div className="container">{pieceList}</div>
+      <div className="row">
+        <button
+          onClick={returnToSetlists}
+          data-cy="back"
+          className="col-sm-1 mr-2 my-2 btn btn-primary"
+        >
+          back
+        </button>
+      </div>
     </div>
   )
 }

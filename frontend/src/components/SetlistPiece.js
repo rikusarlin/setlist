@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
 import { Link, Element } from 'react-scroll'
-import { calculateDuration } from '../utils'
 
 export const SetlistPieceNoHistory = (props) => {
   useEffect(() => {
@@ -47,8 +46,6 @@ export const SetlistPieceNoHistory = (props) => {
     }
   }
 
-  const [pieceDelay, pieceDuration] = calculateDuration(props.piece)
-
   if (props.band.username !== null) {
     return (
       <div>
@@ -56,15 +53,16 @@ export const SetlistPieceNoHistory = (props) => {
         <h2>
           {props.piece.title} by {props.piece.artist}
         </h2>
-        Piece length {props.piece.bpm} seconds <br />
+        Piece length {props.piece.duration} seconds <br />
+        Delay before start of scroll {props.piece.delay} seconds <br />
         <Link
-          className="col-sm-2 mr-2 btn btn-primary white-color"
+          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
           activeClass="active"
           to="bottomOfPage"
           smooth={true}
           offset={50}
-          duration={pieceDuration}
-          delay={pieceDelay}
+          delay={props.piece.delay * 1000}
+          duration={props.piece.duration * 0.7 * 1000}
           isDynamic={true}
         >
           play

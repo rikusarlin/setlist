@@ -10,7 +10,8 @@ import { withRouter } from 'react-router-dom'
 export const NewPieceNoHistory = (props) => {
   const title = useField('text')
   const artist = useField('text')
-  const bpm = useField('number')
+  const delay = useField('number')
+  const duration = useField('number')
   const contents = useField('textarea')
 
   const analyzeContents = async () => {
@@ -21,7 +22,8 @@ export const NewPieceNoHistory = (props) => {
     let newPiece = {
       title: title.value,
       artist: artist.value,
-      bpm: bpm.value,
+      duration: duration.value,
+      delay: delay.value,
       pages: [page],
       contents: contents.value,
     }
@@ -39,7 +41,8 @@ export const NewPieceNoHistory = (props) => {
   const returnToPieces = () => {
     title.reset
     artist.reset
-    bpm.reset
+    duration.reset
+    delay.reset
     contents.reset
     props.history.push('/pieces')
     props.clearAnalysis()
@@ -61,17 +64,26 @@ export const NewPieceNoHistory = (props) => {
         <input className="col-sm-5" data-cy="artist" {...removeReset(artist)} />
       </div>
       <div className="form-group row">
-        <label htmlFor="Bpm" className="col-sm-2 col-form-label">
-          Length (seconds)
+        <label htmlFor="Duration" className="col-sm-2 col-form-label">
+          Duration (seconds)
         </label>
-        <input className="col-sm-5" data-cy="bpm" {...removeReset(bpm)} />
+        <input
+          className="col-sm-5"
+          data-cy="duration"
+          {...removeReset(duration)}
+        />
+      </div>
+      <div className="form-group row">
+        <label htmlFor="Duration" className="col-sm-2 col-form-label">
+          Delay (seconds)
+        </label>
+        <input className="col-sm-5" data-cy="delay" {...removeReset(delay)} />
       </div>
       <div className="form-group row">
         <textarea
           className="col-sm-12"
           rows="20"
           data-cy="contents"
-          style="font-family:monospace;"
           {...removeReset(contents)}
         />
       </div>

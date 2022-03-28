@@ -15,7 +15,8 @@ piecesRouter.get('/', async (request, response, next) => {
     let pieces = await Piece.find({ band: decodedToken.id }, [
       'title',
       'artist',
-      'bpm',
+      'duration',
+      'delay',
     ])
     response.json(pieces)
   } catch (error) {
@@ -42,12 +43,16 @@ piecesRouter.post('/', async (req, res, next) => {
     let piece = {
       title: req.body.title,
       artist: req.body.artist,
-      bpm: req.body.bpm,
+      duration: req.body.duration,
+      delay: req.body.delay,
       pages: req.body.pages,
       band: band._id,
     }
-    if (typeof req.body.bpm === 'undefined') {
-      piece.bpm = 0
+    if (typeof req.body.delay === 'undefined') {
+      piece.delay = 0
+    }
+    if (typeof req.body.duration === 'undefined') {
+      piece.duration = 0
     }
 
     let newPiece = new Piece(piece)
@@ -142,12 +147,16 @@ piecesRouter.put('/:id', async (req, res, next) => {
       id: req.params.id,
       title: req.body.title,
       artist: req.body.artist,
-      bpm: req.body.bpm,
+      duration: req.body.duration,
+      delay: req.body.delay,
       pages: req.body.pages,
       band: band._id,
     }
-    if (typeof req.body.bpm === 'undefined') {
-      piece.bpm = 0
+    if (typeof req.body.duration === 'undefined') {
+      piece.duration = 0
+    }
+    if (typeof req.body.delay === 'undefined') {
+      piece.delay = 0
     }
 
     let previousPiece = await Piece.findById(req.params.id)

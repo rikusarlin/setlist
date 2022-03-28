@@ -95,15 +95,25 @@ describe('insert new pieces', () => {
     const titles = response.body.map((r) => r.title)
     expect(titles).toContain(helper.newPiece.title)
   })
-  test('an inserted piece with no bpm result in piece with 0 bpm', async () => {
-    delete helper.newPiece.bpm
+  test('an inserted piece with no duration result in piece with 0 duration', async () => {
+    delete helper.newPiece.duration
     const response = await api
       .post('/api/pieces')
       .set('Authorization', `bearer ${token}`)
       .send(helper.newPiece)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.bpm).toBe(0)
+    expect(response.body.duration).toBe(0)
+  })
+  test('an inserted piece with no delay result in piece with 0 delay', async () => {
+    delete helper.newPiece.delay
+    const response = await api
+      .post('/api/pieces')
+      .set('Authorization', `bearer ${token}`)
+      .send(helper.newPiece)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.delay).toBe(0)
   })
   test('title is required', async () => {
     delete helper.newPiece.title
@@ -192,11 +202,11 @@ describe('delete piece', () => {
 })
 
 describe('update piece', () => {
-  test('update bpm of piece', async () => {
+  test('update duration of piece', async () => {
     const piecesAtStart = await helper.piecesInDb()
     const pieceToUpdate = piecesAtStart[0]
-    const bpmBeforeUpdate = pieceToUpdate.bpm
-    pieceToUpdate.bpm += 10
+    const durationBeforeUpdate = pieceToUpdate.duration
+    pieceToUpdate.duration += 10
     await api
       .put(`/api/pieces/${pieceToUpdate.id}`)
       .set('Authorization', `bearer ${token}`)
@@ -208,7 +218,25 @@ describe('update piece', () => {
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    expect(resultPiece.body.bpm).toBe(bpmBeforeUpdate + 10)
+    expect(resultPiece.body.duration).toBe(durationBeforeUpdate + 10)
+  })
+  test('update delay of piece', async () => {
+    const piecesAtStart = await helper.piecesInDb()
+    const pieceToUpdate = piecesAtStart[0]
+    const delayBeforeUpdate = pieceToUpdate.delay
+    pieceToUpdate.delay += 10
+    await api
+      .put(`/api/pieces/${pieceToUpdate.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send(pieceToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const resultPiece = await api
+      .get(`/api/pieces/${pieceToUpdate.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(resultPiece.body.delay).toBe(delayBeforeUpdate + 10)
   })
   test('fails with 404 status when called with non-existing but valid id', async () => {
     const piecesAtStart = await helper.piecesInDb()

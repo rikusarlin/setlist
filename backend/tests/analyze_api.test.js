@@ -16,7 +16,8 @@ global.console = {
 const introInput1 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -43,7 +44,8 @@ const introOutput1 = {
 const introInput2 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -70,7 +72,8 @@ const introOutput2 = {
 const chordInput1 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -97,7 +100,8 @@ const chordOutput1 = {
 const chordInput2 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -124,7 +128,8 @@ const chordOutput2 = {
 const chordInput3 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -151,7 +156,8 @@ const chordOutput3 = {
 const songInput1 = {
   title: 'title1',
   artist: 'artist1',
-  bpm: 60,
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,

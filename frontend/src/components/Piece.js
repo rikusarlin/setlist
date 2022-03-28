@@ -84,14 +84,14 @@ export const PieceNoHistory = (props) => {
             data-cy="transposeUp"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            trans up
+            transp up
           </button>
           <button
             onClick={transposeDown}
             data-cy="transposeDown"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            trans down
+            transp down
           </button>
           <button
             onClick={confirmDelete}
@@ -130,14 +130,14 @@ export const PieceNoHistory = (props) => {
             data-cy="transposeUp"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            trans up
+            transp up
           </button>
           <button
             onClick={transposeDown}
             data-cy="transposeDown"
             className="col-sm-2 mr-2 btn btn-primary"
           >
-            trans down
+            transp down
           </button>
           <button
             onClick={confirmDelete}

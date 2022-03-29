@@ -3,7 +3,7 @@
   "name": "Application for managing pieces and setlists",
   "icons": [
     {
-      "src": "note.ico",
+      "src": "favicon.ico",
       "sizes": "32x32",
       "type": "image/x-icon"
     }

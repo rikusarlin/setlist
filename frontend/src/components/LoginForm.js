@@ -15,7 +15,7 @@ export const LoginFormNoHistory = (props) => {
     try {
       const username = userName.value
       const password = passWord.value
-      props.login(username, password)
+      await props.login(username, password)
       userName.reset()
       passWord.reset()
       props.showInfo('login successful', 3)

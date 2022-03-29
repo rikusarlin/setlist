@@ -1,6 +1,6 @@
 {
   "short_name": "Band setlist app",
-  "name": "Application for managing bands' pieces and setlists",
+  "name": "Application for managing pieces and setlists",
   "icons": [
     {
       "src": "note.ico",

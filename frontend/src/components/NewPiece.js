@@ -26,6 +26,7 @@ export const NewPieceNoHistory = (props) => {
       delay: delay.value,
       pages: [page],
       contents: contents.value,
+      skipWhitespace: true,
     }
     try {
       props.analyzeContents(newPiece, props.band.token)

@@ -19,7 +19,9 @@ export const PieceRows = (props) => {
             key={page.pageNumber + '_' + row.rowNumber}
             className="row container"
           >
-            <div className={cellStyles}>{row.contents}</div>
+            <div className={cellStyles}>
+              {row.contents !== '' ? row.contents : ' '}
+            </div>
           </div>
         )
       })

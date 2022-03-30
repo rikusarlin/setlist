@@ -13,6 +13,7 @@ import {
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
+import { Link, Element } from 'react-scroll'
 
 export const EditPieceNoHistory = (props) => {
   const [previousPiece, setPreviousPiece] = useState({})
@@ -112,6 +113,7 @@ export const EditPieceNoHistory = (props) => {
       delay: formData.delay,
       pages: [page],
       contents: formData.contents,
+      skipWhitespace: false,
     }
     try {
       props.analyzeContents(newPiece, props.band.token)
@@ -148,15 +150,25 @@ export const EditPieceNoHistory = (props) => {
     props.clearAnalysis()
   }
 
-  const editOrAnalyze =
+  const topButtons =
     props.piece !== null ? (
       <div>
+        <Link
+          className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+          activeClass="active"
+          to="bottomOfPage"
+          smooth={true}
+          delay={props.piece.delay * 1000}
+          duration={props.piece.duration * 0.7 * 1000}
+        >
+          play
+        </Link>{' '}
         <button
           onClick={updateContents}
           data-cy="update"
           className="col-sm-1 mr-2 btn btn-primary"
         >
-          update
+          save
         </button>
         <button
           onClick={editContents}
@@ -170,14 +182,14 @@ export const EditPieceNoHistory = (props) => {
           data-cy="transposeUp"
           className="col-sm-2 mr-2 btn btn-primary"
         >
-          transp up
+          up
         </button>
         <button
           onClick={transposeDown}
           data-cy="transposeDown"
           className="col-sm-2 mr-2 btn btn-primary"
         >
-          transp down
+          down
         </button>
         <button
           onClick={confirmDelete}
@@ -191,10 +203,76 @@ export const EditPieceNoHistory = (props) => {
       <div>
         <button
           onClick={analyzeContents}
-          data-cy="analyze"
+          data-cy="save"
           className="col-sm-1 mr-2 btn btn-primary"
         >
-          analyze
+          save
+        </button>
+        <button
+          onClick={cancelEdit}
+          data-cy="cancel"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          cancel
+        </button>
+      </div>
+    )
+
+  const editOrAnalyze =
+    props.piece !== null ? (
+      <div>
+        <Link
+          className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+          activeClass="active"
+          to="topOfPage"
+          smooth={true}
+        >
+          top
+        </Link>
+        <button
+          onClick={updateContents}
+          data-cy="update"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          save
+        </button>
+        <button
+          onClick={editContents}
+          data-cy="edit"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          edit
+        </button>
+        <button
+          onClick={transposeUp}
+          data-cy="transposeUp"
+          className="col-sm-2 mr-2 btn btn-primary"
+        >
+          up
+        </button>
+        <button
+          onClick={transposeDown}
+          data-cy="transposeDown"
+          className="col-sm-2 mr-2 btn btn-primary"
+        >
+          down
+        </button>
+        <button
+          onClick={confirmDelete}
+          data-cy="deletePiece"
+          className="col-sm-2 mr-2 btn btn-danger"
+        >
+          delete
+        </button>
+      </div>
+    ) : (
+      <div>
+        <button
+          onClick={analyzeContents}
+          data-cy="save"
+          className="col-sm-1 mr-2 btn btn-primary"
+        >
+          save
         </button>
         <button
           onClick={cancelEdit}
@@ -223,6 +301,7 @@ export const EditPieceNoHistory = (props) => {
 
   return (
     <div className="container">
+      <Element name="topOfPage" />
       <h3>Edit piece</h3>
       <div className="form-group row">
         <label htmlFor="Title" className="col-sm-2 col-form-label">
@@ -278,9 +357,11 @@ export const EditPieceNoHistory = (props) => {
           onChange={(e) => setFormData({ ...formData, delay: e.target.value })}
         />
       </div>
+      <div className="form-group">{topButtons}</div>
       <div className="form-group row">{analyzedOrRaw}</div>
       <div className="form-group">
         <div className="form-group">{editOrAnalyze}</div>
+        <Element name="bottomOfPage" />{' '}
         <div className="form-group">
           <button
             onClick={returnToPieces}

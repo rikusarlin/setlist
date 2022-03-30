@@ -55,15 +55,6 @@ export const PiecesNoHistory = (props) => {
             {piece.title}
           </Link>
         </div>
-        <div className="col-sm-1">
-          <Link
-            className="mr-2 py-0 btn btn-primary white-color"
-            data-cy="piece-link"
-            to={`/editpiece/${piece.id}`}
-          >
-            Edit
-          </Link>
-        </div>
         <div className="col-sm-6">
           <select
             value={selectedSetlist.value}

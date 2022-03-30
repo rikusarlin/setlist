@@ -1,7 +1,6 @@
 import React from 'react'
 import './App.css'
 import Pieces from './components/Pieces'
-import Piece from './components/Piece'
 import Setlists from './components/Setlists'
 import Setlist from './components/Setlist'
 import SetlistPiece from './components/SetlistPiece'
@@ -68,11 +67,6 @@ export const App = (props) => {
             />
             <Route
               exact
-              path="/editpiece/:id"
-              render={({ match }) => <EditPiece pieceId={match.params.id} />}
-            />
-            <Route
-              exact
               path="/pieces"
               render={() => (
                 <div>
@@ -110,7 +104,7 @@ export const App = (props) => {
             <Route
               exact
               path="/piece/:id"
-              render={({ match }) => <Piece pieceId={match.params.id} />}
+              render={({ match }) => <EditPiece pieceId={match.params.id} />}
             />
           </div>
         ) : (

@@ -41,6 +41,13 @@ analyzeRouter.post('/', async (req, res, next) => {
       piece.duration = 0
     }
 
+    let skipWhitespace
+    if (typeof req.body.skipWhitespace === 'undefined') {
+      skipWhitespace = false
+    } else {
+      skipWhitespace = req.body.skipWhitespace
+    }
+
     let contents = req.body.contents
     if (contents.indexOf('\n') === -1) {
       contents = contents + '\n'
@@ -48,7 +55,7 @@ analyzeRouter.post('/', async (req, res, next) => {
     let rows = []
     let rN = 1
     req.body.contents.split('\n').map((row) => {
-      if (!onlyWhitespace(row)) {
+      if (!(skipWhitespace && onlyWhitespace(row))) {
         // Analyze whether the row is lyrics, chords or label
         let rowType = 'Lyrics'
         if (row.indexOf('[') >= 0) {

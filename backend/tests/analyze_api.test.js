@@ -69,6 +69,130 @@ const introOutput2 = {
   ],
 }
 
+const skipWhiteSpaceInput1 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [],
+    },
+  ],
+  contents: '[Intro]\n\nAm Fm',
+  skipWhitespace: false,
+}
+const skipWhiteSpaceOutput1 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+        {
+          rowNumber: 2,
+          rowType: 'Lyrics',
+          contents: '',
+        },
+        {
+          rowNumber: 3,
+          rowType: 'Chords',
+          contents: 'Am Fm',
+        },
+      ],
+    },
+  ],
+}
+
+const skipWhiteSpaceInput2 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [],
+    },
+  ],
+  contents: '[Intro]\n\nAm Fm',
+  skipWhitespace: true,
+}
+const skipWhiteSpaceOutput2 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+        {
+          rowNumber: 2,
+          rowType: 'Chords',
+          contents: 'Am Fm',
+        },
+      ],
+    },
+  ],
+}
+
+const skipWhiteSpaceInput3 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [],
+    },
+  ],
+  contents: '[Intro]\n\nAm Fm'
+}
+const skipWhiteSpaceOutput3 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+        {
+          rowNumber: 2,
+          rowType: 'Lyrics',
+          contents: '',
+        },
+        {
+          rowNumber: 3,
+          rowType: 'Chords',
+          contents: 'Am Fm',
+        },
+      ],
+    },
+  ],
+}
+
+
 const chordInput1 = {
   title: 'title1',
   artist: 'artist1',
@@ -287,6 +411,40 @@ describe('song analysis', () => {
     done()
   })
 })
+
+describe('whitespace tests', () => {
+  test('whitespace is skipped correctly if told so', async (done) => {
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
+      .send(skipWhiteSpaceInput1)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput1.pages[0].rows)
+    done()
+  })
+  test('whitespace remains if specified so', async (done) => {
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
+      .send(skipWhiteSpaceInput2)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput2.pages[0].rows)
+    done()
+  })
+  test('whitespace remains by default', async (done) => {
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
+      .send(skipWhiteSpaceInput3)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput3.pages[0].rows)
+    done()
+  })
+})
+
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500))

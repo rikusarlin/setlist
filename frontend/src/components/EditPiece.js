@@ -119,10 +119,10 @@ export const EditPieceNoHistory = (props) => {
       props.analyzeContents(newPiece, props.band.token)
       props.deletePiece(previousPiece.id, props.band.token)
       props.fetchPieces(props.band.token)
-      props.showInfo('piece re-analyzed', 3)
+      props.showInfo('piece saved', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
-      props.showError('error in re-analyzing piece', 3)
+      props.showError('error in saving piece', 3)
     }
   }
 

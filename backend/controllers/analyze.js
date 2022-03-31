@@ -25,12 +25,16 @@ analyzeRouter.post('/', async (req, res, next) => {
     if (typeof req.body.artist === 'undefined') {
       return res.status(400).json({ error: 'Artist of piece is required' })
     }
+    if (typeof req.body.noteContents !== 'undefined' && typeof req.body.noteInstrument === 'undefined') {
+      return res.status(400).json({ error: 'Note instrument is required if note are given' })
+    }
 
     let piece = {
       title: req.body.title,
       artist: req.body.artist,
       duration: req.body.duration,
       delay: req.body.delay,
+      notes: req.body.notes,
       pages: req.body.pages,
       band: decodedToken.id,
     }
@@ -53,8 +57,7 @@ analyzeRouter.post('/', async (req, res, next) => {
       contents = contents + '\n'
     }
     let rows = []
-    let rN = 1
-    req.body.contents.split('\n').map((row) => {
+    req.body.contents.split('\n').map((row, index) => {
       if (!(skipWhitespace && onlyWhitespace(row))) {
         // Analyze whether the row is lyrics, chords or label
         let rowType = 'Lyrics'
@@ -64,36 +67,53 @@ analyzeRouter.post('/', async (req, res, next) => {
           rowType = 'Chords'
         }
         rows.push({
-          rowNumber: rN,
+          rowNumber: index+1,
           rowType: rowType,
           contents: row,
         })
-        rN++
       }
     })
 
     // Change possible german notation to english (H=>B, B => Bb)
-    let isGerman = false
-    for (let i = 0; i < rows.length; i++) {
-      if (rows[i].rowType === 'Chords') {
-        if (rows[i].contents.indexOf('H') >= 0) {
-          isGerman = true
-          break
-        }
-      }
-    }
+    const isGerman = rows.filter(row => row.rowType === 'Chords')
+      .map(row => row.contents.indexOf('H') >= 0)
+      .reduce((pieceIsGerman, rowIsGerman) => pieceIsGerman || rowIsGerman, false)
+
     if (isGerman) {
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i].rowType === 'Chords') {
-          rows[i].contents = rows[i].contents.replace('B', 'Bb')
-          rows[i].contents = rows[i].contents.replace('H', 'B')
-        }
+      rows = rows.map(row =>  {
+          return ({
+            rowNumber: row.rowNumber,
+            rowType: row.rowType,
+            contents: row.rowType === 'Chords' 
+              ? row.contents.replace('B', 'Bb').replace('H', 'B')
+              : row.contents
+          })
+        })
+    }
+    piece.pages[0].rows = rows
+
+    if(typeof req.body.noteContents !== 'undefined'){
+      let noteContents = req.body.noteContents
+      if (noteContents.indexOf('\n') === -1) {
+        noteContents = noteContents + '\n'
       }
+      let newNote = {
+        instrument: req.body.noteInstrument,
+        rows: []
+      }
+      req.body.noteContents.split('\n').map((noteRow, index) => {
+        newNote.rows.push({
+          rowNumber: index+1,
+          contents: noteRow,
+        })
+      })
+      if(typeof piece.notes === 'undefined'){
+        piece.notes = []
+      }
+      piece.notes.push(newNote)
     }
 
-    piece.pages[0].rows = rows
     // logger.info('rows: '+JSON.stringify(piece))
-
     let newPiece = new Piece(piece)
     let savedPiece = await newPiece.save()
     res.status(201).json(savedPiece.toJSON())

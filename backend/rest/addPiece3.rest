@@ -4,9 +4,10 @@ Accept: application/json
 Authorization: bearer xxx
 
 {
-    "title":"Simpler Man",
+    "title":"Simpler Man v2",
     "artist":"Lynyrd Skynyrd",
-    "bpm":60,
+    "delay": 25,
+    "duration":270,
     "pages":[
         {
             "pageNumber":1,
@@ -15,6 +16,17 @@ Authorization: bearer xxx
                     "rowNumber": 1,
                     "rowType": "Chords",
                     "contents": "       C            G            Am"
+                }
+            ]
+        }
+    ],
+    "notes":[
+        {
+            "instrument":"Guitar",
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "contents": "Finger picking"
                 }
             ]
         }

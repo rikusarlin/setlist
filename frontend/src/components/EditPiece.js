@@ -13,9 +13,11 @@ import {
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
+import NewNote from './NewNote'
 import { Link, Element } from 'react-scroll'
 
 export const EditPieceNoHistory = (props) => {
+  const [selectedNote, setSelectedNote] = useState('choose')
   const [previousPiece, setPreviousPiece] = useState({})
   const [formData, setFormData] = useState({
     title: '',
@@ -23,6 +25,8 @@ export const EditPieceNoHistory = (props) => {
     duration: 0,
     delay: 0,
     contents: '',
+    noteContents: '',
+    noteInstrument: '',
   })
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +42,17 @@ export const EditPieceNoHistory = (props) => {
         artist: props.piece.artist,
         duration: props.piece.duration,
         delay: props.piece.delay,
-        contents: getRowContents(props.pages),
+        contents: getRowContents(),
+        noteContents:
+          typeof props.piece.notes !== 'undefined' &&
+          props.piece.notes.length > 0
+            ? getNoteContents(props.piece.notes[0].noteInstrument)
+            : '',
+        noteInstrument:
+          typeof props.piece.notes !== 'undefined' &&
+          props.piece.notes.length > 0
+            ? props.piece.notes[0].noteInstrument
+            : '',
       }
       setFormData(startFormData)
     }
@@ -113,12 +127,14 @@ export const EditPieceNoHistory = (props) => {
       delay: formData.delay,
       pages: [page],
       contents: formData.contents,
+      noteContents: formData.noteContents,
+      noteInstrument: formData.noteInstrument,
       skipWhitespace: false,
     }
     try {
-      props.analyzeContents(newPiece, props.band.token)
-      props.deletePiece(previousPiece.id, props.band.token)
-      props.fetchPieces(props.band.token)
+      await props.analyzeContents(newPiece, props.band.token)
+      await props.deletePiece(previousPiece.id, props.band.token)
+      await props.fetchPieces(props.band.token)
       props.showInfo('piece saved', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -136,6 +152,16 @@ export const EditPieceNoHistory = (props) => {
     return rowContents[0]
   }
 
+  const getNoteContents = (instrumentName) => {
+    let noteContents = []
+    if (props.piece.notes !== null && props.piece.notes !== undefined) {
+      noteContents = props.piece.notes
+        .filter((note) => note.noteInstrument === instrumentName)
+        .map((note) => note.rows.map((row) => row.contents).join('\n'))
+    }
+    return noteContents
+  }
+
   const editContents = async () => {
     setPreviousPiece(props.piece)
     props.clearAnalysis()
@@ -150,54 +176,106 @@ export const EditPieceNoHistory = (props) => {
     props.clearAnalysis()
   }
 
+  var noteList = [
+    {
+      id: 'choose',
+      noteInstrument: '(Choose)',
+    },
+  ]
+  if (
+    props.piece !== null &&
+    typeof props.piece !== 'undefined' &&
+    typeof props.piece.notes !== 'undefined' &&
+    props.piece.notes.length >= 0
+  ) {
+    noteList = noteList.concat(
+      props.piece.notes.map((note) => {
+        note.id, note.noteInstrument
+      })
+    )
+  }
+  const noteListOptions = noteList.map((note, index) => (
+    <option key={index} value={note.id}>
+      {note.noteInstrument}
+    </option>
+  ))
+
+  const noteListSelection =
+    typeof props.piece !== 'undefined' &&
+    typeof props.piece.notes !== 'undefined' &&
+    props.piece.notes.length > 0 ? (
+      <select
+        value={selectedNote.value}
+        data-cy="cy_id_notelist"
+        name="setlist"
+        onChange={(e) => {
+          setSelectedNote(e.target.value)
+          setFormData({
+            ...formData,
+            noteContents: getNoteContents(e.target.value),
+          })
+        }}
+      >
+        {noteListOptions}
+      </select>
+    ) : (
+      ''
+    )
+
   const topButtons =
     props.piece !== null ? (
       <div>
-        <Link
-          className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
-          activeClass="active"
-          to="bottomOfPage"
-          smooth={true}
-          delay={props.piece.delay * 1000}
-          duration={props.piece.duration * 0.7 * 1000}
-        >
-          play
-        </Link>{' '}
-        <button
-          onClick={updateContents}
-          data-cy="update"
-          className="col-sm-1 mr-2 btn btn-primary"
-        >
-          save
-        </button>
-        <button
-          onClick={editContents}
-          data-cy="edit"
-          className="col-sm-1 mr-2 btn btn-primary"
-        >
-          edit
-        </button>
-        <button
-          onClick={transposeUp}
-          data-cy="transposeUp"
-          className="col-sm-2 mr-2 btn btn-primary"
-        >
-          up
-        </button>
-        <button
-          onClick={transposeDown}
-          data-cy="transposeDown"
-          className="col-sm-2 mr-2 btn btn-primary"
-        >
-          down
-        </button>
-        <button
-          onClick={confirmDelete}
-          data-cy="deletePiece"
-          className="col-sm-2 mr-2 btn btn-danger"
-        >
-          delete
-        </button>
+        <div className="row">
+          <Link
+            className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+            activeClass="active"
+            to="bottomOfPage"
+            smooth={true}
+            delay={props.piece.delay * 1000}
+            duration={props.piece.duration * 0.7 * 1000}
+          >
+            play
+          </Link>{' '}
+          <button
+            onClick={updateContents}
+            data-cy="update"
+            className="col-sm-1 mr-2 btn btn-primary"
+          >
+            save
+          </button>
+          <button
+            onClick={editContents}
+            data-cy="edit"
+            className="col-sm-1 mr-2 btn btn-primary"
+          >
+            edit
+          </button>
+          <button
+            onClick={transposeUp}
+            data-cy="transposeUp"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            up
+          </button>
+          <button
+            onClick={transposeDown}
+            data-cy="transposeDown"
+            className="col-sm-2 mr-2 btn btn-primary"
+          >
+            down
+          </button>
+          {noteListSelection}
+          <button
+            onClick={confirmDelete}
+            data-cy="deletePiece"
+            className="col-sm-2 mr-2 btn btn-danger"
+          >
+            delete
+          </button>
+        </div>
+        <div className="row">
+          <NewNote />
+        </div>
       </div>
     ) : (
       <div>
@@ -284,20 +362,50 @@ export const EditPieceNoHistory = (props) => {
       </div>
     )
 
-  const analyzedOrRaw =
-    props.piece !== null ? (
-      <PieceRows piece={props.piece} />
+  const editFields =
+    selectedNote !== 'choose' ? (
+      <div className="row">
+        <textarea
+          className="col-sm-12"
+          rows="20"
+          name="contents"
+          id="conenents"
+          data-cy="contents"
+          value={formData.contents}
+          onChange={(e) => {
+            setFormData({ ...formData, contents: e.target.value })
+          }}
+        />
+      </div>
     ) : (
-      <textarea
-        className="col-sm-12"
-        rows="20"
-        name="contents"
-        id="conenents"
-        data-cy="contents"
-        value={formData.contents}
-        onChange={(e) => setFormData({ ...formData, contents: e.target.value })}
-      />
+      <div className="row">
+        <textarea
+          className="col-sm-6"
+          rows="20"
+          name="contents"
+          id="conenents"
+          data-cy="contents"
+          value={formData.contents}
+          onChange={(e) =>
+            setFormData({ ...formData, contents: e.target.value })
+          }
+        />
+        <textarea
+          className="col-sm-6"
+          rows="20"
+          name="noteContents"
+          id="noteConenents"
+          data-cy="noteContents"
+          value={formData.noteContents}
+          onChange={(e) =>
+            setFormData({ ...formData, contents: e.target.value })
+          }
+        />
+      </div>
     )
+
+  const analyzedOrRaw =
+    props.piece !== null ? <PieceRows piece={props.piece} /> : { editFields }
 
   return (
     <div className="container">

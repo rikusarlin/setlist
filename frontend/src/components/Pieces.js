@@ -61,7 +61,6 @@ export const PiecesNoHistory = (props) => {
             data-cy="cy_id_setlist"
             name="setlist"
             onChange={(e) => {
-              console.log('Changing selected setlist to: ' + e.target.value)
               setSelectedSetlist(e.target.value)
             }}
           >

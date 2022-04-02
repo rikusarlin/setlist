@@ -1,2 +1,4 @@
-get http://localhost:3003/api/pieces/62220f7332cdffec7ecd1603
+get http://localhost:3003/api/pieces/6246abc20c14a08d94504f28
 Content-Type: application/json
+Accept: application/json
+Authorization: bearer xxxx

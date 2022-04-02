@@ -46,6 +46,7 @@ piecesRouter.post('/', async (req, res, next) => {
       duration: req.body.duration,
       delay: req.body.delay,
       pages: req.body.pages,
+      notes: req.body.notes,
       band: band._id,
     }
     if (typeof req.body.delay === 'undefined') {
@@ -150,6 +151,7 @@ piecesRouter.put('/:id', async (req, res, next) => {
       duration: req.body.duration,
       delay: req.body.delay,
       pages: req.body.pages,
+      notes: req.body.notes,
       band: band._id,
     }
     if (typeof req.body.duration === 'undefined') {

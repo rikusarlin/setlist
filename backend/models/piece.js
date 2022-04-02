@@ -9,6 +9,17 @@ const pieceSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Band',
   },
+  notes: [
+    {
+      instrument: String,
+      rows: [
+        {
+          rowNumber: Number,
+          contents: String,
+        },
+      ],
+    },
+  ],
   pages: [
     {
       pageNumber: Number,
@@ -33,9 +44,17 @@ pieceSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
-    if (returnedObject.pages !== undefined) {
+    if (typeof returnedObject.notes !== 'undefined') {
+      returnedObject.notes.map((note) => {
+        if (typeof note.rows !== 'undefined') {
+          note.rows.map((row) => delete row._id)
+        }
+      })
+      returnedObject.notes.map((note) => delete note._id)
+    }
+    if (typeof returnedObject.pages !== 'undefined') {
       returnedObject.pages.map((page) => {
-        if (page.rows !== undefined) {
+        if (typeof page.rows !== 'undefined') {
           page.rows.map((row) => delete row._id)
         }
       })

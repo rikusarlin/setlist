@@ -30,6 +30,8 @@ Frontend
 - adding and deleting setlists
 - adding and removing pieces to/from setlists
 - "playing" pieces with desired speed based on piece length
+- adding, modifying, and deleting "performance notes" for various instruments
+- ability to choose to see one instrument's "performance notes" when playing pieces
 - (ensure that view is changed if another band member changes view, such as selects next piece in setlist)
 
 It is assumed that pieces are represented in text files in the following style:

@@ -1,4 +1,4 @@
-put http://localhost:3003/api/pieces/622213ecaf4b10f558825d18
+put http://localhost:3003/api/pieces/6246abc20c14a08d94504f28
 Content-Type: application/json
 Accept: application/json
 Authorization: bearer xxxx
@@ -6,7 +6,52 @@ Authorization: bearer xxxx
 {
     "title":"Knockin on Heaven's Door",
     "artist":"Bob Dylani",
-    "bpm":"80",
+    "duration":180,
+    "delay": 25,
+    "notes":[
+        {
+            "instrument":"Guitar",
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "contents": "Finger picking"
+                },
+                {
+                    "rowNumber": 2,
+                    "contents": ""
+                },
+                {
+                    "rowNumber": 3,
+                    "contents": ""
+                },
+                {
+                    "rowNumber": 4,
+                    "contents": "Full chords"
+                }
+            ]
+        },
+        {
+            "instrument":"Bass",
+            "rows":[
+                {
+                    "rowNumber": 1,
+                    "contents": "Don't play anything"
+                },
+                {
+                    "rowNumber": 2,
+                    "contents": ""
+                },
+                {
+                    "rowNumber": 3,
+                    "contents": ""
+                },
+                {
+                    "rowNumber": 4,
+                    "contents": "Start here"
+                }
+            ]
+        }
+    ],
     "pages":[
         {
             "pageNumber":1,

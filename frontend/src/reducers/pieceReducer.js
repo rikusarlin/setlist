@@ -64,6 +64,37 @@ export const transposeDown = (piece, token) => {
   }
 }
 
+export const addNote = (piece, noteInstrument, token) => {
+  return async (dispatch) => {
+    if (typeof piece.notes === 'undefined') {
+      piece.notes = []
+    }
+    piece.notes.push({
+      instrument: noteInstrument,
+      rows: [],
+    })
+    const updatedPiece = await piecesService.update(piece, token)
+    dispatch({
+      type: 'ADD_NOTE',
+      data: updatedPiece,
+    })
+  }
+}
+
+export const deleteNote = (piece, noteInstrument, token) => {
+  return async (dispatch) => {
+    const pieceToUpdate = {
+      ...piece,
+      notes: piece.notes.filter((note) => note.instrument !== noteInstrument),
+    }
+    const updatedPiece = await piecesService.update(pieceToUpdate, token)
+    dispatch({
+      type: 'DELETE_NOTE',
+      data: updatedPiece,
+    })
+  }
+}
+
 export const changeContents = (page, row, newContents) => {
   return async (dispatch) => {
     dispatch({
@@ -103,6 +134,10 @@ const reducer = (state = [], action) => {
       return action.data
     case 'CLEAR_ANALYSIS':
       return null
+    case 'DELETE_NOTE':
+      return action.data
+    case 'ADD_NOTE':
+      return action.data
     default:
       return state
   }

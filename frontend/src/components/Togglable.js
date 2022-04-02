@@ -23,7 +23,7 @@ const Togglable = React.forwardRef((props, ref) => {
         <button
           onClick={toggleVisibility}
           data-cy={props.buttonLabel}
-          className="btn btn-primary"
+          className="btn btn-primary py-2"
         >
           {props.buttonLabel}
         </button>

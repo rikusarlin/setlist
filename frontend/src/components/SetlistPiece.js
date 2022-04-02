@@ -1,12 +1,14 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { fetchPiece } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PieceRows from './PieceRows'
+import NoteSelectionList from './NoteSelectionList'
 import { Link, Element } from 'react-scroll'
 
 export const SetlistPieceNoHistory = (props) => {
+  const [selectedNote, setSelectedNote] = useState('choose')
   useEffect(() => {
     const fetchData = async () => {
       await props.fetchPiece(props.pieceId, props.band.token)
@@ -46,6 +48,10 @@ export const SetlistPieceNoHistory = (props) => {
     }
   }
 
+  const selectNote = (event) => {
+    setSelectedNote(event.target.value)
+  }
+
   if (props.band.username !== null) {
     return (
       <div>
@@ -83,6 +89,11 @@ export const SetlistPieceNoHistory = (props) => {
         >
           next
         </button>
+        <NoteSelectionList
+          selectedNote={selectedNote}
+          onChange={selectNote}
+          className="mx-2"
+        />
         <button
           onClick={returnToSetlist}
           data-cy="back"
@@ -90,9 +101,9 @@ export const SetlistPieceNoHistory = (props) => {
         >
           back
         </button>
-        <PieceRows piece={props.piece} />
+        <PieceRows piece={props.piece} selectedInstrument={selectedNote} />
         <Link
-          className="col-sm-2 mr-2 btn btn-primary white-color"
+          className="col-sm-2 mr-2 py-0 btn btn-primary white-color"
           activeClass="active"
           to="topOfPage"
           smooth={true}
@@ -115,6 +126,11 @@ export const SetlistPieceNoHistory = (props) => {
         >
           next
         </button>
+        <NoteSelectionList
+          selectedNote={selectedNote}
+          onChange={selectNote}
+          className="mx-2"
+        />
         <button
           onClick={returnToSetlist}
           data-cy="back"

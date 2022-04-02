@@ -141,7 +141,7 @@ const skipWhiteSpaceOutput2 = {
           contents: '[Intro]',
         },
         {
-          rowNumber: 2,
+          rowNumber: 3,
           rowType: 'Chords',
           contents: 'Am Fm',
         },
@@ -291,6 +291,10 @@ const songInput1 = {
   contents: '[Intro]\nC Bm Bb\n[Verse 1]\nC Bm Bb\nHey mama doing fine',
 }
 const songOutput1 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
   pages: [
     {
       pageNumber: 1,
@@ -413,7 +417,7 @@ describe('song analysis', () => {
 })
 
 describe('whitespace tests', () => {
-  test('whitespace is skipped correctly if told so', async (done) => {
+  test('whitespace remains if told so', async (done) => {
     const response = await api
       .post('/api/analyze')
       .set('Authorization', `bearer ${token}`)
@@ -423,7 +427,7 @@ describe('whitespace tests', () => {
     expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput1.pages[0].rows)
     done()
   })
-  test('whitespace remains if specified so', async (done) => {
+  test('whitespace is skipped if specified so', async (done) => {
     const response = await api
       .post('/api/analyze')
       .set('Authorization', `bearer ${token}`)
@@ -445,6 +449,98 @@ describe('whitespace tests', () => {
   })
 })
 
+const instrumentNoteInput1 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [],
+    },
+  ],
+  contents: '[Intro]\nC Bm Bb\n[Verse 1]',
+  noteContents: '\nPlay really spaciously',
+}
+const instrumentNoteInput2 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [],
+    },
+  ],
+  contents: '[Intro]\nC Bm Bb\n[Verse 1]',
+  noteContents: '\nPlay really spaciously',
+  noteInstrument: 'Guitar',
+}
+const instrumentNoteOutput2 = {
+  title: 'title1',
+  artist: 'artist1',
+  duration: 120,
+  delay: 30,
+  pages: [{
+    pageNumber: 1,
+    rows: [
+      {
+        rowNumber: 1,
+        rowType: 'Label',
+        contents: '[Intro]',
+      },
+      {
+        rowNumber: 2,
+        rowType: 'Chords',
+        contents: 'C Bm Bb',
+      },
+      {
+        rowNumber: 3,
+        rowType: 'Label',
+        contents: '[Verse 1]',
+      },
+    ],
+  }],
+  notes: [{
+    noteInstrument: 'Guitar',
+    rows: [
+      {
+        rowNumber: 1,
+        contents: '',
+      },
+      {
+        rowNumber: 2,
+        contents: 'Play really spaciously',
+      },
+    ],
+  }],
+}
+
+describe('instrumeent note tests', () => {
+  test('Instrument name is required if instrument notes are given', async (done) => {
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
+      .send(instrumentNoteInput1)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.error).toContain('Note instrument is required if note are given')
+    done()
+  })
+  test('instrument notes are parsed correctly if given', async (done) => {
+    const response = await api
+      .post('/api/analyze')
+      .set('Authorization', `bearer ${token}`)
+      .send(instrumentNoteInput2)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.pages[0].rows).toStrictEqual(instrumentNoteOutput2.pages[0].rows)
+    expect(response.body.notes[0].rows).toStrictEqual(instrumentNoteOutput2.notes[0].rows)
+    done()
+  })
+})
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500))

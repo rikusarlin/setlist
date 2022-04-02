@@ -46,7 +46,7 @@ export const NewNote = (props) => {
             data-cy="create"
             className="btn btn-primary my-2"
           >
-            create
+            save
           </button>
         </form>
       </div>

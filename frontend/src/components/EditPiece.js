@@ -9,16 +9,18 @@ import {
   transposeUp,
   setPiece,
   fetchPiece,
+  deleteNote,
 } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import NoteSelectionList from './NoteSelectionList'
 import PieceRows from './PieceRows'
 import NewNote from './NewNote'
 import { Link, Element } from 'react-scroll'
 
 export const EditPieceNoHistory = (props) => {
   const [selectedNote, setSelectedNote] = useState('choose')
-  const [previousPiece, setPreviousPiece] = useState({})
+  const [editInProgress, setEditInProgress] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     artist: '',
@@ -46,12 +48,12 @@ export const EditPieceNoHistory = (props) => {
         noteContents:
           typeof props.piece.notes !== 'undefined' &&
           props.piece.notes.length > 0
-            ? getNoteContents(props.piece.notes[0].noteInstrument)
+            ? getNoteContents(selectedNote)
             : '',
         noteInstrument:
           typeof props.piece.notes !== 'undefined' &&
           props.piece.notes.length > 0
-            ? props.piece.notes[0].noteInstrument
+            ? selectedNote
             : '',
       }
       setFormData(startFormData)
@@ -126,15 +128,15 @@ export const EditPieceNoHistory = (props) => {
       duration: formData.duration,
       delay: formData.delay,
       pages: [page],
+      notes: props.piece.notes,
       contents: formData.contents,
       noteContents: formData.noteContents,
-      noteInstrument: formData.noteInstrument,
+      noteInstrument: selectedNote,
       skipWhitespace: false,
     }
     try {
       await props.analyzeContents(newPiece, props.band.token)
-      await props.deletePiece(previousPiece.id, props.band.token)
-      await props.fetchPieces(props.band.token)
+      await props.deletePiece(props.piece.id, props.band.token)
       props.showInfo('piece saved', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -156,19 +158,19 @@ export const EditPieceNoHistory = (props) => {
     let noteContents = []
     if (props.piece.notes !== null && props.piece.notes !== undefined) {
       noteContents = props.piece.notes
-        .filter((note) => note.noteInstrument === instrumentName)
+        .filter((note) => note.instrument === instrumentName)
         .map((note) => note.rows.map((row) => row.contents).join('\n'))
     }
     return noteContents
   }
 
   const editContents = async () => {
-    setPreviousPiece(props.piece)
-    props.clearAnalysis()
+    setEditInProgress(true)
   }
 
   const cancelEdit = async () => {
-    props.setPiece(previousPiece)
+    setSelectedNote('choose')
+    setEditInProgress(false)
   }
 
   const returnToPieces = () => {
@@ -176,137 +178,49 @@ export const EditPieceNoHistory = (props) => {
     props.clearAnalysis()
   }
 
-  var noteList = [
-    {
-      id: 'choose',
-      noteInstrument: '(Choose)',
-    },
-  ]
-  if (
-    props.piece !== null &&
-    typeof props.piece !== 'undefined' &&
-    typeof props.piece.notes !== 'undefined' &&
-    props.piece.notes.length >= 0
-  ) {
-    noteList = noteList.concat(
-      props.piece.notes.map((note) => {
-        note.id, note.noteInstrument
-      })
-    )
+  const editModeSelectPiece = (event) => {
+    setSelectedNote(event.target.value)
+    setFormData({
+      ...formData,
+      noteContents: getNoteContents(event.target.value),
+    })
   }
-  const noteListOptions = noteList.map((note, index) => (
-    <option key={index} value={note.id}>
-      {note.noteInstrument}
-    </option>
-  ))
 
-  const noteListSelection =
-    typeof props.piece !== 'undefined' &&
-    typeof props.piece.notes !== 'undefined' &&
-    props.piece.notes.length > 0 ? (
-      <select
-        value={selectedNote.value}
-        data-cy="cy_id_notelist"
-        name="setlist"
-        onChange={(e) => {
-          setSelectedNote(e.target.value)
-          setFormData({
-            ...formData,
-            noteContents: getNoteContents(e.target.value),
-          })
-        }}
-      >
-        {noteListOptions}
-      </select>
-    ) : (
-      ''
-    )
+  const browseModeSelectPiece = (event) => {
+    setSelectedNote(event.target.value)
+  }
 
-  const topButtons =
-    props.piece !== null ? (
-      <div>
-        <div className="row">
-          <Link
-            className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
-            activeClass="active"
-            to="bottomOfPage"
-            smooth={true}
-            delay={props.piece.delay * 1000}
-            duration={props.piece.duration * 0.7 * 1000}
-          >
-            play
-          </Link>{' '}
-          <button
-            onClick={updateContents}
-            data-cy="update"
-            className="col-sm-1 mr-2 btn btn-primary"
-          >
-            save
-          </button>
-          <button
-            onClick={editContents}
-            data-cy="edit"
-            className="col-sm-1 mr-2 btn btn-primary"
-          >
-            edit
-          </button>
-          <button
-            onClick={transposeUp}
-            data-cy="transposeUp"
-            className="col-sm-2 mr-2 btn btn-primary"
-          >
-            up
-          </button>
-          <button
-            onClick={transposeDown}
-            data-cy="transposeDown"
-            className="col-sm-2 mr-2 btn btn-primary"
-          >
-            down
-          </button>
-          {noteListSelection}
-          <button
-            onClick={confirmDelete}
-            data-cy="deletePiece"
-            className="col-sm-2 mr-2 btn btn-danger"
-          >
-            delete
-          </button>
-        </div>
-        <div className="row">
-          <NewNote />
-        </div>
-      </div>
-    ) : (
-      <div>
-        <button
-          onClick={analyzeContents}
-          data-cy="save"
-          className="col-sm-1 mr-2 btn btn-primary"
-        >
-          save
-        </button>
-        <button
-          onClick={cancelEdit}
-          data-cy="cancel"
-          className="col-sm-1 mr-2 btn btn-primary"
-        >
-          cancel
-        </button>
-      </div>
-    )
+  const handleDeleteNote = async () => {
+    try {
+      props.deleteNote(props.piece, selectedNote, props.band.token)
+      props.showInfo('notes deleted', 3)
+    } catch (exception) {
+      console.log('exception: ' + exception)
+      props.showError('error in deleting piece', 3)
+    }
+  }
 
-  const editOrAnalyze =
-    props.piece !== null ? (
-      <div>
+  const confirmDeleteNotes = () => {
+    if (window.confirm(`Remove notes for ${selectedNote}?`)) {
+      handleDeleteNote()
+    }
+  }
+
+  const topButtons = !editInProgress ? (
+    <div>
+      <div className="row">
         <Link
           className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
           activeClass="active"
-          to="topOfPage"
+          to="bottomOfPage"
           smooth={true}
+          delay={props.piece !== null ? props.piece.delay * 1000 : 0}
+          duration={
+            props.piece !== null ? props.piece.duration * 0.7 * 1000 : 0
+          }
         >
-          top
-        </Link>
+          play
+        </Link>{' '}
         <button
           onClick={updateContents}
           data-cy="update"
@@ -324,66 +238,143 @@ export const EditPieceNoHistory = (props) => {
         <button
           onClick={transposeUp}
           data-cy="transposeUp"
-          className="col-sm-2 mr-2 btn btn-primary"
+          className="col-sm-1 mr-2 btn btn-primary"
         >
           up
         </button>
         <button
           onClick={transposeDown}
           data-cy="transposeDown"
-          className="col-sm-2 mr-2 btn btn-primary"
+          className="col-sm-1 mr-2 btn btn-primary"
         >
           down
         </button>
+        <NoteSelectionList
+          selectedNote={selectedNote}
+          onChange={browseModeSelectPiece}
+          className="mx-2"
+        />
         <button
           onClick={confirmDelete}
           data-cy="deletePiece"
-          className="col-sm-2 mr-2 btn btn-danger"
+          className="col-sm-1 mr-2 btn btn-danger"
         >
           delete
         </button>
       </div>
-    ) : (
-      <div>
+    </div>
+  ) : (
+    <div>
+      <div className="row">
+        <NewNote />
+      </div>
+      <div className="row">
+        <NoteSelectionList
+          selectedNote={selectedNote}
+          onChange={editModeSelectPiece}
+          className="col-sm-2"
+        />
         <button
-          onClick={analyzeContents}
-          data-cy="save"
-          className="col-sm-1 mr-2 btn btn-primary"
+          onClick={confirmDeleteNotes}
+          data-cy="deleteNotes"
+          className="col-sm-2 mr-2 btn btn-danger"
         >
-          save
-        </button>
-        <button
-          onClick={cancelEdit}
-          data-cy="cancel"
-          className="col-sm-1 mr-2 btn btn-primary"
-        >
-          cancel
+          delete notes
         </button>
       </div>
-    )
+    </div>
+  )
+
+  const editOrAnalyze = !editInProgress ? (
+    <div>
+      <Link
+        className="col-sm-2 mr-2 py-1 btn btn-primary white-color"
+        activeClass="active"
+        to="topOfPage"
+        smooth={true}
+      >
+        top
+      </Link>
+      <button
+        onClick={updateContents}
+        data-cy="update"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        save
+      </button>
+      <button
+        onClick={editContents}
+        data-cy="edit"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        edit
+      </button>
+      <button
+        onClick={transposeUp}
+        data-cy="transposeUp"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        up
+      </button>
+      <button
+        onClick={transposeDown}
+        data-cy="transposeDown"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        down
+      </button>
+      <NoteSelectionList
+        selectedNote={selectedNote}
+        onChange={browseModeSelectPiece}
+        className="mx-2"
+      />
+      <button
+        onClick={confirmDelete}
+        data-cy="deletePiece"
+        className="col-sm-1 mr-2 btn btn-danger"
+      >
+        delete
+      </button>
+    </div>
+  ) : (
+    <div>
+      <button
+        onClick={analyzeContents}
+        data-cy="save"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        save
+      </button>
+      <button
+        onClick={cancelEdit}
+        data-cy="cancel"
+        className="col-sm-1 mr-2 btn btn-primary"
+      >
+        cancel
+      </button>
+    </div>
+  )
 
   const editFields =
-    selectedNote !== 'choose' ? (
-      <div className="row">
-        <textarea
-          className="col-sm-12"
-          rows="20"
-          name="contents"
-          id="conenents"
-          data-cy="contents"
-          value={formData.contents}
-          onChange={(e) => {
-            setFormData({ ...formData, contents: e.target.value })
-          }}
-        />
-      </div>
+    selectedNote === 'choose' ? (
+      <textarea
+        className="col-sm-12"
+        rows="20"
+        name="contents"
+        id="contents"
+        data-cy="contents"
+        value={formData.contents}
+        onChange={(e) => {
+          setFormData({ ...formData, contents: e.target.value })
+        }}
+      />
     ) : (
-      <div className="row">
+      <div>
         <textarea
           className="col-sm-6"
           rows="20"
           name="contents"
-          id="conenents"
+          id="contents"
           data-cy="contents"
           value={formData.contents}
           onChange={(e) =>
@@ -394,18 +385,21 @@ export const EditPieceNoHistory = (props) => {
           className="col-sm-6"
           rows="20"
           name="noteContents"
-          id="noteConenents"
+          id="noteContents"
           data-cy="noteContents"
           value={formData.noteContents}
           onChange={(e) =>
-            setFormData({ ...formData, contents: e.target.value })
+            setFormData({ ...formData, noteContents: e.target.value })
           }
         />
       </div>
     )
 
-  const analyzedOrRaw =
-    props.piece !== null ? <PieceRows piece={props.piece} /> : { editFields }
+  const analyzedOrRaw = !editInProgress ? (
+    <PieceRows piece={props.piece} selectedInstrument={selectedNote} />
+  ) : (
+    editFields
+  )
 
   return (
     <div className="container">
@@ -466,19 +460,17 @@ export const EditPieceNoHistory = (props) => {
         />
       </div>
       <div className="form-group">{topButtons}</div>
-      <div className="form-group row">{analyzedOrRaw}</div>
-      <div className="form-group">
-        <div className="form-group">{editOrAnalyze}</div>
-        <Element name="bottomOfPage" />{' '}
-        <div className="form-group">
-          <button
-            onClick={returnToPieces}
-            data-cy="back"
-            className="col-sm-1 mr-2 my-2 btn btn-primary"
-          >
-            back
-          </button>
-        </div>
+      <div className="form-group">{analyzedOrRaw}</div>
+      <div className="form-group">{editOrAnalyze}</div>
+      <Element name="bottomOfPage" />{' '}
+      <div className="form-group row">
+        <button
+          onClick={returnToPieces}
+          data-cy="back"
+          className="col-sm-1 mr-2 my-2 btn btn-primary"
+        >
+          back
+        </button>
       </div>
     </div>
   )
@@ -503,6 +495,7 @@ const mapDispatchToProps = {
   fetchPiece,
   setPiece,
   fetchPieces,
+  deleteNote,
 }
 
 const EditPiece = withRouter(EditPieceNoHistory)

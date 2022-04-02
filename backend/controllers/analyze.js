@@ -25,8 +25,13 @@ analyzeRouter.post('/', async (req, res, next) => {
     if (typeof req.body.artist === 'undefined') {
       return res.status(400).json({ error: 'Artist of piece is required' })
     }
-    if (typeof req.body.noteContents !== 'undefined' && typeof req.body.noteInstrument === 'undefined') {
-      return res.status(400).json({ error: 'Note instrument is required if note are given' })
+    if (
+      typeof req.body.noteContents !== 'undefined' &&
+      typeof req.body.noteInstrument === 'undefined'
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Note instrument is required if notes are given' })
     }
 
     let piece = {
@@ -67,7 +72,7 @@ analyzeRouter.post('/', async (req, res, next) => {
           rowType = 'Chords'
         }
         rows.push({
-          rowNumber: index+1,
+          rowNumber: index + 1,
           rowType: rowType,
           contents: row,
         })
@@ -75,42 +80,55 @@ analyzeRouter.post('/', async (req, res, next) => {
     })
 
     // Change possible german notation to english (H=>B, B => Bb)
-    const isGerman = rows.filter(row => row.rowType === 'Chords')
-      .map(row => row.contents.indexOf('H') >= 0)
-      .reduce((pieceIsGerman, rowIsGerman) => pieceIsGerman || rowIsGerman, false)
+    const isGerman = rows
+      .filter((row) => row.rowType === 'Chords')
+      .map((row) => row.contents.indexOf('H') >= 0)
+      .reduce(
+        (pieceIsGerman, rowIsGerman) => pieceIsGerman || rowIsGerman,
+        false
+      )
 
     if (isGerman) {
-      rows = rows.map(row =>  {
-          return ({
-            rowNumber: row.rowNumber,
-            rowType: row.rowType,
-            contents: row.rowType === 'Chords' 
+      rows = rows.map((row) => {
+        return {
+          rowNumber: row.rowNumber,
+          rowType: row.rowType,
+          contents:
+            row.rowType === 'Chords'
               ? row.contents.replace('B', 'Bb').replace('H', 'B')
-              : row.contents
-          })
-        })
+              : row.contents,
+        }
+      })
     }
     piece.pages[0].rows = rows
 
-    if(typeof req.body.noteContents !== 'undefined'){
+    if (typeof req.body.noteContents !== 'undefined') {
       let noteContents = req.body.noteContents
       if (noteContents.indexOf('\n') === -1) {
         noteContents = noteContents + '\n'
       }
       let newNote = {
         instrument: req.body.noteInstrument,
-        rows: []
+        rows: [],
       }
       req.body.noteContents.split('\n').map((noteRow, index) => {
         newNote.rows.push({
-          rowNumber: index+1,
+          rowNumber: index + 1,
           contents: noteRow,
         })
       })
-      if(typeof piece.notes === 'undefined'){
+      if (typeof piece.notes === 'undefined') {
         piece.notes = []
       }
-      piece.notes.push(newNote)
+      const instrumentIndex = piece.notes.findIndex(
+        (note) => note.instrument === req.body.noteInstrument
+      )
+      if (instrumentIndex >= 0) {
+        piece.notes[instrumentIndex] = newNote
+      } else {
+        piece.notes.push(newNote)
+      }
+      console.log('piece.notes: ' + JSON.stringify(piece.notes))
     }
 
     // logger.info('rows: '+JSON.stringify(piece))

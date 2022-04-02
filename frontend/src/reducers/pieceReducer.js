@@ -64,52 +64,32 @@ export const transposeDown = (piece, token) => {
   }
 }
 
-export const addNote = (piece, noteInstrument, noteContents) => {
+export const addNote = (piece, noteInstrument, token) => {
   return async (dispatch) => {
-    console.log('addNote, piece before change: ' + JSON.stringify(piece))
     if (typeof piece.notes === 'undefined') {
       piece.notes = []
     }
     piece.notes.push({
-      noteInstrument: noteInstrument,
-      noteContents: noteContents,
+      instrument: noteInstrument,
+      rows: [],
     })
-    console.log('addNote, piece after change: ' + JSON.stringify(piece))
+    const updatedPiece = await piecesService.update(piece, token)
     dispatch({
       type: 'ADD_NOTE',
-      data: piece,
-    })
-  }
-}
-
-export const deleteNote = (piece, noteInstrument) => {
-  return async (dispatch) => {
-    const updatedPiece = {
-      ...piece,
-      notes: piece.notes.filter(
-        (note) => note.noteInstrument !== noteInstrument
-      ),
-    }
-    dispatch({
-      type: 'DELETE_NOTE',
       data: updatedPiece,
     })
   }
 }
 
-export const updateNote = (piece, noteInstrument, noteContents) => {
+export const deleteNote = (piece, noteInstrument, token) => {
   return async (dispatch) => {
-    const updatedPiece = {
+    const pieceToUpdate = {
       ...piece,
-      notes: piece.notes
-        .filter((note) => note.noteInstrument !== noteInstrument)
-        .push({
-          noteInstrument: noteInstrument,
-          noteContents: noteContents,
-        }),
+      notes: piece.notes.filter((note) => note.instrument !== noteInstrument),
     }
+    const updatedPiece = await piecesService.update(pieceToUpdate, token)
     dispatch({
-      type: 'UPDATE_NOTE',
+      type: 'DELETE_NOTE',
       data: updatedPiece,
     })
   }
@@ -138,8 +118,8 @@ export const clearAnalysis = () => {
 }
 
 const reducer = (state = [], action) => {
-  console.log('state before action in pieceReducer: ', state)
-  console.log('action in pieceReducer', action)
+  //console.log('state before action in pieceReducer: ', state)
+  //console.log('action in pieceReducer', action)
 
   switch (action.type) {
     case 'GET_PIECE':
@@ -157,8 +137,6 @@ const reducer = (state = [], action) => {
     case 'DELETE_NOTE':
       return action.data
     case 'ADD_NOTE':
-      return action.data
-    case 'UPDATE_NOTE':
       return action.data
     default:
       return state

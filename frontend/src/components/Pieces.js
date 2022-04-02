@@ -48,7 +48,10 @@ export const PiecesNoHistory = (props) => {
         {setlist.name}
       </option>
     ))
-    const pieceList = props.pieces.map((piece, index) => (
+    const sortedPieces = props.pieces.sort((a, b) =>
+      a.title.localeCompare(b.title)
+    )
+    const pieceList = sortedPieces.map((piece, index) => (
       <div key={index} className="row">
         <div className="col-sm-4">
           <Link data-cy="piece-link" to={`/piece/${piece.id}`}>

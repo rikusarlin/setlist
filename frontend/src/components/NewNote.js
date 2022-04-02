@@ -16,7 +16,7 @@ export const NewNote = (props) => {
 
     try {
       noteFormRef.current.toggleVisibility()
-      await props.addNote(props.piece, noteInstrument.value, '')
+      await props.addNote(props.piece, noteInstrument.value, props.band.token)
       noteInstrument.reset()
       props.showInfo('added new note to piece', 3)
     } catch (exception) {
@@ -26,7 +26,7 @@ export const NewNote = (props) => {
   }
 
   return (
-    <Togglable buttonLabel="new note" ref={noteFormRef}>
+    <Togglable buttonLabel="new instrument notes" ref={noteFormRef}>
       <div>
         <h3>New note</h3>
         <form onSubmit={handlePost}>
@@ -56,6 +56,7 @@ export const NewNote = (props) => {
 
 const mapStateToProps = (state) => {
   return {
+    band: state.band,
     piece: state.piece,
   }
 }

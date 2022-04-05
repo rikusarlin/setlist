@@ -130,9 +130,11 @@ export const EditPieceNoHistory = (props) => {
       pages: [page],
       notes: props.piece.notes,
       contents: formData.contents,
-      noteContents: formData.noteContents,
-      noteInstrument: selectedNote,
       skipWhitespace: false,
+    }
+    if (selectedNote !== 'choose') {
+      newPiece.noteContents = formData.noteContents
+      newPiece.noteInstrument = selectedNote
     }
     try {
       await props.analyzeContents(newPiece, props.band.token)

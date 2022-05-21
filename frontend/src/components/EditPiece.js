@@ -100,7 +100,9 @@ export const EditPieceNoHistory = (props) => {
 
   const confirmDelete = () => {
     if (
-      window.confirm(`Remove ${props.piece.title} by ${props.piece.artist}?`)
+      window.confirm(
+        `Really remove ${props.piece.title} by ${props.piece.artist}?`
+      )
     ) {
       deletePiece()
     }

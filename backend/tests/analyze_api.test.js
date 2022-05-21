@@ -526,7 +526,7 @@ describe('instrumeent note tests', () => {
       .send(instrumentNoteInput1)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.error).toContain('Note instrument is required if note are given')
+    expect(response.body.error).toContain('Note instrument is required if notes are given')
     done()
   })
   test('instrument notes are parsed correctly if given', async (done) => {

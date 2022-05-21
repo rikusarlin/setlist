@@ -30,9 +30,9 @@ const notesNoA = [
   'H',
 ]
 const modifiers = [
-  'm',
   '7',
   'maj7',
+  '5',
   '6',
   '9',
   '11',
@@ -40,9 +40,24 @@ const modifiers = [
   'add6',
   'add9',
   'add11',
+  '7add6',
+  '7add9',
+  '7add11',
   'sus',
   'sus2',
   'sus4',
+  'm7',
+  'mMaj7',
+  'm6',
+  'm9',
+  'm11',
+  'm13',
+  'madd6',
+  'madd9',
+  'madd11',
+  'm7add6',
+  'm7add9',
+  'm7add11',
 ]
 
 const chordList = () => {

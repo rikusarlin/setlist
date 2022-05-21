@@ -112,7 +112,7 @@ export const EditPieceNoHistory = (props) => {
       props.showInfo('piece transposed down', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
-      props.showError('error in transposing piece down', 3)
+      props.showError('error in transposing piece down!', 3)
     }
   }
 
@@ -129,9 +129,11 @@ export const EditPieceNoHistory = (props) => {
       pages: [page],
       notes: props.piece.notes,
       contents: formData.contents,
-      noteContents: formData.noteContents,
-      noteInstrument: selectedNote,
       skipWhitespace: false,
+    }
+    if (selectedNote !== 'choose') {
+      newPiece.noteContents = formData.noteContents
+      newPiece.noteInstrument = selectedNote
     }
     try {
       await props.analyzeContents(newPiece, props.band.token)

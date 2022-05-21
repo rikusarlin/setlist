@@ -110,7 +110,6 @@ export const EditPieceNoHistory = (props) => {
     try {
       props.transposeDown(props.piece, props.band.token)
       props.showInfo('piece transposed down', 3)
-      props.changePieceData(props.piece)
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in transposing piece down', 3)

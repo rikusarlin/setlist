@@ -161,7 +161,7 @@ const skipWhiteSpaceInput3 = {
       rows: [],
     },
   ],
-  contents: '[Intro]\n\nAm Fm'
+  contents: '[Intro]\n\nAm Fm',
 }
 const skipWhiteSpaceOutput3 = {
   title: 'title1',
@@ -191,7 +191,6 @@ const skipWhiteSpaceOutput3 = {
     },
   ],
 }
-
 
 const chordInput1 = {
   title: 'title1',
@@ -424,7 +423,9 @@ describe('whitespace tests', () => {
       .send(skipWhiteSpaceInput1)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput1.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      skipWhiteSpaceOutput1.pages[0].rows
+    )
     done()
   })
   test('whitespace is skipped if specified so', async (done) => {
@@ -434,7 +435,9 @@ describe('whitespace tests', () => {
       .send(skipWhiteSpaceInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput2.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      skipWhiteSpaceOutput2.pages[0].rows
+    )
     done()
   })
   test('whitespace remains by default', async (done) => {
@@ -444,7 +447,9 @@ describe('whitespace tests', () => {
       .send(skipWhiteSpaceInput3)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(skipWhiteSpaceOutput3.pages[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      skipWhiteSpaceOutput3.pages[0].rows
+    )
     done()
   })
 })
@@ -483,39 +488,43 @@ const instrumentNoteOutput2 = {
   artist: 'artist1',
   duration: 120,
   delay: 30,
-  pages: [{
-    pageNumber: 1,
-    rows: [
-      {
-        rowNumber: 1,
-        rowType: 'Label',
-        contents: '[Intro]',
-      },
-      {
-        rowNumber: 2,
-        rowType: 'Chords',
-        contents: 'C Bm Bb',
-      },
-      {
-        rowNumber: 3,
-        rowType: 'Label',
-        contents: '[Verse 1]',
-      },
-    ],
-  }],
-  notes: [{
-    noteInstrument: 'Guitar',
-    rows: [
-      {
-        rowNumber: 1,
-        contents: '',
-      },
-      {
-        rowNumber: 2,
-        contents: 'Play really spaciously',
-      },
-    ],
-  }],
+  pages: [
+    {
+      pageNumber: 1,
+      rows: [
+        {
+          rowNumber: 1,
+          rowType: 'Label',
+          contents: '[Intro]',
+        },
+        {
+          rowNumber: 2,
+          rowType: 'Chords',
+          contents: 'C Bm Bb',
+        },
+        {
+          rowNumber: 3,
+          rowType: 'Label',
+          contents: '[Verse 1]',
+        },
+      ],
+    },
+  ],
+  notes: [
+    {
+      noteInstrument: 'Guitar',
+      rows: [
+        {
+          rowNumber: 1,
+          contents: '',
+        },
+        {
+          rowNumber: 2,
+          contents: 'Play really spaciously',
+        },
+      ],
+    },
+  ],
 }
 
 describe('instrumeent note tests', () => {
@@ -526,7 +535,9 @@ describe('instrumeent note tests', () => {
       .send(instrumentNoteInput1)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.error).toContain('Note instrument is required if notes are given')
+    expect(response.body.error).toContain(
+      'Note instrument is required if notes are given'
+    )
     done()
   })
   test('instrument notes are parsed correctly if given', async (done) => {
@@ -536,8 +547,12 @@ describe('instrumeent note tests', () => {
       .send(instrumentNoteInput2)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.pages[0].rows).toStrictEqual(instrumentNoteOutput2.pages[0].rows)
-    expect(response.body.notes[0].rows).toStrictEqual(instrumentNoteOutput2.notes[0].rows)
+    expect(response.body.pages[0].rows).toStrictEqual(
+      instrumentNoteOutput2.pages[0].rows
+    )
+    expect(response.body.notes[0].rows).toStrictEqual(
+      instrumentNoteOutput2.notes[0].rows
+    )
     done()
   })
 })

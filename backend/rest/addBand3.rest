@@ -1,12 +1,12 @@
-post http://localhost:3003/api/bands
+post https://band-setlist.herokuapp.com/api/bands
 Content-Type: application/json
 Accept: application/json
 
 {
-    "username": "root",
-    "name": "root band",
-    "password": "sekret",
-    "securityQuestion": "Question",
-    "securityAnswer": "Answer"
+    "username": "Beatles",
+    "name": "Beatles",
+    "password": "m3rseyBeat4",
+    "securityQuestion": "F famous club in Liverpool",
+    "securityAnswer": "Cavern"
 }
 

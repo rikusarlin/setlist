@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const helper = require('./bands_test_helper')
 const app = require('../app')
@@ -16,7 +16,8 @@ const api = supertest(app)
 
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
-    await Band.deleteMany({})
+    const bands = await Band.query({})
+    bands.map((band) => band.delete)
     const band = new Band({
       name: 'Roots',
       username: 'root',
@@ -180,5 +181,5 @@ describe('when there is initially one band at db', () => {
 })
 
 afterAll(() => {
-  mongoose.connection.close()
+  dynamoose.connection.close()
 })

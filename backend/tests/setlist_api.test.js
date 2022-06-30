@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken')
 const testUtil = require('./test_utils')
 const Setlist = require('../models/setlist')
 const Band = require('../models/band')
+import { v4 as uuidv4 } from 'uuid'
 
 const api = supertest(app)
 
@@ -41,7 +42,8 @@ beforeAll(async () => {
 })
 
 beforeEach(async () => {
-  await Piece.deleteMany({})
+  const pieces2 = await Piece.query({})
+  pieces2.map((piece) => piece.delete)
   const pieceObjects = helper.initialPieces.map((piece) => new Piece(piece))
   const piecePromiseArray = pieceObjects.map((piece) => {
     piece.band = decodedToken.id
@@ -51,7 +53,8 @@ beforeEach(async () => {
   const pieces = await Piece.find({ band: decodedToken.id })
   piece = pieces[0]
   piece2 = pieces[1]
-  await Setlist.deleteMany({})
+  const setlists2 = await Setlist.query({})
+  setlists2.map((setlist) => setlist.delete)
   const setlist = new Setlist({
     name: 'Setlist name',
     band: decodedToken.id,
@@ -159,7 +162,7 @@ describe('insert piece to setlist', () => {
     expect(pieceTitles).toContain(piece2.title)
   })
   test('addition fails with 404 and message if setlist is not found', async () => {
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .put(`/api/setlist/${randomId}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
@@ -168,7 +171,7 @@ describe('insert piece to setlist', () => {
   })
   test('addition fails with 404 and message if piece is not found', async () => {
     const setlistsAtBeginning = await setlistsInDb()
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}`)
       .set('Authorization', `bearer ${token}`)
@@ -215,7 +218,7 @@ describe('delete piece from setlist', () => {
     expect(pieceTitles).not.toContain(piece.title)
   })
   test('addition fails with 404 and message if setlist is not found', async () => {
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .delete(`/api/setlist/${randomId}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
@@ -224,7 +227,7 @@ describe('delete piece from setlist', () => {
   })
   test('addition fails with 404 and message if piece is not found', async () => {
     const setlistsAtBeginning = await setlistsInDb()
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .delete(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}`)
       .set('Authorization', `bearer ${token}`)
@@ -371,7 +374,7 @@ describe('move pieces in setlist', () => {
     expect(indexBeforeUpdate).toBe(indexAfterUpdate)
   })
   test('moving fails with 404 and message if setlist is not found', async () => {
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .put(`/api/setlist/${randomId}/${piece2.id}/up`)
       .set('Authorization', `bearer ${token}`)
@@ -380,7 +383,7 @@ describe('move pieces in setlist', () => {
   })
   test('addition fails with 404 and message if piece is not found', async () => {
     const setlistsAtBeginning = await setlistsInDb()
-    var randomId = mongoose.Types.ObjectId()
+    var randomId = uuidv4()
     const response = await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}/down`)
       .set('Authorization', `bearer ${token}`)
@@ -414,5 +417,5 @@ describe('move pieces in setlist', () => {
 })
 
 afterAll(() => {
-  mongoose.connection.close()
+  dynamoose.connection.close()
 })

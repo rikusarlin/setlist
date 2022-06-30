@@ -1,7 +1,8 @@
-const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
+const dynamoose = require('dynamoose')
+const Piece = require('./piece')
+const Setlist = require('./setlist')
 
-const bandSchema = mongoose.Schema({
+const bandSchema = new dynamoose.Schema({
   username: {
     type: String,
     unique: true,
@@ -12,22 +13,17 @@ const bandSchema = mongoose.Schema({
   securityQuestion: String,
   securityAnswerHash: String,
   name: String,
-  pieces: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Piece',
-    },
-  ],
-  setlists: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Setlist',
-    },
-  ],
+  pieces: {
+    type: Array,
+    schema: Piece,
+  },
+  setlists: {
+    type: Array,
+    schema: Setlist,
+  },
 })
 
-bandSchema.plugin(uniqueValidator)
-
+/*
 bandSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
@@ -38,7 +34,8 @@ bandSchema.set('toJSON', {
     delete returnedObject.securityAnswerHash
   },
 })
+*/
 
-const Band = mongoose.model('Band', bandSchema)
+const Band = dynamoose.model('Band', bandSchema)
 
 module.exports = Band

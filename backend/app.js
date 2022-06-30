@@ -3,6 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
+const dynamoose = require('dynamoose')
 const piecesRouter = require('./controllers/pieces')
 const bandsRouter = require('./controllers/bands')
 const analyzeRouter = require('./controllers/analyze')
@@ -11,21 +12,19 @@ const resetRouter = require('./controllers/reset')
 const healthRouter = require('./controllers/health')
 const setlistRouter = require('./controllers/setlists')
 const middleware = require('./utils/middleware')
-const mongoose = require('mongoose')
 const logger = require('./utils/logger')
 
-mongoose.set('useCreateIndex', true)
-mongoose
-  .connect(config.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+// FIXME: move to AWS DynamoDB later on
+dynamoose.aws.ddb.local(config.DYNAMODB_URI)
+logger.info('hopefully connected to DynamoDB')
+/*
   .then(() => {
-    logger.info('connected to MongoDB')
+    logger.info('connected to DynamoDB')
   })
   .catch((error) => {
-    logger.error('error connection to MongoDB:', error.message)
+    logger.error('error in connecting to DynamoDB:', error.message)
   })
+*/
 
 app.use(cors())
 app.use(express.static('build'))

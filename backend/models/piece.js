@@ -1,44 +1,55 @@
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
+const Band = require('./band')
 
-const pieceSchema = mongoose.Schema({
+const pieceSchema = new dynamoose.Schema({
   title: String,
   artist: String,
   duration: Number,
   delay: Number,
-  band: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Band',
+  band: Band,
+  notes: {
+    type: Array,
+    schema: [
+      {
+        instrument: String,
+        rows: {
+          type: Array,
+          schema: [
+            {
+              rowNumber: Number,
+              contents: String,
+            },
+          ],
+        },
+      },
+    ],
   },
-  notes: [
-    {
-      instrument: String,
-      rows: [
-        {
-          rowNumber: Number,
-          contents: String,
+  pages: {
+    type: Array,
+    schema: [
+      {
+        pageNumber: Number,
+        duration: Number,
+        delay: Number,
+        rows: {
+          type: Array,
+          schema: [
+            {
+              rowNumber: Number,
+              rowType: {
+                type: String,
+                enum: ['Label', 'Chords', 'Lyrics'],
+              },
+              contents: String,
+            },
+          ],
         },
-      ],
-    },
-  ],
-  pages: [
-    {
-      pageNumber: Number,
-      duration: Number,
-      delay: Number,
-      rows: [
-        {
-          rowNumber: Number,
-          rowType: {
-            type: String,
-            enum: ['Label', 'Chords', 'Lyrics'],
-          },
-          contents: String,
-        },
-      ],
-    },
-  ],
+      },
+    ],
+  },
 })
 
+/*
 pieceSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
@@ -62,5 +73,6 @@ pieceSchema.set('toJSON', {
     }
   },
 })
+*/
 
-module.exports = mongoose.model('Piece', pieceSchema)
+module.exports = dynamoose.model('Piece', pieceSchema)

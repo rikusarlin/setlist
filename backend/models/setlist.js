@@ -1,19 +1,17 @@
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
+const Band = require('./band')
+const Piece = require('./piece')
 
-const setlistSchema = mongoose.Schema({
+const setlistSchema = new dynamoose.Schema({
   name: String,
-  band: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Band',
+  band: Band,
+  pieces: {
+    type: Array,
+    schema: Piece,
   },
-  pieces: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Piece',
-    },
-  ],
 })
 
+/*
 setlistSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
@@ -21,5 +19,6 @@ setlistSchema.set('toJSON', {
     delete returnedObject.__v
   },
 })
+*/
 
-module.exports = mongoose.model('Setlist', setlistSchema)
+module.exports = dynamoose.model('Setlist', setlistSchema)

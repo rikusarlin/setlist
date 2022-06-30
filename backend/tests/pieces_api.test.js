@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
@@ -32,7 +32,8 @@ beforeAll(async () => {
 })
 
 beforeEach(async () => {
-  await Piece.deleteMany({})
+  const pieces = await Piece.query({})
+  pieces.map((piece) => piece.delete)
   const pieceObjects = helper.initialPieces.map((piece) => new Piece(piece))
   const piecePromiseArray = pieceObjects.map((piece) => {
     piece.band = decodedToken.id
@@ -304,5 +305,5 @@ describe('transpose piece', () => {
 })
 
 afterAll(() => {
-  mongoose.connection.close()
+  dynamoose.connection.close()
 })

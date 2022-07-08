@@ -3,7 +3,7 @@ const bandsRouter = require('express').Router()
 const Band = require('../models/band')
 
 bandsRouter.get('/', async (request, response) => {
-  const bands = await Band.find({})
+  const bands = await Band.scan().exec()
   response.json(bands.map((b) => b.toJSON()))
 })
 
@@ -30,6 +30,20 @@ bandsRouter.post('/', async (request, response, next) => {
         .status(400)
         .json({ error: '`securityAnswer` is required' })
     }
+
+    // username needs to be unique, if given
+    if (body.username) {
+      const countResponse = await Band.scan('username')
+        .eq(body.username)
+        .count()
+        .exec()
+      if (countResponse.count > 0) {
+        return response
+          .status(400)
+          .json({ error: 'band with that name already exists' })
+      }
+    }
+
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
     const securityAnswerHash = await bcrypt.hash(

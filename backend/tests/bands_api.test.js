@@ -16,8 +16,9 @@ const api = supertest(app)
 
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
-    const bands = await Band.query({})
-    bands.map((band) => band.delete)
+    dynamoose.aws.ddb.local()
+    const bands = await Band.scan().exec()
+    bands.map((band) => Band.delete(band.username))
     const band = new Band({
       name: 'Roots',
       username: 'root',
@@ -60,7 +61,7 @@ describe('when there is initially one band at db', () => {
       .send(newBand)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    expect(result.body.error).toContain('`username` to be unique')
+    expect(result.body.error).toContain('band with that name already exists')
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length)
   })
@@ -78,7 +79,9 @@ describe('when there is initially one band at db', () => {
       .send(newBand)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    expect(result.body.error).toContain('`username` is required')
+    expect(result.body.error).toContain(
+      'username is a required property but has no value when trying to save document'
+    )
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length)
   })
@@ -98,7 +101,9 @@ describe('when there is initially one band at db', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
     expect(result.body.error).toContain(
-      'is shorter than the minimum allowed length'
+      'username with a value of ' +
+        newBand.username +
+        ' had a validation error when trying to save the document'
     )
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length)
@@ -181,5 +186,7 @@ describe('when there is initially one band at db', () => {
 })
 
 afterAll(() => {
-  dynamoose.connection.close()
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

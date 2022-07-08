@@ -1,4 +1,4 @@
-const config = require('./utils/config')
+//const config = require('./utils/config')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
@@ -15,7 +15,7 @@ const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
 // FIXME: move to AWS DynamoDB later on
-dynamoose.aws.ddb.local(config.DYNAMODB_URI)
+dynamoose.aws.ddb.local()
 logger.info('hopefully connected to DynamoDB')
 /*
   .then(() => {

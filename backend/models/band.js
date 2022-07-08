@@ -5,9 +5,10 @@ const Setlist = require('./setlist')
 const bandSchema = new dynamoose.Schema({
   username: {
     type: String,
-    unique: true,
-    minlength: 3,
+    validate: (val) => val.length > 2,
     required: true,
+    index: true,
+    hashKey: true,
   },
   passwordHash: String,
   securityQuestion: String,

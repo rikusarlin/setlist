@@ -9,7 +9,7 @@ const newBand = {
 }
 
 const bandsInDb = async () => {
-  const bands = await Band.find({})
+  const bands = await Band.scan().exec()
   return bands.map((b) => b.toJSON())
 }
 

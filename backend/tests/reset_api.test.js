@@ -1,35 +1,45 @@
 /* eslint-disable prettier/prettier */
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Band = require('../models/band')
+const bcrypt = require('bcrypt')
 
 // Define console functions so that they exist...
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }
 
 const api = supertest(app)
 
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
-    await Band.deleteMany({})
-    const band = {
+    dynamoose.aws.ddb.local()
+    const bands = await Band.scan().exec()
+    bands.map((band) => Band.delete(band.username))
+    const saltRounds = 10
+    const password = 'sekret'
+    const securityAnswer = 'Answer'
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+    const securityAnswerHash = await bcrypt.hash(securityAnswer, saltRounds)
+    const band = new Band({
+      name: 'Roots',
       username: 'root',
-      name: 'root band',
-      password: 'sekret',
+      password: password,
       securityQuestion: 'Question',
-      securityAnswer: 'Answer'
-    }
-    await api.post('/api/bands').send(band)
+      securityAnswer: 'Answer',
+      securityAnswerHash,
+      passwordHash,
+    })
+    await band.save()
   })
   test('reset succeeds when valid new password and security answer are given', async () => {
     const resetRequest = {
       username: 'root',
       newPassword: 'sekret2',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     }
     await api
       .post('/api/reset')
@@ -38,10 +48,10 @@ describe('when there is initially one band at db', () => {
       .expect('Content-Type', /application\/json/)
   })
 
-  test('reset fails with 400 and message if username is not present', async () => {
+  test('reset fails with 401 and message if username is not present', async () => {
     const resetRequest = {
       newPassword: 'sekret2',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     }
     const result = await api
       .post('/api/reset')
@@ -54,7 +64,7 @@ describe('when there is initially one band at db', () => {
   test('reset fails with 400 and message if new password is not present', async () => {
     const resetRequest = {
       username: 'root',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     }
     const result = await api
       .post('/api/reset')
@@ -68,7 +78,7 @@ describe('when there is initially one band at db', () => {
     const resetRequest = {
       username: 'root',
       newPassword: 'se',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     }
     const result = await api
       .post('/api/reset')
@@ -84,7 +94,7 @@ describe('when there is initially one band at db', () => {
     const resetRequest = {
       username: 'root',
       newPassword: 'sekret2',
-      securityAnswer: 'Answer2'
+      securityAnswer: 'Answer2',
     }
     const result = await api
       .post('/api/reset')
@@ -96,5 +106,7 @@ describe('when there is initially one band at db', () => {
 })
 
 afterAll(() => {
-  mongoose.connection.close()
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

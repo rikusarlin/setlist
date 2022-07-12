@@ -1,3 +1,4 @@
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
@@ -329,6 +330,7 @@ const songOutput1 = {
 }
 
 beforeAll(async () => {
+  dynamoose.aws.ddb.local()
   var newBand = bandHelper.newBand
   newBand.username = testUtil.randomStr(16)
   await api.post('/api/bands').send(newBand)
@@ -559,4 +561,7 @@ describe('instrumeent note tests', () => {
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500))
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

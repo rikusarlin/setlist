@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken')
 const testUtil = require('./test_utils')
 const Setlist = require('../models/setlist')
 const Band = require('../models/band')
-import { v4 as uuidv4 } from 'uuid'
+const { v4: uuidv4 } = require('uuid')
 
 const api = supertest(app)
 
@@ -21,49 +21,63 @@ global.console = {
   info: jest.fn(),
   error: jest.fn(),
 }
+
 const setlistsInDb = async () => {
-  let setlists = await Setlist.find(
-    { band: decodedToken.id },
-    { name: 1 }
-  ).populate('pieces', { title: 1, artist: 1, id: 1 })
-  return setlists.map((setlist) => setlist.toJSON())
+  dynamoose.aws.ddb.local()
+  const setlists = await Setlist.scan('band')
+    .eq(decodedToken.username)
+    .attributes(['id', 'name', 'pieces'])
+    .exec()
+  return setlists
 }
 
 beforeAll(async () => {
-  var newBand = bandHelper.newBand
-  newBand.username = testUtil.randomStr(16)
-  await api.post('/api/bands').send(newBand)
-  const res = await api.post('/api/login').send({
-    username: newBand.username,
-    password: bandHelper.newBand.password,
-  })
-  token = res.body.token
-  decodedToken = jwt.verify(token, process.env.SECRET)
+  try {
+    dynamoose.aws.ddb.local()
+    var newBand = bandHelper.newBand
+    newBand.username = testUtil.randomStr(16)
+    await api.post('/api/bands').send(newBand)
+    const res = await api.post('/api/login').send(newBand)
+    token = res.body.token
+    decodedToken = jwt.verify(token, process.env.SECRET)
+  } catch (execption) {
+    console.error(execption)
+  }
 })
 
 beforeEach(async () => {
-  const pieces2 = await Piece.query({})
-  pieces2.map((piece) => piece.delete)
-  const pieceObjects = helper.initialPieces.map((piece) => new Piece(piece))
-  const piecePromiseArray = pieceObjects.map((piece) => {
-    piece.band = decodedToken.id
-    return piece.save()
-  })
-  await Promise.all(piecePromiseArray)
-  const pieces = await Piece.find({ band: decodedToken.id })
-  piece = pieces[0]
-  piece2 = pieces[1]
-  const setlists2 = await Setlist.query({})
-  setlists2.map((setlist) => setlist.delete)
-  const setlist = new Setlist({
-    name: 'Setlist name',
-    band: decodedToken.id,
-    pieces: [piece.id],
-  })
-  const savedSetlist = await setlist.save()
-  const band = await Band.findById(decodedToken.id)
-  band.setlists = band.setlists.concat(savedSetlist._id)
-  await band.save()
+  try {
+    dynamoose.aws.ddb.local()
+    const pieces = await Piece.scan().exec()
+    pieces.map(async (piece) => await piece.delete())
+    var newPiece1 = new Piece(helper.initialPieces[0])
+    newPiece1.band = decodedToken.username
+    newPiece1.id = uuidv4()
+    var newPiece2 = new Piece(helper.initialPieces[1])
+    newPiece2.band = decodedToken.username
+    newPiece2.id = uuidv4()
+    piece = await newPiece1.save()
+    piece2 = await newPiece2.save()
+    const setlists2 = await Setlist.scan().exec()
+    setlists2.map(async (setlist) => {
+      await Setlist.delete({ id: setlist.id, band: setlist.band })
+    })
+    var setlist = new Setlist({
+      id: uuidv4(),
+      name: 'Setlist name',
+      band: decodedToken.username,
+      pieces: [piece.id],
+    })
+    const savedSetlist = await setlist.save()
+    var band = await Band.get(decodedToken.username)
+    if (!band.setlists) {
+      band.setlists = []
+    }
+    band.setlists = band.setlists.concat(savedSetlist.id)
+    await band.save()
+  } catch (execption) {
+    console.error(execption)
+  }
 })
 
 describe('fetch setlists', () => {
@@ -209,13 +223,18 @@ describe('delete piece from setlist', () => {
   })
   test('an inserted piece in setlist cannot be found after deletion', async () => {
     const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
     const response = await api
-      .delete(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .delete(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
     const pieceTitles = response.body.pieces.map((piece) => piece.title)
-    expect(pieceTitles).not.toContain(piece.title)
+    expect(pieceTitles).not.toContain(piece2.title)
   })
   test('addition fails with 404 and message if setlist is not found', async () => {
     var randomId = uuidv4()
@@ -288,12 +307,6 @@ describe('delete setlist', () => {
     const setlistsAfterDelete = await setlistsInDb()
     expect(setlistsAfterDelete.length).toBe(setlistsAtStart.length)
   })
-  test('invalid id results in 400 status', async () => {
-    await api
-      .delete('/api/setlist/3457896543')
-      .set('Authorization', `bearer ${token}`)
-      .expect(400)
-  })
 })
 
 describe('move pieces in setlist', () => {
@@ -303,17 +316,13 @@ describe('move pieces in setlist', () => {
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
     const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
-      (item) => item.id === piece2.id
-    )
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece2.id)
     await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/up`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
     const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
-      (item) => item.id === piece2.id
-    )
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece2.id)
     expect(indexBeforeUpdate).toBe(indexAfterUpdate + 1)
   })
   test('1st piece in list stays 1st when moved up', async () => {
@@ -322,17 +331,13 @@ describe('move pieces in setlist', () => {
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
     const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
-      (item) => item.id === piece.id
-    )
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece.id)
     await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/up`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
     const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
-      (item) => item.id === piece.id
-    )
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece.id)
     expect(indexBeforeUpdate).toBe(indexAfterUpdate)
   })
   test('1st piece in list becomes 2nd when moved down', async () => {
@@ -341,17 +346,13 @@ describe('move pieces in setlist', () => {
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
     const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
-      (item) => item.id === piece.id
-    )
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece.id)
     await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/down`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
     const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
-      (item) => item.id === piece.id
-    )
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece.id)
     expect(indexBeforeUpdate).toBe(indexAfterUpdate - 1)
   })
   test('last piece in list stays last when moved down', async () => {
@@ -360,17 +361,13 @@ describe('move pieces in setlist', () => {
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
     const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.findIndex(
-      (item) => item.id === piece2.id
-    )
+    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece2.id)
     await api
       .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/down`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
     const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.findIndex(
-      (item) => item.id === piece2.id
-    )
+    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece2.id)
     expect(indexBeforeUpdate).toBe(indexAfterUpdate)
   })
   test('moving fails with 404 and message if setlist is not found', async () => {
@@ -416,6 +413,9 @@ describe('move pieces in setlist', () => {
   })
 })
 
-afterAll(() => {
-  dynamoose.connection.close()
+afterAll(async () => {
+  await new Promise((resolve) => setTimeout(() => resolve(), 500))
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

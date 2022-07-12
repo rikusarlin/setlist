@@ -13,33 +13,47 @@ var token
 var decodedToken
 
 // Define console functions so that they exist...
+// Comment if you wish to see console.log
+/*
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
   error: jest.fn(),
 }
+*/
 
 beforeAll(async () => {
-  var newBand = bandHelper.newBand
-  newBand.username = testUtil.randomStr(16)
-  await api.post('/api/bands').send(newBand)
-  const res = await api.post('/api/login').send({
-    username: newBand.username,
-    password: bandHelper.newBand.password,
-  })
-  token = res.body.token
-  decodedToken = jwt.verify(token, process.env.SECRET)
+  try {
+    dynamoose.aws.ddb.local()
+    var newBand = bandHelper.newBand
+    newBand.username = testUtil.randomStr(16)
+    await api.post('/api/bands').send(newBand)
+    const res = await api.post('/api/login').send(newBand)
+    token = res.body.token
+    decodedToken = jwt.verify(token, process.env.SECRET)
+  } catch (execption) {
+    console.error(execption)
+  }
 })
 
 beforeEach(async () => {
-  const pieces = await Piece.query({})
-  pieces.map((piece) => piece.delete)
-  const pieceObjects = helper.initialPieces.map((piece) => new Piece(piece))
-  const piecePromiseArray = pieceObjects.map((piece) => {
-    piece.band = decodedToken.id
-    return piece.save()
-  })
-  await Promise.all(piecePromiseArray)
+  try {
+    dynamoose.aws.ddb.local()
+    const pieces = await Piece.scan().exec()
+    pieces.map(async (piece) => {
+      await Piece.delete({ id: piece.id, band: piece.band })
+    })
+    var piece1 = new Piece(helper.initialPieces[0])
+    piece1.band = decodedToken.username
+    piece1.id = testUtil.randomStr(16)
+    var piece2 = new Piece(helper.initialPieces[1])
+    piece2.band = decodedToken.username
+    piece2.id = testUtil.randomStr(16)
+    await piece1.save()
+    await piece2.save()
+  } catch (execption) {
+    console.error(execption)
+  }
 })
 
 describe('fetch all pieces', () => {
@@ -68,6 +82,7 @@ describe('fetch all pieces', () => {
       .get('/api/pieces')
       .set('Authorization', `bearer ${token}`)
     const piece = response.body[0]
+
     expect(piece.id).toBeDefined()
   })
 })
@@ -151,12 +166,6 @@ describe('view a specific piece', () => {
       .set('Authorization', `bearer ${token}`)
       .expect(404)
   })
-  test('invalid id results in 400 status', async () => {
-    await api
-      .get('/api/pieces/3457896543')
-      .set('Authorization', `bearer ${token}`)
-      .expect(400)
-  })
 })
 
 describe('delete piece', () => {
@@ -193,12 +202,6 @@ describe('delete piece', () => {
       .expect(404)
     const piecesAfterDelete = await helper.piecesInDb()
     expect(piecesAfterDelete.length).toBe(piecesAtStart.length)
-  })
-  test('invalid id results in 400 status', async () => {
-    await api
-      .delete('/api/pieces/3457896543')
-      .set('Authorization', `bearer ${token}`)
-      .expect(400)
   })
 })
 
@@ -248,15 +251,6 @@ describe('update piece', () => {
       .send(pieceToUpdate)
       .expect(404)
   })
-  test('invalid id results in 400 status', async () => {
-    const piecesAtStart = await helper.piecesInDb()
-    var pieceToUpdate = piecesAtStart[0]
-    await api
-      .put('/api/pieces/3457896543')
-      .set('Authorization', `bearer ${token}`)
-      .send(pieceToUpdate)
-      .expect(400)
-  })
   test('update without title results in 400', async () => {
     const piecesAtStart = await helper.piecesInDb()
     var pieceToUpdate = piecesAtStart[0]
@@ -305,5 +299,7 @@ describe('transpose piece', () => {
 })
 
 afterAll(() => {
-  dynamoose.connection.close()
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

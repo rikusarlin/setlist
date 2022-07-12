@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Band = require('../models/band')
@@ -8,20 +8,22 @@ const Band = require('../models/band')
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }
 
 const api = supertest(app)
 
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
-    await Band.deleteMany({})
+    dynamoose.aws.ddb.local()
+    const bands = await Band.scan().exec()
+    bands.map((band) => Band.delete(band.username))
     const band = {
       username: 'root',
       name: 'root band',
       password: 'sekret',
       securityQuestion: 'Question',
-      securityAnswer: 'Answer'
+      securityAnswer: 'Answer',
     }
     await api.post('/api/bands').send(band)
   })
@@ -29,7 +31,7 @@ describe('when there is initially one band at db', () => {
   test('login succeeds when valid username and password are given', async () => {
     const loginRequest = {
       username: 'root',
-      password: 'sekret'
+      password: 'sekret',
     }
     await api
       .post('/api/login')
@@ -41,7 +43,7 @@ describe('when there is initially one band at db', () => {
   test('reset fails with 401 and message if password does not match that of existing band', async () => {
     const loginRequest = {
       username: 'root',
-      password: 'sekret2'
+      password: 'sekret2',
     }
     const result = await api
       .post('/api/login')
@@ -54,7 +56,7 @@ describe('when there is initially one band at db', () => {
   test('reset fails with 401 and message if username is not found', async () => {
     const loginRequest = {
       username: 'aStrangeUsername',
-      password: 'sekret2'
+      password: 'sekret2',
     }
     const result = await api
       .post('/api/login')
@@ -66,5 +68,7 @@ describe('when there is initially one band at db', () => {
 })
 
 afterAll(() => {
-  mongoose.connection.close()
+  if (dynamoose.connection) {
+    dynamoose.connection.close()
+  }
 })

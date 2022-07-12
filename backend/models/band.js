@@ -7,7 +7,6 @@ const bandSchema = new dynamoose.Schema({
     type: String,
     validate: (val) => val.length > 2,
     required: true,
-    index: true,
     hashKey: true,
   },
   passwordHash: String,
@@ -37,6 +36,6 @@ bandSchema.set('toJSON', {
 })
 */
 
-const Band = dynamoose.model('Band', bandSchema)
+const Band = dynamoose.model('Band', bandSchema, { update: true })
 
 module.exports = Band

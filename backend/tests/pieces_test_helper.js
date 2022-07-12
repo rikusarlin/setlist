@@ -144,8 +144,9 @@ var newPiece = {
 }
 
 const piecesInDb = async () => {
-  const pieces = await Piece.find({})
-  return pieces.map((piece) => piece.toJSON())
+  let pieces = await Piece.scan().exec()
+  pieces.sort((a, b) => b.title.localeCompare(a.title))
+  return pieces.map((b) => b.toJSON())
 }
 
 module.exports = {

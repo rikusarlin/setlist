@@ -3,6 +3,7 @@ const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
 const Piece = require('../models/piece')
 const jwt = require('jsonwebtoken')
+const { v4: uuidv4 } = require('uuid')
 
 const onlyWhitespace = (str) => {
   return /^\s*$/.test(str)
@@ -11,14 +12,12 @@ const onlyWhitespace = (str) => {
 analyzeRouter.post('/', async (req, res, next) => {
   try {
     const decodedToken = jwt.verify(req.token, process.env.SECRET)
-    if (!req.token || !decodedToken.id) {
+    if (!req.token || !decodedToken.username) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-
     if (typeof req.body.contents === 'undefined') {
       return res.status(400).json({ error: 'No contents to analyze' })
     }
-
     if (typeof req.body.title === 'undefined') {
       return res.status(400).json({ error: 'Title of piece is required' })
     }
@@ -35,13 +34,14 @@ analyzeRouter.post('/', async (req, res, next) => {
     }
 
     let piece = {
+      id: uuidv4(),
       title: req.body.title,
       artist: req.body.artist,
       duration: req.body.duration,
       delay: req.body.delay,
       notes: req.body.notes,
       pages: req.body.pages,
-      band: decodedToken.id,
+      band: decodedToken.username,
     }
     if (typeof req.body.delay === 'undefined') {
       piece.delay = 0

@@ -6,7 +6,12 @@ resetRouter.post('/', async (request, response, next) => {
   try {
     const body = request.body
 
-    const band = await Band.findOne({ username: body.username })
+    if (!body.username) {
+      return response.status(401).json({
+        error: 'invalid username or security answer',
+      })
+    }
+    const band = await Band.get(body.username)
     const securityAnswerCorrect =
       band === null
         ? false
@@ -40,10 +45,9 @@ resetRouter.post('/', async (request, response, next) => {
       passwordHash,
     })
 
-    band.overwrite(updatedBand)
-    let updatedSavedBand = await band.save()
+    let updatedSavedBand = band.save(updatedBand)
     if (updatedSavedBand) {
-      response.json(updatedSavedBand.toJSON())
+      response.json(updatedSavedBand)
     } else {
       response.status(404).end()
     }

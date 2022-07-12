@@ -6,11 +6,10 @@ const Band = require('../models/band')
 loginRouter.post('/', async (request, response) => {
   const body = request.body
 
-  const band = await Band.findOne({ username: body.username })
-  const passwordCorrect =
-    band === null
-      ? false
-      : await bcrypt.compare(body.password, band.passwordHash)
+  const [band] = await Band.query('username').eq(body.username).exec()
+  const passwordCorrect = !band
+    ? false
+    : await bcrypt.compare(body.password, band.passwordHash)
 
   if (!(band && passwordCorrect)) {
     return response.status(401).json({

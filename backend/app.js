@@ -15,6 +15,9 @@ const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
 // FIXME: move to AWS DynamoDB later on
+dynamoose.model.defaults.set({
+  update: true,
+})
 dynamoose.aws.ddb.local()
 logger.info('hopefully connected to DynamoDB')
 /*

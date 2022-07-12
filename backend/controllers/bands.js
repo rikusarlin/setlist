@@ -12,12 +12,20 @@ bandsRouter.post('/', async (request, response, next) => {
     const body = request.body
 
     // Validity checks on password and security question & answer... not the hash
+    if (!body.username) {
+      return response.status(400).json({ error: 'missing username' })
+    }
     if (typeof body.password === 'undefined') {
       return response.status(400).json({ error: '`password` is required' })
     }
     if (body.password.length < 3) {
       return response.status(400).json({
         error: `password length ${body.password.length} is shorter than the minimum allowed length (3)`,
+      })
+    }
+    if (body.username.length < 3) {
+      return response.status(400).json({
+        error: `username ${body.username.length} is shorter than the minimum allowed length (3)`,
       })
     }
     if (typeof body.securityQuestion === 'undefined') {
@@ -43,7 +51,6 @@ bandsRouter.post('/', async (request, response, next) => {
           .json({ error: 'band with that name already exists' })
       }
     }
-
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
     const securityAnswerHash = await bcrypt.hash(

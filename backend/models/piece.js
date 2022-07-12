@@ -2,6 +2,11 @@ const dynamoose = require('dynamoose')
 const Band = require('./band')
 
 const pieceSchema = new dynamoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    hashKey: true,
+  },
   title: String,
   artist: String,
   duration: Number,
@@ -11,15 +16,21 @@ const pieceSchema = new dynamoose.Schema({
     type: Array,
     schema: [
       {
-        instrument: String,
-        rows: {
-          type: Array,
-          schema: [
-            {
-              rowNumber: Number,
-              contents: String,
-            },
-          ],
+        type: Object,
+        schema: {
+          instrument: String,
+          rows: {
+            type: Array,
+            schema: [
+              {
+                type: Object,
+                schema: {
+                  rowNumber: Number,
+                  contents: String,
+                },
+              },
+            ],
+          },
         },
       },
     ],
@@ -28,21 +39,27 @@ const pieceSchema = new dynamoose.Schema({
     type: Array,
     schema: [
       {
-        pageNumber: Number,
-        duration: Number,
-        delay: Number,
-        rows: {
-          type: Array,
-          schema: [
-            {
-              rowNumber: Number,
-              rowType: {
-                type: String,
-                enum: ['Label', 'Chords', 'Lyrics'],
+        type: Object,
+        schema: {
+          pageNumber: Number,
+          duration: Number,
+          delay: Number,
+          rows: {
+            type: Array,
+            schema: [
+              {
+                type: Object,
+                schema: {
+                  rowNumber: Number,
+                  rowType: {
+                    type: String,
+                    enum: ['Label', 'Chords', 'Lyrics'],
+                  },
+                  contents: String,
+                },
               },
-              contents: String,
-            },
-          ],
+            ],
+          },
         },
       },
     ],
@@ -75,4 +92,4 @@ pieceSchema.set('toJSON', {
 })
 */
 
-module.exports = dynamoose.model('Piece', pieceSchema)
+module.exports = dynamoose.model('Piece', pieceSchema, { update: true })

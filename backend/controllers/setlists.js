@@ -4,18 +4,34 @@ const Setlist = require('../models/setlist')
 const Piece = require('../models/piece')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
+const { v4: uuidv4 } = require('uuid')
+//const { update } = require('lodash')
 
 setlistRouter.get('/', async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!request.token || !decodedToken.id) {
+    if (!request.token) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
-    let setlists = await Setlist.find(
-      { band: decodedToken.id },
-      { name: 1 }
-    ).populate('pieces', { title: 1, artist: 1, id: 1 })
-    response.json(setlists)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.username) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    let setlists = await Setlist.scan('band')
+      .eq(decodedToken.username)
+      .attributes(['id', 'name', 'pieces'])
+      .exec()
+    // Read some properties for pieces
+    const populatedSetlists = await Promise.all(
+      setlists.map(async (setlist) => {
+        if (setlist.pieces.length > 0) {
+          setlist.pieces = await Piece.batchGet(setlist.pieces, {
+            attributes: ['id', 'title', 'artist'],
+          })
+        }
+        return setlist
+      })
+    )
+    response.json(populatedSetlists)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
@@ -24,11 +40,14 @@ setlistRouter.get('/', async (request, response, next) => {
 
 setlistRouter.post('/', async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!request.token || !decodedToken.id) {
+    if (!request.token) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
-    const band = await Band.findById(decodedToken.id)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.username) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const band = await Band.get(decodedToken.username)
     const body = request.body
     if (typeof body.name === 'undefined') {
       return response.status(400).json({ error: '`name` is required' })
@@ -38,12 +57,18 @@ setlistRouter.post('/', async (request, response, next) => {
         error: `name length ${body.name.length} is shorter than the minimum allowed length (3)`,
       })
     }
-    const setlist = new Setlist({
+    const setlist = {
+      id: uuidv4(),
       name: body.name,
-      band: decodedToken.id,
-    })
-    const savedSetlist = await setlist.save()
-    band.setlists = band.setlists.concat(savedSetlist._id)
+      band: decodedToken.username,
+      pieces: [],
+    }
+    const newSetlist = new Setlist(setlist)
+    const savedSetlist = await newSetlist.save()
+    if (!band.setlists) {
+      band.setlists = []
+    }
+    band.setlists = band.setlists.concat(savedSetlist.id)
     await band.save()
     response.status(201).json(savedSetlist)
   } catch (error) {
@@ -54,36 +79,45 @@ setlistRouter.post('/', async (request, response, next) => {
 
 setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
   try {
+    if (!request.token) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!request.token || !decodedToken.id) {
+    if (!decodedToken.username) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    const piece = await Piece.findById(request.params.pieceid)
+    const piece = await Piece.get(request.params.pieceid)
     if (!piece) {
-      response.status(404).json({ error: `piece not found` })
+      return response.status(404).json({ error: `piece not found` })
     }
 
-    var setlist = await Setlist.findById(request.params.setlistid)
+    var setlist = await Setlist.get(request.params.setlistid)
     if (!setlist) {
-      response.status(404).json({ error: `setlist not found` })
+      return response.status(404).json({ error: `setlist not found` })
     }
 
+    if (!setlist.pieces) {
+      setlist.pieces = []
+    }
     const pieceIndex = setlist.pieces.indexOf(piece.id)
     if (pieceIndex >= 0) {
-      response.status(400).json({
+      return response.status(400).json({
         error: `piece is already in setlist`,
       })
     }
 
-    setlist.pieces = setlist.pieces.concat(piece.id)
-    await setlist.save()
+    var updatedSetlist = await Setlist.update(
+      { id: request.params.setlistid },
+      { $ADD: { pieces: piece.id } }
+    )
+    if (updatedSetlist.pieces.length > 0) {
+      updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
+        attributes: ['id', 'title', 'artist'],
+      })
+    }
 
-    const updatedSetlist = await Setlist.findById(setlist.id, {
-      name: 1,
-    }).populate('pieces', { title: 1, artist: 1, id: 1 })
-
-    response.status(200).json(updatedSetlist)
+    return response.status(200).json(updatedSetlist)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
@@ -100,24 +134,27 @@ setlistRouter.put(
   '/:setlistid/:pieceid/:dir',
   async (request, response, next) => {
     try {
+      if (!request.token) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+      }
       const decodedToken = jwt.verify(request.token, process.env.SECRET)
-      if (!request.token || !decodedToken.id) {
+      if (!decodedToken.username) {
         return response.status(401).json({ error: 'token missing or invalid' })
       }
 
-      const piece = await Piece.findById(request.params.pieceid)
+      const piece = await Piece.get(request.params.pieceid)
       if (!piece) {
-        response.status(404).json({ error: `piece not found` })
+        return response.status(404).json({ error: `piece not found` })
       }
 
-      var setlist = await Setlist.findById(request.params.setlistid)
+      var setlist = await Setlist.get(request.params.setlistid)
       if (!setlist) {
-        response.status(404).json({ error: `setlist not found` })
+        return response.status(404).json({ error: `setlist not found` })
       }
 
       const pieceIndex = setlist.pieces.indexOf(piece.id)
       if (pieceIndex < 0) {
-        response.status(404).json({
+        return response.status(404).json({
           error: `piece not in setlist`,
         })
       }
@@ -133,16 +170,20 @@ setlistRouter.put(
           await setlist.save()
         }
       } else {
-        response.status(400).json({
+        return response.status(400).json({
           error: `invalid direction, only up and down are allowed`,
         })
       }
 
-      const updatedSetlist = await Setlist.findById(setlist.id, {
-        name: 1,
-      }).populate('pieces', { title: 1, artist: 1, id: 1 })
-
-      response.status(200).json(updatedSetlist)
+      const updatedSetlist = await Setlist.get(setlist.id, {
+        attributes: ['id', 'name', 'pieces'],
+      })
+      if (updatedSetlist.pieces.length > 0) {
+        updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
+          attributes: ['id', 'title', 'artist'],
+        })
+      }
+      return response.status(200).json(updatedSetlist)
     } catch (error) {
       logger.error('error: ' + error)
       next(error)
@@ -154,19 +195,22 @@ setlistRouter.delete(
   '/:setlistid/:pieceid',
   async (request, response, next) => {
     try {
+      if (!request.token) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+      }
       const decodedToken = jwt.verify(request.token, process.env.SECRET)
-      if (!request.token || !decodedToken.id) {
+      if (!decodedToken.username) {
         return response.status(401).json({ error: 'token missing or invalid' })
       }
 
-      const piece = await Piece.findById(request.params.pieceid)
+      const piece = await Piece.get(request.params.pieceid)
       if (!piece) {
-        response.status(404).json({ error: `piece not found` })
+        return response.status(404).json({ error: `piece not found` })
       }
 
-      var setlist = await Setlist.findById(request.params.setlistid)
+      var setlist = await Setlist.get(request.params.setlistid)
       if (!setlist) {
-        response.status(404).json({ error: `setlist not found` })
+        return response.status(404).json({ error: `setlist not found` })
       }
 
       const pieceIndex = setlist.pieces.indexOf(piece.id)
@@ -175,11 +219,16 @@ setlistRouter.delete(
         await setlist.save()
       }
 
-      const updatedSetlist = await Setlist.findById(setlist.id, {
-        name: 1,
-      }).populate('pieces', { title: 1, artist: 1, id: 1 })
+      const updatedSetlist = await Setlist.get(setlist.id, {
+        attributes: ['id', 'name', 'pieces'],
+      })
+      if (updatedSetlist.pieces.length > 0) {
+        updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
+          attributes: ['id', 'title', 'artist'],
+        })
+      }
 
-      response.status(200).json(updatedSetlist)
+      return response.status(200).json(updatedSetlist)
     } catch (error) {
       logger.error('error: ' + error)
       next(error)
@@ -189,11 +238,14 @@ setlistRouter.delete(
 
 setlistRouter.delete('/:id', async (req, res, next) => {
   try {
-    const decodedToken = jwt.verify(req.token, process.env.SECRET)
-    if (!req.token || !decodedToken.id) {
+    if (!req.token) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    let setlistToDelete = await Setlist.findById(req.params.id)
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    if (!decodedToken.username) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+    let setlistToDelete = await Setlist.get(req.params.id)
 
     if (!setlistToDelete) {
       return res.status(204).end()
@@ -202,19 +254,17 @@ setlistRouter.delete('/:id', async (req, res, next) => {
     // Can delete setlist from own band only
     if (
       new String(setlistToDelete.band).valueOf() !=
-      new String(decodedToken.id).valueOf()
+      new String(decodedToken.username).valueOf()
     ) {
       return res.status(404).end()
     }
 
     // Delete setlist from band
-    const band = await Band.findById(setlistToDelete.band._id)
+    let band = await Band.get(setlistToDelete.band)
     var setlistIndex = band.setlists.indexOf(req.params.id)
     band.setlists.splice(setlistIndex, 1)
     await band.save()
-    await Setlist.findByIdAndRemove(req.params.id).setOptions({
-      useFindAndModify: false,
-    })
+    await setlistToDelete.delete()
     return res.status(204).end()
   } catch (error) {
     logger.error('error: ' + error)

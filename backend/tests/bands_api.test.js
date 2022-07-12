@@ -79,9 +79,7 @@ describe('when there is initially one band at db', () => {
       .send(newBand)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    expect(result.body.error).toContain(
-      'username is a required property but has no value when trying to save document'
-    )
+    expect(result.body.error).toContain('missing username')
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length)
   })
@@ -101,9 +99,7 @@ describe('when there is initially one band at db', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
     expect(result.body.error).toContain(
-      'username with a value of ' +
-        newBand.username +
-        ' had a validation error when trying to save the document'
+      'is shorter than the minimum allowed length'
     )
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length)

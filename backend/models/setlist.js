@@ -1,13 +1,18 @@
 const dynamoose = require('dynamoose')
-const Band = require('./band')
-const Piece = require('./piece')
+//const Band = require('./band')
+//const Piece = require('./piece')
 
 const setlistSchema = new dynamoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    hashKey: true,
+  },
   name: String,
-  band: Band,
+  band: String,
   pieces: {
     type: Array,
-    schema: Piece,
+    schema: [String],
   },
 })
 
@@ -21,4 +26,4 @@ setlistSchema.set('toJSON', {
 })
 */
 
-module.exports = dynamoose.model('Setlist', setlistSchema)
+module.exports = dynamoose.model('Setlist', setlistSchema, { update: true })

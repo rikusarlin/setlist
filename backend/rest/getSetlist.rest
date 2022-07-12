@@ -1,4 +1,4 @@
 get http://localhost:3003/api/setlist
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbGEiLCJpYXQiOjE2NTc0NTIwODV9.3ivby4xtHgIq15GPVhLnja0Y4Li3n9MMoI2VnmLHWkY
+Authorization: bearer xxx
 

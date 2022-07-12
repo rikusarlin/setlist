@@ -1,7 +1,6 @@
 put http://localhost:3003/api/setlist/6c25bc23-fe33-4d03-8262-87e5fad1a0e2/824e2099-41ab-4030-a7f2-a8219f3900d0
 Content-Type: application/json
 Accept: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbGEiLCJpYXQiOjE2NTc0NTIwODV9.3ivby4xtHgIq15GPVhLnja0Y4Li3n9MMoI2VnmLHWkY
-
+Authorization: bearer xxx
 
 

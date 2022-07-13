@@ -4,6 +4,7 @@ const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
 const app = require('../app')
 const Piece = require('../models/piece')
+const Band = require('../models/band')
 const jwt = require('jsonwebtoken')
 const testUtil = require('./test_utils')
 
@@ -14,17 +15,21 @@ var decodedToken
 
 // Define console functions so that they exist...
 // Comment if you wish to see console.log
-/*
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
   error: jest.fn(),
 }
-*/
 
 beforeAll(async () => {
   try {
     dynamoose.aws.ddb.local()
+    const bands = await Band.scan().exec()
+    await Promise.all(
+      bands.map(async (band) => {
+        await Band.delete({ username: band.username })
+      })
+    )
     var newBand = bandHelper.newBand
     newBand.username = testUtil.randomStr(16)
     await api.post('/api/bands').send(newBand)
@@ -40,9 +45,11 @@ beforeEach(async () => {
   try {
     dynamoose.aws.ddb.local()
     const pieces = await Piece.scan().exec()
-    pieces.map(async (piece) => {
-      await Piece.delete({ id: piece.id, band: piece.band })
-    })
+    await Promise.all(
+      pieces.map(async (piece) => {
+        await Piece.delete({ id: piece.id, band: piece.band })
+      })
+    )
     var piece1 = new Piece(helper.initialPieces[0])
     piece1.band = decodedToken.username
     piece1.id = testUtil.randomStr(16)
@@ -241,15 +248,6 @@ describe('update piece', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
     expect(resultPiece.body.delay).toBe(delayBeforeUpdate + 10)
-  })
-  test('fails with 404 status when called with non-existing but valid id', async () => {
-    const piecesAtStart = await helper.piecesInDb()
-    var pieceToUpdate = piecesAtStart[0]
-    await api
-      .put('/api/pieces/5dfa698896cfe676450a2916')
-      .set('Authorization', `bearer ${token}`)
-      .send(pieceToUpdate)
-      .expect(404)
   })
   test('update without title results in 400', async () => {
     const piecesAtStart = await helper.piecesInDb()

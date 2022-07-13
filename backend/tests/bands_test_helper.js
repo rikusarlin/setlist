@@ -6,6 +6,8 @@ const newBand = {
   password: 'JohnWasADickhead',
   securityQuestion: 'The Kindergarden',
   securityAnswer: 'Strawberry Fields',
+  pieces: [],
+  setlists: [],
 }
 
 const bandsInDb = async () => {

@@ -139,8 +139,11 @@ piecesRouter.delete('/:id', async (req, res, next) => {
 
 piecesRouter.put('/:id', async (req, res, next) => {
   try {
+    if (!req.token) {
+      return res.status(401).json({ error: 'Token missing or invalid' })
+    }
     const decodedToken = jwt.verify(req.token, process.env.SECRET)
-    if (!req.token || !decodedToken.username) {
+    if (!decodedToken.username) {
       return res.status(401).json({ error: 'Token missing or invalid' })
     }
     const band = await Band.get(decodedToken.username)
@@ -200,7 +203,7 @@ piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
     if (req.params.dir === 'undefined') {
       return res.status(400).json({ error: 'Transposing direction not given' })
     }
-
+    console.log(`page: ${JSON.stringify(piece)}`)
     for (let page = 0; page < piece.pages.length; page++) {
       for (let row = 0; row < piece.pages[page].rows.length; row++) {
         if (piece.pages[page].rows[row].rowType === 'Chords') {

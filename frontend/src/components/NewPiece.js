@@ -22,8 +22,8 @@ export const NewPieceNoHistory = (props) => {
     let newPiece = {
       title: title.value,
       artist: artist.value,
-      duration: duration.value,
-      delay: delay.value,
+      duration: parseInt(duration.value),
+      delay: parseInt(delay.value),
       pages: [page],
       contents: contents.value,
       skipWhitespace: true,
@@ -71,6 +71,8 @@ export const NewPieceNoHistory = (props) => {
         <input
           className="col-sm-5"
           data-cy="duration"
+          type="text"
+          pattern="[0-9]*"
           {...removeReset(duration)}
         />
       </div>
@@ -78,7 +80,13 @@ export const NewPieceNoHistory = (props) => {
         <label htmlFor="Duration" className="col-sm-2 col-form-label">
           Delay (seconds)
         </label>
-        <input className="col-sm-5" data-cy="delay" {...removeReset(delay)} />
+        <input
+          className="col-sm-5"
+          data-cy="delay"
+          type="text"
+          pattern="[0-9]*"
+          {...removeReset(delay)}
+        />
       </div>
       <div className="form-group row">
         <textarea

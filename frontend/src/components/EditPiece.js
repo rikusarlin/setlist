@@ -42,8 +42,8 @@ export const EditPieceNoHistory = (props) => {
       const startFormData = {
         title: props.piece.title,
         artist: props.piece.artist,
-        duration: props.piece.duration,
-        delay: props.piece.delay,
+        duration: parseInt(props.piece.duration),
+        delay: parseInt(props.piece.delay),
         contents: getRowContents(),
         noteContents:
           typeof props.piece.notes !== 'undefined' &&
@@ -65,8 +65,8 @@ export const EditPieceNoHistory = (props) => {
       let newPiece = props.piece
       newPiece.title = formData.title
       newPiece.artist = formData.artist
-      newPiece.duration = formData.duration
-      newPiece.delay = formData.delay
+      newPiece.duration = parseInt(formData.duration)
+      newPiece.delay = parseInt(formData.delay)
 
       props.updatePiece(newPiece, props.band.token)
       props.showInfo('piece updated', 3)
@@ -443,6 +443,8 @@ export const EditPieceNoHistory = (props) => {
           name="duration"
           id="duration"
           data-cy="duration"
+          type="text"
+          pattern="[0-9]*"
           value={formData.duration}
           onChange={(e) =>
             setFormData({ ...formData, duration: e.target.value })
@@ -458,6 +460,8 @@ export const EditPieceNoHistory = (props) => {
           name="delay"
           id="delay"
           data-cy="delay"
+          type="text"
+          pattern="[0-9]*"
           value={formData.delay}
           onChange={(e) => setFormData({ ...formData, delay: e.target.value })}
         />

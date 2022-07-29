@@ -1,7 +1,5 @@
 const setlistRouter = require('express').Router()
-const Band = require('../models/band')
-const Setlist = require('../models/setlist')
-const Piece = require('../models/piece')
+const BandSetlist = require('../models/bandsetlist')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
 const { v4: uuidv4 } = require('uuid')
@@ -16,22 +14,74 @@ setlistRouter.get('/', async (request, response, next) => {
     if (!decodedToken.username) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
-    let setlists = await Setlist.scan('band')
-      .eq(decodedToken.username)
-      .attributes(['id', 'name', 'pieces'])
+    const setlists = await BandSetlist.query('sk')
+      .eq('SETLIST')
+      .where('data')
+      .beginsWith(`BAND-${decodedToken.username}`)
+      .attributes(['id', 'setlistName'])
+      .using('GSI1')
       .exec()
-    // Read some properties for pieces
-    const populatedSetlists = await Promise.all(
-      setlists.map(async (setlist) => {
-        if (setlist.pieces.length > 0) {
-          setlist.pieces = await Piece.batchGet(setlist.pieces, {
-            attributes: ['id', 'title', 'artist'],
-          })
-        }
-        return setlist
-      })
-    )
-    response.json(populatedSetlists)
+
+    console.log(`setlists: ${JSON.stringify(setlists)}`)
+    response.json(setlists)
+  } catch (error) {
+    logger.error('error: ' + error)
+    next(error)
+  }
+})
+
+setlistRouter.get('/:id', async (request, response, next) => {
+  try {
+    if (!request.token) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.username) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const setlist = await BandSetlist.get({
+      pk: `SETLIST-${request.params.id}`,
+      sk: 'SETLIST',
+    })
+    if (!setlist) {
+      return response.status(404).json({ error: `setlist not found` })
+    }
+    console.log(JSON.stringify(setlist))
+    const setlistPieces = await BandSetlist.query('pk')
+      .eq(`SETLIST-${request.params.id}`)
+      .where('sk')
+      .beginsWith(`PIECE-`)
+      .attributes([
+        'id',
+        'pk',
+        'sk',
+        'data',
+        'setlistName',
+        'title',
+        'artist',
+        'indexInSetlist',
+      ])
+      .exec()
+    console.log('setlistPieces: ' + JSON.stringify(setlistPieces))
+    let pieceData = setlistPieces.map((setlistPiece) => {
+      return {
+        id: setlistPiece.sk.substring(6),
+        title: setlistPiece.title,
+        artist: setlistPiece.artist,
+        indexInSetlist: setlistPiece.indexInSetlist,
+      }
+    })
+    pieceData.sort((a, b) => a.indexInSetlist - b.indexInSetlist)
+    console.log(`pieceData: ${JSON.stringify(pieceData)}`)
+    const setlistInfo = {
+      id: request.params.id,
+      name: setlist.setlistName,
+    }
+    if (pieceData) {
+      setlistInfo.pieces = pieceData
+    }
+    console.log(`setlistInfo: ${JSON.stringify(setlistInfo)}`)
+    response.json(setlistInfo)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
@@ -47,7 +97,6 @@ setlistRouter.post('/', async (request, response, next) => {
     if (!decodedToken.username) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
-    const band = await Band.get(decodedToken.username)
     const body = request.body
     if (typeof body.name === 'undefined') {
       return response.status(400).json({ error: '`name` is required' })
@@ -57,19 +106,25 @@ setlistRouter.post('/', async (request, response, next) => {
         error: `name length ${body.name.length} is shorter than the minimum allowed length (3)`,
       })
     }
+    const id = uuidv4()
     const setlist = {
-      id: uuidv4(),
-      name: body.name,
-      band: decodedToken.username,
-      pieces: [],
+      pk: `SETLIST-${id}`,
+      sk: 'SETLIST',
+      data: `BAND-${decodedToken.username}`,
+      id: id,
+      setlistName: body.name,
     }
-    const newSetlist = new Setlist(setlist)
+    const newSetlist = new BandSetlist(setlist)
     const savedSetlist = await newSetlist.save()
-    if (!band.setlists) {
-      band.setlists = []
+    const setlist2 = {
+      pk: `SETLIST-${id}`,
+      sk: `BAND-${decodedToken.username}`,
+      data: `SETLIST-${id}`,
+      id: id,
+      setlistName: body.name,
     }
-    band.setlists = band.setlists.concat(savedSetlist.id)
-    await band.save()
+    const newSetlist2 = new BandSetlist(setlist2)
+    newSetlist2.save()
     response.status(201).json(savedSetlist)
   } catch (error) {
     logger.error('error: ' + error)
@@ -87,48 +142,83 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    const piece = await Piece.get(request.params.pieceid)
+    const piece = await BandSetlist.get({
+      pk: `PIECE-${request.params.pieceid}`,
+      sk: 'PIECE',
+    })
     if (!piece) {
       return response.status(404).json({ error: `piece not found` })
     }
 
-    var setlist = await Setlist.get(request.params.setlistid)
+    const setlist = await BandSetlist.get({
+      pk: `SETLIST-${request.params.setlistid}`,
+      sk: 'SETLIST',
+    })
     if (!setlist) {
       return response.status(404).json({ error: `setlist not found` })
     }
 
-    if (!setlist.pieces) {
-      setlist.pieces = []
-    }
-    const pieceIndex = setlist.pieces.indexOf(piece.id)
-    if (pieceIndex >= 0) {
+    const pieceInsetlist = await BandSetlist.get({
+      pk: `SETLIST-${request.params.setlistid}`,
+      sk: `PIECE-${request.params.pieceid}`,
+    })
+    if (pieceInsetlist) {
       return response.status(400).json({
         error: `piece is already in setlist`,
       })
     }
 
-    var updatedSetlist = await Setlist.update(
-      { id: request.params.setlistid },
-      { $ADD: { pieces: piece.id } }
-    )
-    if (updatedSetlist.pieces.length > 0) {
-      updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
-        attributes: ['id', 'title', 'artist'],
-      })
+    if (!setlist.pieces) {
+      setlist.pieces = []
+    }
+    let piecesInSetlist = await BandSetlist.query('pk')
+      .eq(`SETLIST-${request.params.setlistid}`)
+      .where('sk')
+      .beginsWith(`PIECE-`)
+      .attributes([
+        'id',
+        'sk',
+        'data',
+        'setlistName',
+        'title',
+        'artist',
+        'indexInSetlist',
+      ])
+      .exec()
+
+    const newSetlistPieceData = {
+      pk: `SETLIST-${request.params.setlistid}`,
+      sk: `PIECE-${request.params.pieceid}`,
+      data: `SETLIST-${request.params.setlistid}`,
+      setlistName: setlist.name,
+      indexInSetlist: piecesInSetlist.length,
+      title: piece.title,
+      artist: piece.artist,
+    }
+    const newSetlistPiece = new BandSetlist(newSetlistPieceData)
+    const savedSetlistPiece = await newSetlistPiece.save()
+    piecesInSetlist.push(savedSetlistPiece)
+    piecesInSetlist.sort((a, b) => a.indexInSetlist - b.indexInSetlist)
+    const pieceData = piecesInSetlist.map((setlistPiece) => {
+      return {
+        id: setlistPiece.sk.substring(6),
+        title: setlistPiece.title,
+        artist: setlistPiece.artist,
+        indexInSetlist: setlistPiece.indexInSetlist,
+      }
+    })
+    const setlistData = {
+      id: setlist.id,
+      name: setlist.setlistName,
+      pieces: pieceData,
     }
 
-    return response.status(200).json(updatedSetlist)
+    return response.status(200).json(setlistData)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
   }
 })
-
-const arraymove = (arr, fromIndex, toIndex) => {
-  var element = arr[fromIndex]
-  arr.splice(fromIndex, 1)
-  arr.splice(toIndex, 0, element)
-}
 
 setlistRouter.put(
   '/:setlistid/:pieceid/:dir',
@@ -142,48 +232,104 @@ setlistRouter.put(
         return response.status(401).json({ error: 'token missing or invalid' })
       }
 
-      const piece = await Piece.get(request.params.pieceid)
+      const piece = await BandSetlist.get({
+        pk: `PIECE-${request.params.pieceid}`,
+        sk: 'PIECE',
+      })
       if (!piece) {
         return response.status(404).json({ error: `piece not found` })
       }
 
-      var setlist = await Setlist.get(request.params.setlistid)
+      const setlist = await BandSetlist.get({
+        pk: `SETLIST-${request.params.setlistid}`,
+        sk: 'SETLIST',
+      })
       if (!setlist) {
         return response.status(404).json({ error: `setlist not found` })
       }
 
-      const pieceIndex = setlist.pieces.indexOf(piece.id)
-      if (pieceIndex < 0) {
+      let piecesInSetlist = await BandSetlist.query('pk')
+        .eq(`SETLIST-${request.params.setlistid}`)
+        .where('sk')
+        .beginsWith(`PIECE-`)
+        .attributes([
+          'id',
+          'pk',
+          'sk',
+          'data',
+          'setlistName',
+          'title',
+          'artist',
+          'indexInSetlist',
+        ])
+        .exec()
+
+      let [setlistPiece] = piecesInSetlist.filter(
+        (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+      )
+      if (!setlistPiece) {
         return response.status(404).json({
           error: `piece not in setlist`,
         })
       }
+      const pieceIndex = setlistPiece.indexInSetlist
 
       if (request.params.dir == 'up') {
         if (pieceIndex > 0) {
-          arraymove(setlist.pieces, pieceIndex, pieceIndex - 1)
-          await setlist.save()
+          let [pieceAbove] = piecesInSetlist.filter(
+            (setlistPiece) => setlistPiece.indexInSetlist === pieceIndex - 1
+          )
+          setlistPiece.indexInSetlist = setlistPiece.indexInSetlist - 1
+          pieceAbove.indexInSetlist = pieceAbove.indexInSetlist + 1
+          await setlistPiece.save()
+          await pieceAbove.save()
         }
       } else if (request.params.dir == 'down') {
-        if (pieceIndex < setlist.pieces.length - 1) {
-          arraymove(setlist.pieces, pieceIndex, pieceIndex + 1)
-          await setlist.save()
+        if (pieceIndex < piecesInSetlist.length - 1) {
+          let [pieceBelow] = piecesInSetlist.filter(
+            (setlistPiece) => setlistPiece.indexInSetlist === pieceIndex + 1
+          )
+          setlistPiece.indexInSetlist = setlistPiece.indexInSetlist + 1
+          pieceBelow.indexInSetlist = pieceBelow.indexInSetlist - 1
+          await setlistPiece.save()
+          await pieceBelow.save()
         }
       } else {
         return response.status(400).json({
           error: `invalid direction, only up and down are allowed`,
         })
       }
-
-      const updatedSetlist = await Setlist.get(setlist.id, {
-        attributes: ['id', 'name', 'pieces'],
+      const updatedSetlist = await BandSetlist.query('pk')
+        .eq(`SETLIST-${request.params.setlistid}`)
+        .where('sk')
+        .beginsWith(`PIECE-`)
+        .attributes([
+          'id',
+          'pk',
+          'sk',
+          'data',
+          'setlistName',
+          'title',
+          'artist',
+          'indexInSetlist',
+        ])
+        .exec()
+      let pieceData = updatedSetlist.map((setlistPiece) => {
+        return {
+          id: setlistPiece.sk.substring(6),
+          title: setlistPiece.title,
+          artist: setlistPiece.artist,
+          indexInSetlist: setlistPiece.indexInSetlist,
+        }
       })
-      if (updatedSetlist.pieces.length > 0) {
-        updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
-          attributes: ['id', 'title', 'artist'],
-        })
+      pieceData.sort((a, b) => a.indexInSetlist - b.indexInSetlist)
+      const updatedSetlistData = {
+        id: setlist.id,
+        name: setlist.name,
+        pieces: pieceData,
       }
-      return response.status(200).json(updatedSetlist)
+
+      return response.status(200).json(updatedSetlistData)
     } catch (error) {
       logger.error('error: ' + error)
       next(error)
@@ -203,32 +349,97 @@ setlistRouter.delete(
         return response.status(401).json({ error: 'token missing or invalid' })
       }
 
-      const piece = await Piece.get(request.params.pieceid)
+      const piece = await BandSetlist.get({
+        pk: `PIECE-${request.params.pieceid}`,
+        sk: 'PIECE',
+      })
       if (!piece) {
         return response.status(404).json({ error: `piece not found` })
       }
 
-      var setlist = await Setlist.get(request.params.setlistid)
+      const setlist = await BandSetlist.get({
+        pk: `SETLIST-${request.params.setlistid}`,
+        sk: 'SETLIST',
+      })
       if (!setlist) {
         return response.status(404).json({ error: `setlist not found` })
       }
 
-      const pieceIndex = setlist.pieces.indexOf(piece.id)
-      if (pieceIndex >= 0) {
-        setlist.pieces.splice(pieceIndex, 1)
-        await setlist.save()
+      let piecesInSetlist = await BandSetlist.query('pk')
+        .eq(`SETLIST-${request.params.setlistid}`)
+        .where('sk')
+        .beginsWith(`PIECE-`)
+        .attributes([
+          'id',
+          'pk',
+          'sk',
+          'data',
+          'setlistName',
+          'title',
+          'artist',
+          'indexInSetlist',
+        ])
+        .exec()
+
+      let [setlistPiece] = piecesInSetlist.filter(
+        (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+      )
+      if (!setlistPiece) {
+        return response.status(404).json({ error: `piece not in setlist` })
+      } else {
+        const deletedSetlistIndex = setlistPiece.indexInSetlist
+        console.log('deletedSetlistIndex:' + deletedSetlistIndex)
+        const setlistPiecesToUpdate = piecesInSetlist.filter(
+          (setlistPiece) => setlistPiece.indexInSetlist > deletedSetlistIndex
+        )
+        console.log(
+          'setlistPiecesToUpdate:' + JSON.stringify(setlistPiecesToUpdate)
+        )
+        setlistPiecesToUpdate.forEach(
+          (setlistPiece) => setlistPiece.indexInSetlist--
+        )
+        console.log(
+          'setlistPiecesToUpdate:' + JSON.stringify(setlistPiecesToUpdate)
+        )
+        await Promise.all(
+          setlistPiecesToUpdate.map(async (setlistPiece) => {
+            await setlistPiece.save()
+          })
+        )
+        await setlistPiece.delete()
       }
 
-      const updatedSetlist = await Setlist.get(setlist.id, {
-        attributes: ['id', 'name', 'pieces'],
+      const updatedSetlist = await BandSetlist.query('pk')
+        .eq(`SETLIST-${request.params.setlistid}`)
+        .where('sk')
+        .beginsWith(`PIECE-`)
+        .attributes([
+          'id',
+          'pk',
+          'sk',
+          'data',
+          'setlistName',
+          'title',
+          'artist',
+          'indexInSetlist',
+        ])
+        .exec()
+      let pieceData = updatedSetlist.map((setlistPiece) => {
+        return {
+          id: setlistPiece.sk.substring(6),
+          title: setlistPiece.title,
+          artist: setlistPiece.artist,
+          indexInSetlist: setlistPiece.indexInSetlist,
+        }
       })
-      if (updatedSetlist.pieces.length > 0) {
-        updatedSetlist.pieces = await Piece.batchGet(updatedSetlist.pieces, {
-          attributes: ['id', 'title', 'artist'],
-        })
+      pieceData.sort((a, b) => a.indexInSetlist - b.indexInSetlist)
+      const updatedSetlistData = {
+        id: setlist.id,
+        name: setlist.name,
+        pieces: pieceData,
       }
 
-      return response.status(200).json(updatedSetlist)
+      return response.status(200).json(updatedSetlistData)
     } catch (error) {
       logger.error('error: ' + error)
       next(error)
@@ -245,7 +456,10 @@ setlistRouter.delete('/:id', async (req, res, next) => {
     if (!decodedToken.username) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    let setlistToDelete = await Setlist.get(req.params.id)
+    const setlistToDelete = await BandSetlist.get({
+      pk: `SETLIST-${req.params.id}`,
+      sk: 'SETLIST',
+    })
 
     if (!setlistToDelete) {
       return res.status(204).end()
@@ -253,18 +467,21 @@ setlistRouter.delete('/:id', async (req, res, next) => {
 
     // Can delete setlist from own band only
     if (
-      new String(setlistToDelete.band).valueOf() !=
-      new String(decodedToken.username).valueOf()
+      new String(setlistToDelete.data).valueOf() !=
+      new String(`BAND-${decodedToken.username}`).valueOf()
     ) {
       return res.status(404).end()
     }
 
-    // Delete setlist from band
-    let band = await Band.get(setlistToDelete.band)
-    var setlistIndex = band.setlists.indexOf(req.params.id)
-    band.setlists.splice(setlistIndex, 1)
-    await band.save()
-    await setlistToDelete.delete()
+    // Delete setlist and all related
+    const setlistStuffToDelete = await BandSetlist.query({
+      pk: `SETLIST-${req.params.id}`,
+    }).exec()
+    await Promise.all(
+      setlistStuffToDelete.map(async (setlistPiece) => {
+        await setlistPiece.delete()
+      })
+    )
     return res.status(204).end()
   } catch (error) {
     logger.error('error: ' + error)

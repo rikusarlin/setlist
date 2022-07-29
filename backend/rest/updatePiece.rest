@@ -1,7 +1,7 @@
-put http://localhost:3003/api/pieces/6246abc20c14a08d94504f28
+put http://localhost:3003/api/pieces/6447cd98-adf7-4b6f-8c0b-46ed5aabf736
 Content-Type: application/json
 Accept: application/json
-Authorization: bearer xxxx
+Authorization: bearer xxx
 
 {
     "title":"Knockin on Heaven's Door",

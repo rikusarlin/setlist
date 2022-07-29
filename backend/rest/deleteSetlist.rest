@@ -1,4 +1,4 @@
-delete http://localhost:3003/api/setlist/623608d6712cd01d15cd34fb/6234c793a32fd00e5e505237
+delete http://localhost:3003/api/setlist/a0a8596b-a419-4951-b540-b90fabd9e0dd
 Content-Type: application/json
 Accept: application/json
 Authorization: bearer xxx

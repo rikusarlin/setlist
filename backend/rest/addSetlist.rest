@@ -4,7 +4,7 @@ Accept: application/json
 Authorization: bearer xxx
 
 {
-    "name":"IT Christmas party 2021-11-26"
+    "name":"IT Christmas party2 2021-11-26"
 }
 
 

@@ -6,7 +6,8 @@ Authorization: bearer xxx
 {
     "title":"Knockin on Heaven's Door",
     "artist":"Bob Dylan",
-    "bpm":80,
+    "duration":180,
+    "delay":25,
     "pages":[
         {
             "pageNumber":1,

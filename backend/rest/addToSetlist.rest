@@ -1,4 +1,4 @@
-put http://localhost:3003/api/setlist/6c25bc23-fe33-4d03-8262-87e5fad1a0e2/824e2099-41ab-4030-a7f2-a8219f3900d0
+put http://localhost:3003/api/setlist/a0a8596b-a419-4951-b540-b90fabd9e0dd/e80777db-8eed-413e-a827-56f9e49fcb6b
 Content-Type: application/json
 Accept: application/json
 Authorization: bearer xxx

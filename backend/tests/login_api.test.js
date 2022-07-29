@@ -2,7 +2,7 @@
 const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const app = require('../app')
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 
 // Define console functions so that they exist...
 global.console = {
@@ -16,8 +16,12 @@ const api = supertest(app)
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
     dynamoose.aws.ddb.local()
-    const bands = await Band.scan().exec()
-    bands.map((band) => Band.delete(band.username))
+    const bands = await BandSetlist.query('sk').eq('BAND').using('GSI1').exec()
+    await Promise.all(
+      bands.map(async (band) => {
+        await band.delete()
+      })
+    )
     const band = {
       username: 'root',
       name: 'root band',

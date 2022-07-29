@@ -1,7 +1,5 @@
 const piecesRouter = require('express').Router()
-const Piece = require('../models/piece')
-const Setlist = require('../models/setlist')
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
 const { transpose } = require('../utils/music')
@@ -13,7 +11,13 @@ piecesRouter.get('/', async (request, response, next) => {
     if (!request.token || !decodedToken.username) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
-    const pieces = await Piece.scan('band').eq(decodedToken.username).exec()
+    const pieces = await BandSetlist.query('sk')
+      .eq('PIECE')
+      .where('data')
+      .eq(`BAND-${decodedToken.username}`)
+      .attributes(['id', 'title', 'artist'])
+      .using('GSI1')
+      .exec()
     const piecesMapped = pieces.map((piece) => ({
       id: piece.id,
       title: piece.title,
@@ -34,7 +38,10 @@ piecesRouter.post('/', async (req, res, next) => {
     if (!req.token || !decodedToken.username) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    var band = await Band.get(decodedToken.username)
+    var band = await BandSetlist.get({
+      pk: `BAND-${decodedToken.username}`,
+      sk: 'BAND',
+    })
 
     if (typeof req.body.title === 'undefined') {
       return res.status(400).json({ error: 'Title of piece is required' })
@@ -43,15 +50,18 @@ piecesRouter.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Artist of piece is required' })
     }
 
+    const pieceId = uuidv4()
     let piece = {
-      id: uuidv4(),
+      pk: `PIECE-${pieceId}`,
+      sk: 'PIECE',
+      data: `BAND-${decodedToken.username}`,
+      id: pieceId,
       title: req.body.title,
       artist: req.body.artist,
-      duration: req.body.duration,
-      delay: req.body.delay,
+      duration: parseInt(req.body.duration, 10),
+      delay: parseInt(req.body.delay, 10),
       pages: req.body.pages,
       notes: req.body.notes,
-      band: decodedToken.username,
     }
     if (typeof req.body.delay === 'undefined') {
       piece.delay = 0
@@ -60,12 +70,8 @@ piecesRouter.post('/', async (req, res, next) => {
       piece.duration = 0
     }
 
-    let newPiece = new Piece(piece)
+    let newPiece = new BandSetlist(piece)
     let savedPiece = await newPiece.save()
-    if (!band.pieces) {
-      band.pieces = []
-    }
-    band.pieces = band.pieces.concat(savedPiece.id)
     await band.save()
     res.status(201).json(savedPiece.toJSON())
   } catch (error) {
@@ -76,7 +82,10 @@ piecesRouter.post('/', async (req, res, next) => {
 
 piecesRouter.get('/:id', async (req, res, next) => {
   try {
-    const piece = await Piece.get(req.params.id)
+    const piece = await BandSetlist.get({
+      pk: `PIECE-${req.params.id}`,
+      sk: 'PIECE',
+    })
 
     if (piece) {
       res.json(piece.toJSON())
@@ -95,7 +104,10 @@ piecesRouter.delete('/:id', async (req, res, next) => {
     if (!req.token || !decodedToken.username) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
-    let pieceToDelete = await Piece.get(req.params.id)
+    const pieceToDelete = await BandSetlist.get({
+      pk: `PIECE-${req.params.id}`,
+      sk: 'PIECE',
+    })
 
     if (!pieceToDelete) {
       return res.status(204).end()
@@ -103,33 +115,13 @@ piecesRouter.delete('/:id', async (req, res, next) => {
 
     // Can delete piece from own band only
     if (
-      new String(pieceToDelete.band).valueOf() !=
-      new String(decodedToken.username).valueOf()
+      new String(pieceToDelete.data).valueOf() !=
+      new String(`BAND-${decodedToken.username}`).valueOf()
     ) {
       return res.status(404).end()
     }
 
-    // Delete piece from setlists, if any
-    var setlistsWithPiece = await Setlist.scan()
-      .filter('pieces')
-      .contains(req.params.id)
-      .exec()
-    for (let setlist = 0; setlist < setlistsWithPiece.length; setlist++) {
-      var pieceIndex = setlistsWithPiece[setlist].pieces.indexOf(req.params.id)
-      setlistsWithPiece[setlist].pieces.splice(pieceIndex, 1)
-      setlistsWithPiece[setlist].save()
-    }
-    // Delete piece from band, if any
-    var bandsWithPiece = await Band.scan()
-      .filter('pieces')
-      .contains(req.params.id)
-      .exec()
-    for (let band = 0; band < bandsWithPiece.length; band++) {
-      var pieceIndex2 = bandsWithPiece[band].pieces.indexOf(req.params.id)
-      bandsWithPiece[band].pieces.splice(pieceIndex2, 1)
-      bandsWithPiece[band].save()
-    }
-    await Piece.delete(req.params.id)
+    await pieceToDelete.delete()
     return res.status(204).end()
   } catch (error) {
     logger.error('error: ' + error)
@@ -146,38 +138,42 @@ piecesRouter.put('/:id', async (req, res, next) => {
     if (!decodedToken.username) {
       return res.status(401).json({ error: 'Token missing or invalid' })
     }
-    const band = await Band.get(decodedToken.username)
-
     if (typeof req.body.title === 'undefined') {
       return res.status(400).json({ error: 'Title of piece is required' })
     }
     if (typeof req.body.artist === 'undefined') {
       return res.status(400).json({ error: 'Artist of piece is required' })
     }
-    const previousPiece = await Piece.get(req.params.id)
+    var previousPiece = await BandSetlist.get({
+      pk: `PIECE-${req.params.id}`,
+      sk: 'PIECE',
+    })
     if (!previousPiece) {
       res.status(404).end()
     }
-
-    let piece = {
-      id: req.params.id,
-      title: req.body.title,
-      artist: req.body.artist,
-      duration: req.body.duration,
-      delay: req.body.delay,
-      pages: req.body.pages,
-      notes: req.body.notes,
-      band: band.username,
+    // Can transpose piece from own band only
+    if (
+      new String(previousPiece.data).valueOf() !=
+      new String(`BAND-${decodedToken.username}`).valueOf()
+    ) {
+      return res.status(404).end()
     }
+
+    previousPiece.title = req.body.title
+    previousPiece.artist = req.body.artist
+    previousPiece.duration = parseInt(req.body.duration, 10)
+    previousPiece.delay = parseInt(req.body.delay, 10)
+    previousPiece.pages = req.body.pages
+    previousPiece.notes = req.body.notes
+
     if (typeof req.body.duration === 'undefined') {
-      piece.duration = 0
+      previousPiece.duration = 0
     }
     if (typeof req.body.delay === 'undefined') {
-      piece.delay = 0
+      previousPiece.delay = 0
     }
 
-    const updatedPiece = new Piece(piece)
-    const savedPiece = await updatedPiece.save()
+    const savedPiece = await previousPiece.save()
     if (savedPiece) {
       res.json(savedPiece.toJSON())
     } else {
@@ -195,7 +191,10 @@ piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
       return res.status(401).json({ error: 'Token missing or invalid' })
     }
 
-    let piece = await Piece.get(req.params.id)
+    var piece = await BandSetlist.get({
+      pk: `PIECE-${req.params.id}`,
+      sk: 'PIECE',
+    })
     if (!piece) {
       res.status(404).end()
     }
@@ -203,6 +202,15 @@ piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
     if (req.params.dir === 'undefined') {
       return res.status(400).json({ error: 'Transposing direction not given' })
     }
+
+    // Can transpose piece from own band only
+    if (
+      new String(piece.data).valueOf() !=
+      new String(`BAND-${decodedToken.username}`).valueOf()
+    ) {
+      return res.status(404).end()
+    }
+
     console.log(`page: ${JSON.stringify(piece)}`)
     for (let page = 0; page < piece.pages.length; page++) {
       for (let row = 0; row < piece.pages[page].rows.length; row++) {

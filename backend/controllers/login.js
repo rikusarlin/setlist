@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const loginRouter = require('express').Router()
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 
 loginRouter.post('/', async (request, response) => {
   const body = request.body
 
-  const [band] = await Band.query('username').eq(body.username).exec()
+  var band = await BandSetlist.get({
+    pk: `BAND-${body.username}`,
+    sk: 'BAND',
+  })
   const passwordCorrect = !band
     ? false
     : await bcrypt.compare(body.password, band.passwordHash)
@@ -19,7 +22,7 @@ loginRouter.post('/', async (request, response) => {
 
   const bandForToken = {
     username: band.username,
-    id: band._id,
+    id: band.id,
   }
 
   const token = jwt.sign(bandForToken, process.env.SECRET)

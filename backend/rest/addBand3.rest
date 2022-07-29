@@ -1,4 +1,4 @@
-post https://band-setlist.herokuapp.com/api/bands
+post http://localhost:3003/api/bands
 Content-Type: application/json
 Accept: application/json
 
@@ -6,7 +6,7 @@ Accept: application/json
     "username": "Beatles",
     "name": "Beatles",
     "password": "m3rseyBeat4",
-    "securityQuestion": "F famous club in Liverpool",
+    "securityQuestion": "Famous club in Liverpool",
     "securityAnswer": "Cavern"
 }
 

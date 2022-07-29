@@ -3,7 +3,7 @@ const dynamoose = require('dynamoose')
 const supertest = require('supertest')
 const helper = require('./bands_test_helper')
 const app = require('../app')
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 
 // Define console functions so that they exist...
 global.console = {
@@ -17,9 +17,16 @@ const api = supertest(app)
 describe('when there is initially one band at db', () => {
   beforeEach(async () => {
     dynamoose.aws.ddb.local()
-    const bands = await Band.scan().exec()
-    bands.map((band) => Band.delete(band.username))
-    const band = new Band({
+    const bands = await BandSetlist.query('sk').eq('BAND').using('GSI1').exec()
+    await Promise.all(
+      bands.map(async (band) => {
+        await band.delete()
+      })
+    )
+    const band = new BandSetlist({
+      pk: 'BAND-root',
+      sk: 'BAND',
+      data: 'BAND-root',
       name: 'Roots',
       username: 'root',
       password: 'sekret',
@@ -36,11 +43,12 @@ describe('when there is initially one band at db', () => {
   })
   test('creation succeeds with a fresh username', async () => {
     const bandsAtStart = await helper.bandsInDb()
-    await api
+    const addedBand = await api
       .post('/api/bands')
       .send(helper.newBand)
       .expect(200)
       .expect('Content-Type', /application\/json/)
+    console.log(addedBand)
     const bandsAtEnd = await helper.bandsInDb()
     expect(bandsAtEnd.length).toBe(bandsAtStart.length + 1)
     const usernames = bandsAtEnd.map((u) => u.username)

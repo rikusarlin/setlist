@@ -3,11 +3,9 @@ const supertest = require('supertest')
 const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
 const app = require('../app')
-const Piece = require('../models/piece')
 const jwt = require('jsonwebtoken')
 const testUtil = require('./test_utils')
-const Setlist = require('../models/setlist')
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 const { v4: uuidv4 } = require('uuid')
 
 const api = supertest(app)
@@ -24,9 +22,9 @@ global.console = {
 
 const setlistsInDb = async () => {
   dynamoose.aws.ddb.local()
-  const setlists = await Setlist.scan('band')
-    .eq(decodedToken.username)
-    .attributes(['id', 'name', 'pieces'])
+  const setlists = await BandSetlist.query('sk')
+    .eq('SETLIST')
+    .using('GSI1')
     .exec()
   return setlists
 }
@@ -48,33 +46,39 @@ beforeAll(async () => {
 beforeEach(async () => {
   try {
     dynamoose.aws.ddb.local()
-    const pieces = await Piece.scan().exec()
-    pieces.map(async (piece) => await piece.delete())
-    var newPiece1 = new Piece(helper.initialPieces[0])
-    newPiece1.band = decodedToken.username
-    newPiece1.id = uuidv4()
-    var newPiece2 = new Piece(helper.initialPieces[1])
-    newPiece2.band = decodedToken.username
-    newPiece2.id = uuidv4()
-    piece = await newPiece1.save()
-    piece2 = await newPiece2.save()
-    const setlists2 = await Setlist.scan().exec()
-    setlists2.map(async (setlist) => {
-      await Setlist.delete({ id: setlist.id, band: setlist.band })
-    })
-    var setlist = new Setlist({
+    const pieces = await BandSetlist.query('sk')
+      .eq('PIECE')
+      .using('GSI1')
+      .exec()
+    await Promise.all(
+      pieces.map(async (piece) => {
+        await piece.delete()
+      })
+    )
+    await api
+      .post('/api/pieces')
+      .set('Authorization', `bearer ${token}`)
+      .send(helper.initialPieces[0])
+    await api
+      .post('/api/pieces')
+      .set('Authorization', `bearer ${token}`)
+      .send(helper.initialPieces[1])
+    const setlists2 = await BandSetlist.query('sk')
+      .eq('SETLIST')
+      .using('GSI1')
+      .exec()
+    await Promise.all(
+      setlists2.map(async (setlist) => {
+        await setlist.delete()
+      })
+    )
+
+    var setlist = new BandSetlist({
       id: uuidv4(),
       name: 'Setlist name',
-      band: decodedToken.username,
-      pieces: [piece.id],
+      data: `BAND-${decodedToken.username}#PIECE-${piece.id}`,
     })
-    const savedSetlist = await setlist.save()
-    var band = await Band.get(decodedToken.username)
-    if (!band.setlists) {
-      band.setlists = []
-    }
-    band.setlists = band.setlists.concat(savedSetlist.id)
-    await band.save()
+    await setlist.save()
   } catch (execption) {
     console.error(execption)
   }

@@ -1,4 +1,4 @@
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 
 const newBand = {
   username: 'beatles',
@@ -6,12 +6,14 @@ const newBand = {
   password: 'JohnWasADickhead',
   securityQuestion: 'The Kindergarden',
   securityAnswer: 'Strawberry Fields',
-  pieces: [],
-  setlists: [],
 }
 
 const bandsInDb = async () => {
-  const bands = await Band.scan().exec()
+  const bands = await BandSetlist.query('sk')
+    .eq('BAND')
+    .attributes(['username', 'name'])
+    .using('GSI1')
+    .exec()
   return bands.map((b) => b.toJSON())
 }
 

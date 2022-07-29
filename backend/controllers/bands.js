@@ -1,9 +1,14 @@
 const bcrypt = require('bcrypt')
 const bandsRouter = require('express').Router()
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
+const { v4: uuidv4 } = require('uuid')
 
 bandsRouter.get('/', async (request, response) => {
-  const bands = await Band.scan().exec()
+  const bands = await BandSetlist.query('sk')
+    .eq('BAND')
+    .attributes(['username', 'name'])
+    .using('GSI1')
+    .exec()
   response.json(bands.map((b) => b.toJSON()))
 })
 
@@ -41,11 +46,11 @@ bandsRouter.post('/', async (request, response, next) => {
 
     // username needs to be unique, if given
     if (body.username) {
-      const countResponse = await Band.scan('username')
-        .eq(body.username)
-        .count()
-        .exec()
-      if (countResponse.count > 0) {
+      const fetchedBand = await BandSetlist.get({
+        pk: `BAND-${body.username}`,
+        sk: 'BAND',
+      })
+      if (fetchedBand) {
         return response
           .status(400)
           .json({ error: 'band with that name already exists' })
@@ -58,7 +63,11 @@ bandsRouter.post('/', async (request, response, next) => {
       saltRounds
     )
 
-    const band = new Band({
+    const band = new BandSetlist({
+      pk: `BAND-${body.username}`,
+      sk: 'BAND',
+      data: `BAND-${body.username}`,
+      id: uuidv4(),
       username: body.username,
       name: body.name,
       securityQuestion: body.securityQuestion,

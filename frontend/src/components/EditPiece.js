@@ -124,6 +124,7 @@ export const EditPieceNoHistory = (props) => {
       rows: [],
     }
     let newPiece = {
+      id: props.pieceId,
       title: formData.title,
       artist: formData.artist,
       duration: formData.duration,
@@ -139,7 +140,7 @@ export const EditPieceNoHistory = (props) => {
     }
     try {
       await props.analyzeContents(newPiece, props.band.token)
-      await props.deletePiece(props.piece.id, props.band.token)
+      //await props.deletePiece(props.piece.id, props.band.token)
       props.showInfo('piece saved', 3)
     } catch (exception) {
       console.log('exception: ' + exception)

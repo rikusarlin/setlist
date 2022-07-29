@@ -33,15 +33,22 @@ analyzeRouter.post('/', async (req, res, next) => {
         .json({ error: 'Note instrument is required if notes are given' })
     }
 
+    let id = uuidv4()
+    if (req.body.id) {
+      id = req.body.id
+      console.log('using id received in body...')
+    }
     let piece = {
-      id: uuidv4(),
+      pk: `PIECE-${id}`,
+      data: `BAND-${decodedToken.username}`,
+      sk: `PIECE`,
+      id: id,
       title: req.body.title,
       artist: req.body.artist,
-      duration: req.body.duration,
-      delay: req.body.delay,
+      duration: parseInt(req.body.duration),
+      delay: parseInt(req.body.delay),
       notes: req.body.notes,
       pages: req.body.pages,
-      band: decodedToken.username,
     }
     if (typeof req.body.delay === 'undefined') {
       piece.delay = 0
@@ -131,9 +138,9 @@ analyzeRouter.post('/', async (req, res, next) => {
       console.log('piece.notes: ' + JSON.stringify(piece.notes))
     }
 
-    // logger.info('rows: '+JSON.stringify(piece))
-    let newPiece = new Piece(piece)
-    let savedPiece = await newPiece.save()
+    logger.info('rows: ' + JSON.stringify(piece))
+    const newPiece = new Piece(piece)
+    const savedPiece = await newPiece.save()
     res.status(201).json(savedPiece.toJSON())
   } catch (error) {
     logger.error('error: ' + error)

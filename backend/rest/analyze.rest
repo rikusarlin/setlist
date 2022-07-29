@@ -1,7 +1,7 @@
 post http://localhost:3003/api/analyze
 Content-Type: application/json
 Accept: application/json
-Authorization: bearer xxxx
+Authorization: bearer xxx
 
 {
     "title":"Simpler Man",

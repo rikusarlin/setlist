@@ -22,8 +22,13 @@ setlistRouter.get('/', async (request, response, next) => {
       .using('GSI1')
       .exec()
 
-    console.log(`setlists: ${JSON.stringify(setlists)}`)
-    response.json(setlists)
+    let modifiedSetlists = setlists.map((setlist) => {
+      return {
+        id: setlist.id.substring(6),
+        name: setlist.setlistName,
+      }
+    })
+    response.json(modifiedSetlists)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
@@ -46,7 +51,6 @@ setlistRouter.get('/:id', async (request, response, next) => {
     if (!setlist) {
       return response.status(404).json({ error: `setlist not found` })
     }
-    console.log(JSON.stringify(setlist))
     const setlistPieces = await BandSetlist.query('pk')
       .eq(`SETLIST-${request.params.id}`)
       .where('sk')
@@ -62,7 +66,6 @@ setlistRouter.get('/:id', async (request, response, next) => {
         'indexInSetlist',
       ])
       .exec()
-    console.log('setlistPieces: ' + JSON.stringify(setlistPieces))
     let pieceData = setlistPieces.map((setlistPiece) => {
       return {
         id: setlistPiece.sk.substring(6),
@@ -72,7 +75,6 @@ setlistRouter.get('/:id', async (request, response, next) => {
       }
     })
     pieceData.sort((a, b) => a.indexInSetlist - b.indexInSetlist)
-    console.log(`pieceData: ${JSON.stringify(pieceData)}`)
     const setlistInfo = {
       id: request.params.id,
       name: setlist.setlistName,
@@ -80,7 +82,6 @@ setlistRouter.get('/:id', async (request, response, next) => {
     if (pieceData) {
       setlistInfo.pieces = pieceData
     }
-    console.log(`setlistInfo: ${JSON.stringify(setlistInfo)}`)
     response.json(setlistInfo)
   } catch (error) {
     logger.error('error: ' + error)
@@ -125,7 +126,12 @@ setlistRouter.post('/', async (request, response, next) => {
     }
     const newSetlist2 = new BandSetlist(setlist2)
     newSetlist2.save()
-    response.status(201).json(savedSetlist)
+    const setlistData = {
+      id: savedSetlist.id,
+      name: savedSetlist.setlistName,
+      pieces: [],
+    }
+    response.status(201).json(setlistData)
   } catch (error) {
     logger.error('error: ' + error)
     next(error)
@@ -158,11 +164,11 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       return response.status(404).json({ error: `setlist not found` })
     }
 
-    const pieceInsetlist = await BandSetlist.get({
+    const pieceInSetlist = await BandSetlist.get({
       pk: `SETLIST-${request.params.setlistid}`,
       sk: `PIECE-${request.params.pieceid}`,
     })
-    if (pieceInsetlist) {
+    if (pieceInSetlist) {
       return response.status(400).json({
         error: `piece is already in setlist`,
       })
@@ -388,18 +394,11 @@ setlistRouter.delete(
         return response.status(404).json({ error: `piece not in setlist` })
       } else {
         const deletedSetlistIndex = setlistPiece.indexInSetlist
-        console.log('deletedSetlistIndex:' + deletedSetlistIndex)
         const setlistPiecesToUpdate = piecesInSetlist.filter(
           (setlistPiece) => setlistPiece.indexInSetlist > deletedSetlistIndex
         )
-        console.log(
-          'setlistPiecesToUpdate:' + JSON.stringify(setlistPiecesToUpdate)
-        )
         setlistPiecesToUpdate.forEach(
           (setlistPiece) => setlistPiece.indexInSetlist--
-        )
-        console.log(
-          'setlistPiecesToUpdate:' + JSON.stringify(setlistPiecesToUpdate)
         )
         await Promise.all(
           setlistPiecesToUpdate.map(async (setlistPiece) => {

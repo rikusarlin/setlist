@@ -13,6 +13,7 @@ const api = supertest(app)
 var token
 var decodedToken
 var piece, piece2
+var setlist
 
 global.console = {
   log: jest.fn(),
@@ -29,9 +30,35 @@ const setlistsInDb = async () => {
   return setlists
 }
 
+const setlistPiecesInDb = async (id) => {
+  dynamoose.aws.ddb.local()
+  const setlistPieces = await BandSetlist.query('pk')
+    .eq(`SETLIST-${id}`)
+    .where('sk')
+    .beginsWith(`PIECE-`)
+    .attributes([
+      'id',
+      'pk',
+      'sk',
+      'data',
+      'setlistName',
+      'title',
+      'artist',
+      'indexInSetlist',
+    ])
+    .exec()
+  return setlistPieces
+}
+
 beforeAll(async () => {
   try {
     dynamoose.aws.ddb.local()
+    const bands = await BandSetlist.query('sk').eq('BAND').using('GSI1').exec()
+    await Promise.all(
+      bands.map(async (band) => {
+        await band.delete()
+      })
+    )
     var newBand = bandHelper.newBand
     newBand.username = testUtil.randomStr(16)
     await api.post('/api/bands').send(newBand)
@@ -55,14 +82,17 @@ beforeEach(async () => {
         await piece.delete()
       })
     )
-    await api
+    const piece1Response = await api
       .post('/api/pieces')
       .set('Authorization', `bearer ${token}`)
       .send(helper.initialPieces[0])
-    await api
+    piece = piece1Response.body
+    const piece2Response = await api
       .post('/api/pieces')
       .set('Authorization', `bearer ${token}`)
       .send(helper.initialPieces[1])
+    piece2 = piece2Response.body
+
     const setlists2 = await BandSetlist.query('sk')
       .eq('SETLIST')
       .using('GSI1')
@@ -73,15 +103,43 @@ beforeEach(async () => {
       })
     )
 
-    var setlist = new BandSetlist({
-      id: uuidv4(),
-      name: 'Setlist name',
-      data: `BAND-${decodedToken.username}#PIECE-${piece.id}`,
+    const id = uuidv4()
+    setlist = new BandSetlist({
+      pk: `SETLIST-${id}`,
+      sk: 'SETLIST',
+      id: id,
+      setlistName: 'Setlist name',
+      data: `BAND-${decodedToken.username}`,
     })
-    await setlist.save()
+    setlist = await setlist.save()
   } catch (execption) {
     console.error(execption)
   }
+})
+
+describe('fetch setlist', () => {
+  test('setlist is returned as json', async () => {
+    await api
+      .get(`/api/setlist/${setlist.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+  test('all pieces are returned', async () => {
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const response = await api
+      .get(`/api/setlist/${setlist.id}`)
+      .set('Authorization', `bearer ${token}`)
+    expect(response.body.pieces.length).toBe(1)
+  })
+  test('404 is returned if called with non-existing id', async () => {
+    await api
+      .get('/api/setlist/4398704397')
+      .set('Authorization', `bearer ${token}`)
+      .expect(404)
+  })
 })
 
 describe('fetch setlists', () => {
@@ -158,21 +216,18 @@ describe('insert new setlist', () => {
 
 describe('insert piece to setlist', () => {
   test('number of pieces in setlist increases when a new piece is added', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
+    const setlistPiecesAtBeginning = await setlistPiecesInDb(setlist.id)
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    const setlistsAtEnd = await setlistsInDb()
-    expect(setlistsAtEnd[0].pieces.length).toBe(
-      setlistsAtBeginning[0].pieces.length + 1
-    )
+    const setlistPiecesAtEnd = await setlistPiecesInDb(setlist.id)
+    expect(setlistPiecesAtEnd.length).toBe(setlistPiecesAtBeginning.length + 1)
   })
   test('an inserted piece in setlist can be found after addition', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     const response = await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -188,18 +243,20 @@ describe('insert piece to setlist', () => {
     expect(response.body.error).toContain('setlist not found')
   })
   test('addition fails with 404 and message if piece is not found', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     var randomId = uuidv4()
     const response = await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${randomId}`)
+      .put(`/api/setlist/${setlist.id}/${randomId}`)
       .set('Authorization', `bearer ${token}`)
       .expect(404)
     expect(response.body.error).toContain('piece not found')
   })
   test('cannot add a piece to setlist if it already has been added', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
     const response = await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(400)
     expect(response.body.error).toContain('piece is already in setlist')
@@ -214,16 +271,18 @@ describe('insert piece to setlist', () => {
 
 describe('delete piece from setlist', () => {
   test('number of pieces in setlist decreases when a new piece is deleted', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     await api
-      .delete(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(200)
+    const setlistPiecesAtBeginning = await setlistPiecesInDb(setlist.id)
+    await api
+      .delete(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    const setlistsAtEnd = await setlistsInDb()
-    expect(setlistsAtEnd[0].pieces.length).toBe(
-      setlistsAtBeginning[0].pieces.length - 1
-    )
+    const setlistPiecesAtEnd = await setlistPiecesInDb(setlist.id)
+    expect(setlistPiecesAtEnd.length).toBe(setlistPiecesAtBeginning.length - 1)
   })
   test('an inserted piece in setlist cannot be found after deletion', async () => {
     const setlistsAtBeginning = await setlistsInDb()
@@ -257,16 +316,15 @@ describe('delete piece from setlist', () => {
       .expect(404)
     expect(response.body.error).toContain('piece not found')
   })
-  test('no changes if trying to delete a piece from setlist is piece is not in setlist', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
-    await api
-      .delete(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+  test('fails with 404 if trying to delete a piece from setlist is piece is not in setlist', async () => {
+    const setlistPiecesAtBeginning = await setlistPiecesInDb(setlist.id)
+    const response = await api
+      .delete(`/api/setlist/${setlist.id}/${piece2.id}`)
       .set('Authorization', `bearer ${token}`)
-      .expect(200)
-    const setlistsAtEnd = await setlistsInDb()
-    expect(setlistsAtEnd[0].pieces.length).toBe(
-      setlistsAtBeginning[0].pieces.length
-    )
+      .expect(404)
+    const setlistPiecesAtEnd = await setlistPiecesInDb(piece.id)
+    expect(setlistPiecesAtEnd.length).toBe(setlistPiecesAtBeginning.length)
+    expect(response.body.error).toContain('piece not in setlist')
   })
   test('need to be authorized', async () => {
     const setlistsAtBeginning = await setlistsInDb()
@@ -315,64 +373,96 @@ describe('delete setlist', () => {
 
 describe('move pieces in setlist', () => {
   test('2nd piece in list becomes 1st when moved up', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
-    const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece2.id)
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/up`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistPiecesBeforeUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceBeforeUpdate] = setlistPiecesBeforeUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece2.id}`
+    )
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece2.id}/up`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
-    const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece2.id)
-    expect(indexBeforeUpdate).toBe(indexAfterUpdate + 1)
+    const setlistPiecesAfterUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceAfterUpdate] = setlistPiecesAfterUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece2.id}`
+    )
+    expect(setlistPieceBeforeUpdate.indexInSetlist).toBe(
+      setlistPieceAfterUpdate.indexInSetlist + 1
+    )
   })
   test('1st piece in list stays 1st when moved up', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
-    const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece.id)
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/up`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistPiecesBeforeUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceBeforeUpdate] = setlistPiecesBeforeUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+    )
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece.id}/up`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
-    const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece.id)
-    expect(indexBeforeUpdate).toBe(indexAfterUpdate)
+    const setlistPiecesAfterUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceAfterUpdate] = setlistPiecesAfterUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+    )
+    expect(setlistPieceBeforeUpdate.indexInSetlist).toBe(
+      setlistPieceAfterUpdate.indexInSetlist
+    )
   })
   test('1st piece in list becomes 2nd when moved down', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
-    const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece.id)
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/down`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistPiecesBeforeUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceBeforeUpdate] = setlistPiecesBeforeUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+    )
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece.id}/down`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
-    const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece.id)
-    expect(indexBeforeUpdate).toBe(indexAfterUpdate - 1)
+    const setlistPiecesAfterUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceAfterUpdate] = setlistPiecesAfterUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece.id}`
+    )
+    expect(setlistPieceBeforeUpdate.indexInSetlist).toBe(
+      setlistPieceAfterUpdate.indexInSetlist - 1
+    )
   })
   test('last piece in list stays last when moved down', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
       .set('Authorization', `bearer ${token}`)
-    const setlistsBeforeUpdate = await setlistsInDb()
-    const indexBeforeUpdate = setlistsBeforeUpdate[0].pieces.indexOf(piece2.id)
     await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece2.id}/down`)
+      .put(`/api/setlist/${setlist.id}/${piece2.id}`)
+      .set('Authorization', `bearer ${token}`)
+    const setlistPiecesBeforeUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceBeforeUpdate] = setlistPiecesBeforeUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece2.id}`
+    )
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece2.id}/down`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
-    const setlistsAfterUpdate = await setlistsInDb()
-    const indexAfterUpdate = setlistsAfterUpdate[0].pieces.indexOf(piece2.id)
-    expect(indexBeforeUpdate).toBe(indexAfterUpdate)
+    const setlistPiecesAfterUpdate = await setlistPiecesInDb(setlist.id)
+    const [setlistPieceAfterUpdate] = setlistPiecesAfterUpdate.filter(
+      (setlistPiece) => setlistPiece.sk === `PIECE-${piece2.id}`
+    )
+    expect(setlistPieceBeforeUpdate.indexInSetlist).toBe(
+      setlistPieceAfterUpdate.indexInSetlist
+    )
   })
   test('moving fails with 404 and message if setlist is not found', async () => {
     var randomId = uuidv4()
@@ -400,9 +490,11 @@ describe('move pieces in setlist', () => {
     expect(response.body.error).toContain('piece not in setlist')
   })
   test('fails with 400 if moving direction is not up or down', async () => {
-    const setlistsAtBeginning = await setlistsInDb()
+    await api
+      .put(`/api/setlist/${setlist.id}/${piece.id}`)
+      .set('Authorization', `bearer ${token}`)
     const response = await api
-      .put(`/api/setlist/${setlistsAtBeginning[0].id}/${piece.id}/sideways`)
+      .put(`/api/setlist/${setlist.id}/${piece.id}/sideways`)
       .set('Authorization', `bearer ${token}`)
       .expect(400)
     expect(response.body.error).toContain(

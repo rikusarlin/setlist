@@ -211,7 +211,6 @@ piecesRouter.put('/:id/transpose/:dir', async (req, res, next) => {
       return res.status(404).end()
     }
 
-    console.log(`page: ${JSON.stringify(piece)}`)
     for (let page = 0; page < piece.pages.length; page++) {
       for (let row = 0; row < piece.pages[page].rows.length; row++) {
         if (piece.pages[page].rows[row].rowType === 'Chords') {

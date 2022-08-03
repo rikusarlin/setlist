@@ -72,7 +72,7 @@ describe('<Piece />', () => {
     const div = component.container.querySelector('.piece')
     expect(div).toHaveTextContent('Knocking on Heavens Door by Bob Dylan')
     expect(div).toHaveTextContent('Piece length 150 seconds')
-    expect(div).toHaveTextContent('Delay before scroll 35 seconds')
+    expect(div).toHaveTextContent('Delay before start of scroll 35 seconds')
     expect(div).toHaveTextContent('G D Am')
     expect(div).toHaveTextContent('Mama take this badge off of me')
   })

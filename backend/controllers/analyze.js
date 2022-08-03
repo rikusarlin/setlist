@@ -1,7 +1,7 @@
 const analyzeRouter = require('express').Router()
 const logger = require('../utils/logger')
 const { chordTest } = require('../utils/music')
-const Piece = require('../models/piece')
+const BandSetlist = require('../models/bandsetlist')
 const jwt = require('jsonwebtoken')
 const { v4: uuidv4 } = require('uuid')
 
@@ -33,16 +33,16 @@ analyzeRouter.post('/', async (req, res, next) => {
         .json({ error: 'Note instrument is required if notes are given' })
     }
 
-    let id = uuidv4()
+    let pieceId = uuidv4()
     if (req.body.id) {
-      id = req.body.id
+      pieceId = req.body.id
       console.log('using id received in body...')
     }
     let piece = {
-      pk: `PIECE-${id}`,
+      pk: `PIECE-${pieceId}`,
       data: `BAND-${decodedToken.username}`,
       sk: `PIECE`,
-      id: id,
+      id: pieceId,
       title: req.body.title,
       artist: req.body.artist,
       duration: parseInt(req.body.duration),
@@ -50,6 +50,7 @@ analyzeRouter.post('/', async (req, res, next) => {
       notes: req.body.notes,
       pages: req.body.pages,
     }
+
     if (typeof req.body.delay === 'undefined') {
       piece.delay = 0
     }
@@ -139,7 +140,7 @@ analyzeRouter.post('/', async (req, res, next) => {
     }
 
     logger.info('rows: ' + JSON.stringify(piece))
-    const newPiece = new Piece(piece)
+    const newPiece = new BandSetlist(piece)
     const savedPiece = await newPiece.save()
     res.status(201).json(savedPiece.toJSON())
   } catch (error) {

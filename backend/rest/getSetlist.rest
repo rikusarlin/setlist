@@ -1,4 +1,3 @@
-get http://localhost:3003/api/setlist/a0a8596b-a419-4951-b540-b90fabd9e0dd
+get http://localhost:3003/api/setlist/02-0740-49a9-b0e1-10b799d7fa3e
 Content-Type: application/json
 Authorization: bearer xxx
-

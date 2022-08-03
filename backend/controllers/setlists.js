@@ -153,6 +153,7 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: 'PIECE',
     })
     if (!piece) {
+      console.log(`PIECE-${request.params.pieceid} not found`)
       return response.status(404).json({ error: `piece not found` })
     }
 
@@ -161,6 +162,7 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: 'SETLIST',
     })
     if (!setlist) {
+      console.log(`SETLIST-${request.params.setlistid} not found`)
       return response.status(404).json({ error: `setlist not found` })
     }
 
@@ -169,6 +171,9 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: `PIECE-${request.params.pieceid}`,
     })
     if (pieceInSetlist) {
+      console.log(
+        `PIECE-${request.params.pieceid} already in SETLIST-${request.params.setlistid}`
+      )
       return response.status(400).json({
         error: `piece is already in setlist`,
       })
@@ -218,6 +223,7 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       name: setlist.setlistName,
       pieces: pieceData,
     }
+    console.log(`setlistData: ${setlistData}`)
 
     return response.status(200).json(setlistData)
   } catch (error) {

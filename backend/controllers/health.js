@@ -1,13 +1,11 @@
 const healthRouter = require('express').Router()
-const mongoose = require('mongoose')
+const dynamoose = require('dynamoose')
 const config = require('../utils/config')
+const BandSetlist = require('../models/bandsetlist')
 
 healthRouter.get('/', async (request, response) => {
-  mongoose
-    .connect(config.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
+   dynamoose.aws.ddb.local()
+   BandSetlist.query('sk').eq('BAND').using('GSI1').exec()
     .then(() => {
       response.status(200).send('OK')
     })

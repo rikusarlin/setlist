@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchPieces } from '../reducers/piecesReducer'
-import { fetchSetlists, addPieceToSetlist } from '../reducers/setlistReducer'
+import { fetchSetlists } from '../reducers/setlistsReducer'
+import { addPieceToSetlist } from '../reducers/setlistReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -28,8 +29,15 @@ export const PiecesNoHistory = (props) => {
         props.showInfo('added piece to setlist', 3)
       }
     } catch (exception) {
-      console.log('exception: ' + exception)
-      props.showError('error in adding piece to setlist', 3)
+      // This is a little crappy, but the the only 400 is this
+      if (
+        exception.toString() === 'Error: Request failed with status code 400'
+      ) {
+        props.showInfo('not added, piece already in setlist!', 3)
+      } else {
+        console.log('exception: ' + exception)
+        props.showError('error in adding piece to setlist', 3)
+      }
     }
   }
 

@@ -20,6 +20,14 @@ const createSetlist = async (name, token) => {
   return response.data
 }
 
+const getSetlist = async (setlistId, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  }
+  const response = await axios.get(`${baseUrl}/${setlistId}`, config)
+  return response.data
+}
+
 const addPieceToSetlist = async (setlistId, pieceId, token) => {
   const config = {
     headers: { Authorization: `bearer ${token}` },
@@ -69,4 +77,5 @@ export default {
   deletePieceFromSetlist,
   movePieceInSetlist,
   deleteSetlist,
+  getSetlist,
 }

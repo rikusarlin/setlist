@@ -1,7 +1,7 @@
 post http://localhost:3003/api/setlist
 Content-Type: application/json
 Accept: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbGEiLCJpZCI6IjBjMDFlMzJlLTViMGItNDU1Yy1iM2ZhLWE4Yjg1MmExYTM5MSIsImlhdCI6MTY1OTEwOTYyMX0.4dVzmzNKWfto1rb-yxxKrfIe5beIHw1TOFnXJZgyC_I
+Authorization: bearer xxx
 
 {
     "name":"IT Christmas party2 2021-11-26"

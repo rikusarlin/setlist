@@ -1,24 +1,31 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { deletePieceFromSetlist, movePiece } from '../reducers/setlistReducer'
+import {
+  deletePieceFromSetlist,
+  movePiece,
+  getSetlist,
+} from '../reducers/setlistReducer'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 export const SetlistNoHistory = (props) => {
-  const setlistById = (id) => {
-    if (props.setlists !== null) {
-      var setlist = props.setlists.find((a) => a.id === id)
-      return setlist
-    } else {
-      return null
-    }
-  }
+  //var token = props.band.token
+  //var fetchSetlist = props.getSetlist
+  useEffect(() => {
+    props.getSetlist(props.setlistId, props.band.token)
+    console.log('props.setlist: ' + JSON.stringify(props.setlist))
+  }, [props.setlistId])
 
+  console.log(
+    'outside useEffect, props.setlist: ' + JSON.stringify(props.setlist)
+  )
   if (
-    setlistById(props.setlistId) === undefined ||
-    setlistById(props.setlistId) === null ||
-    setlistById(props.setlistId).pieces.length === 0
+    props.setlist === undefined ||
+    props.setlist === null ||
+    props.setlist.pieces === undefined ||
+    props.setlist.pieces === null ||
+    props.setlist.pieces.length === 0
   ) {
     return (
       <div>
@@ -59,7 +66,7 @@ export const SetlistNoHistory = (props) => {
     props.history.push('/setlists')
   }
 
-  const pieceList = setlistById(props.setlistId).pieces.map((piece, index) => {
+  const pieceList = props.setlist.pieces.map((piece, index) => {
     return (
       <div className="row" key={index}>
         <div className="col-sm-6">
@@ -89,7 +96,7 @@ export const SetlistNoHistory = (props) => {
             className="mr-2 py-0 btn btn-primary"
             value={piece.id}
             type="basic"
-            disabled={index === setlistById(props.setlistId).pieces.length - 1}
+            disabled={index === props.setlist.pieces.length - 1}
           >
             down
           </button>
@@ -112,7 +119,7 @@ export const SetlistNoHistory = (props) => {
   return (
     <div className="container">
       <div className="row">
-        <h2>{setlistById(props.setlistId).name}</h2>
+        <h2>{props.setlist.name}</h2>
       </div>
       <div className="container">{pieceList}</div>
       <div className="row">
@@ -131,7 +138,7 @@ export const SetlistNoHistory = (props) => {
 const mapStateToProps = (state) => {
   return {
     band: state.band,
-    setlists: state.setlists,
+    setlist: state.setlist,
   }
 }
 
@@ -140,6 +147,7 @@ const mapDispatchToProps = {
   showError,
   deletePieceFromSetlist,
   movePiece,
+  getSetlist,
 }
 
 const Setlist = withRouter(SetlistNoHistory)

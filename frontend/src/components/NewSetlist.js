@@ -1,7 +1,7 @@
 import React from 'react'
 import Togglable from './Togglable'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { createSetlist } from '../reducers/setlistReducer'
+import { createSetlist } from '../reducers/setlistsReducer'
 import { connect } from 'react-redux'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'

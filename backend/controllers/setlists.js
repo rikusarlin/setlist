@@ -17,14 +17,14 @@ setlistRouter.get('/', async (request, response, next) => {
     const setlists = await BandSetlist.query('sk')
       .eq('SETLIST')
       .where('data')
-      .beginsWith(`BAND-${decodedToken.username}`)
-      .attributes(['id', 'setlistName'])
+      .eq(`BAND-${decodedToken.username}`)
+      .attributes(['pk', 'setlistName'])
       .using('GSI1')
       .exec()
 
     let modifiedSetlists = setlists.map((setlist) => {
       return {
-        id: setlist.id.substring(6),
+        id: setlist.pk.substring(8),
         name: setlist.setlistName,
       }
     })
@@ -153,7 +153,6 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: 'PIECE',
     })
     if (!piece) {
-      console.log(`PIECE-${request.params.pieceid} not found`)
       return response.status(404).json({ error: `piece not found` })
     }
 
@@ -162,7 +161,6 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: 'SETLIST',
     })
     if (!setlist) {
-      console.log(`SETLIST-${request.params.setlistid} not found`)
       return response.status(404).json({ error: `setlist not found` })
     }
 
@@ -171,9 +169,6 @@ setlistRouter.put('/:setlistid/:pieceid', async (request, response, next) => {
       sk: `PIECE-${request.params.pieceid}`,
     })
     if (pieceInSetlist) {
-      console.log(
-        `PIECE-${request.params.pieceid} already in SETLIST-${request.params.setlistid}`
-      )
       return response.status(400).json({
         error: `piece is already in setlist`,
       })

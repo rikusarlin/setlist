@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { logout } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { emptyPieceList } from '../reducers/piecesReducer'
-import { emptySetlist } from '../reducers/setlistReducer'
+import { emptySetlist } from '../reducers/setlistsReducer'
 import { withRouter } from 'react-router-dom'
 
 export const LogoutNoHistory = (props) => {

@@ -5,6 +5,7 @@ import notificationReducer from './reducers/notificationReducer'
 import loginReducer from './reducers/loginReducer'
 import bandReducer from './reducers/bandReducer'
 import pieceReducer from './reducers/pieceReducer'
+import setlistsReducer from './reducers/setlistsReducer'
 import setlistReducer from './reducers/setlistReducer'
 
 const reducer = combineReducers({
@@ -13,7 +14,8 @@ const reducer = combineReducers({
   band: loginReducer,
   bands: bandReducer,
   piece: pieceReducer,
-  setlists: setlistReducer,
+  setlists: setlistsReducer,
+  setlist: setlistReducer,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

@@ -1,30 +1,11 @@
 import setlistService from '../services/setlists'
 
-export const fetchSetlists = (token) => {
+export const getSetlist = (id, token) => {
   return async (dispatch) => {
-    const setlists = await setlistService.getSetlists(token)
-    await dispatch({
-      type: 'GET_SETLISTS',
-      data: setlists,
-    })
-  }
-}
-
-export const createSetlist = (name, token) => {
-  return async (dispatch) => {
-    const addedSetlist = await setlistService.createSetlist(name, token)
+    const fetchedSetlist = await setlistService.getSetlist(id, token)
     dispatch({
-      type: 'ADD_SETLIST',
-      data: addedSetlist,
-    })
-  }
-}
-
-export const emptySetlist = () => {
-  return async (dispatch) => {
-    dispatch({
-      type: 'EMPTY_SETLISTS',
-      data: null,
+      type: 'GET_SETLIST',
+      data: fetchedSetlist,
     })
   }
 }
@@ -39,19 +20,6 @@ export const addPieceToSetlist = (setlistId, pieceId, token) => {
     dispatch({
       type: 'ADD_PIECE_TO_SETLIST',
       data: updatedSetlist,
-    })
-  }
-}
-
-export const deleteSetlist = (setlistId, token) => {
-  return async (dispatch) => {
-    await setlistService.deleteSetlist(setlistId, token)
-    const deleteData = {
-      id: setlistId,
-    }
-    dispatch({
-      type: 'DELETE_SETLIST',
-      data: deleteData,
     })
   }
 }
@@ -86,40 +54,21 @@ export const movePiece = (setlistId, pieceId, direction, token) => {
 }
 
 const reducer = (state = [], action) => {
-  //console.log('state before action in setlistReducer: ', state)
-  //console.log('action in setlistReducer', action)
+  console.log('state before action in setlistsReducer: ', state)
+  console.log('action in setlistReducer', action)
 
   switch (action.type) {
-    case 'EMPTY_SETLISTS':
-      return null
-    case 'GET_SETLISTS':
+    case 'GET_SETLIST': {
       return action.data
-    case 'ADD_SETLIST':
-      return [...state, action.data]
-    case 'MOVE_PIECE': {
-      return [
-        state.filter((setlist) => setlist.id !== action.data.id),
-        action.data,
-      ]
     }
-    case 'DELETE_SETLIST': {
-      const newState = [
-        state.filter((setlist) => setlist.id !== action.data.id),
-      ]
-      return newState
+    case 'MOVE_PIECE': {
+      return action.data
     }
     case 'ADD_PIECE_TO_SETLIST': {
-      const newState = [
-        state.filter((setlist) => setlist.id !== action.data.id),
-        action.data,
-      ]
-      return newState
+      return action.data
     }
     case 'DELETE_PIECE_FROM_SETLIST':
-      return [
-        state.filter((setlist) => setlist.id !== action.data.id),
-        action.data,
-      ]
+      return action.data
     default:
       return state
   }

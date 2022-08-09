@@ -3,7 +3,7 @@ import { fetchSetlists, deleteSetlist } from '../reducers/setlistsReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const SetlistsNoHistory = (props) => {
   useEffect(() => {

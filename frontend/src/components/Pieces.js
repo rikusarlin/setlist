@@ -5,7 +5,7 @@ import { addPieceToSetlist } from '../reducers/setlistReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const PiecesNoHistory = (props) => {
   const [selectedSetlist, setSelectedSetlist] = useState('choose')
@@ -18,7 +18,7 @@ export const PiecesNoHistory = (props) => {
   }, [props.band.token])
 
   const moveToNewPiece = () => {
-    props.history.push('/newpiece')
+    props.router.navigate('/newpiece')
   }
 
   const handleAdd = async (setlistId, pieceId) => {

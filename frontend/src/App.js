@@ -12,18 +12,10 @@ import NewPiece from './components/NewPiece'
 import NewSetlist from './components/NewSetlist'
 import Logout from './components/Logout'
 import ResetPasswordForm from './components/ResetPasswordForm'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 export const App = (props) => {
-  const setlistById = (id) => {
-    if (props.setlists !== null) {
-      return props.setlists.find((a) => a.id === id)
-    } else {
-      return null
-    }
-  }
-
   return (
     <div className="container">
       <Router>
@@ -37,7 +29,7 @@ export const App = (props) => {
                   </Link>
                 </div>
                 <div className="nav-item">
-                  <Link className="nav-link" to="/setlists">
+                  <Link className="nav-link" to="setlists">
                     setlists
                   </Link>
                 </div>
@@ -47,105 +39,85 @@ export const App = (props) => {
               </div>
             </div>
             <Notification />
-            <Route
-              exact
-              path="/"
-              render={() => (
-                <div>
-                  <Pieces />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/newpiece"
-              render={() => (
-                <div>
-                  <NewPiece />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/pieces"
-              render={() => (
-                <div>
-                  <Pieces />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/setlists"
-              render={() => (
-                <div>
-                  <NewSetlist />
-                  <Setlists />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/setlist/:id"
-              render={({ match }) => (
-                <Setlist setlistId={setlistById(match.params.id).id} />
-              )}
-            />
-            <Route
-              exact
-              path="/setlistpiece/:setlistid/:pieceid"
-              render={({ match }) => (
-                <SetlistPiece
-                  setlistId={setlistById(match.params.setlistid).id}
-                  pieceId={match.params.pieceid}
-                />
-              )}
-            />
-            <Route
-              exact
-              path="/piece/:id"
-              render={({ match }) => <EditPiece pieceId={match.params.id} />}
-            />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <Pieces />
+                  </div>
+                }
+              />
+              <Route
+                path="newpiece"
+                element={
+                  <div>
+                    <NewPiece />
+                  </div>
+                }
+              />
+              <Route
+                path="pieces"
+                element={
+                  <div>
+                    <Pieces />
+                  </div>
+                }
+              />
+              <Route
+                path="setlists"
+                element={
+                  <div>
+                    <NewSetlist />
+                    <Setlists />
+                  </div>
+                }
+              />
+              <Route path="setlist/:setlistId" element={<Setlist />} />
+              <Route
+                path="setlistpiece/:setlistId/:pieceId"
+                element={<SetlistPiece />}
+              />
+              <Route path="piece/:pieceId" element={<EditPiece />} />
+            </Routes>
           </div>
         ) : (
           <div>
             <Notification />
-            <Route
-              exact
-              path="/"
-              render={() => (
-                <div>
-                  <LoginForm />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/pieces"
-              render={() => (
-                <div>
-                  <LoginForm />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/signup"
-              render={() => (
-                <div>
-                  <SignUpForm />
-                </div>
-              )}
-            />
-            <Route
-              exact
-              path="/reset-password"
-              render={() => (
-                <div>
-                  <ResetPasswordForm />
-                </div>
-              )}
-            />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <LoginForm />
+                  </div>
+                }
+              />
+              <Route
+                path="pieces"
+                element={
+                  <div>
+                    <LoginForm />
+                  </div>
+                }
+              />
+              <Route
+                path="signup"
+                element={
+                  <div>
+                    <SignUpForm />
+                  </div>
+                }
+              />
+              <Route
+                path="reset-password"
+                element={
+                  <div>
+                    <ResetPasswordForm />
+                  </div>
+                }
+              />
+            </Routes>
           </div>
         )}
       </Router>

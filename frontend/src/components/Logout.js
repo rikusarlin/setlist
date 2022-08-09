@@ -4,7 +4,7 @@ import { logout } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { emptyPieceList } from '../reducers/piecesReducer'
 import { emptySetlist } from '../reducers/setlistsReducer'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const LogoutNoHistory = (props) => {
   const handleLogout = async (event) => {
@@ -14,7 +14,7 @@ export const LogoutNoHistory = (props) => {
       await props.emptyPieceList()
       await props.emptySetlist()
       props.showInfo('logout successful', 3)
-      props.history.push('/')
+      props.router.navigate('/')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in logout', 3)

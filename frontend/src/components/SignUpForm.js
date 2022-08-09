@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { signUpBand } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
 
@@ -32,7 +32,7 @@ export const SignUpFormNoHistory = (props) => {
       }
       props.signUpBand(formData)
       props.showInfo('sign up successful', 3)
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in sign up', 3)
@@ -40,7 +40,7 @@ export const SignUpFormNoHistory = (props) => {
   }
   const handleCancel = async (event) => {
     event.preventDefault()
-    props.history.push('/')
+    props.router.navigate('/')
   }
 
   return (

@@ -26,7 +26,7 @@ export const PieceNoHistory = (props) => {
     try {
       props.deletePiece(props.piece.id, props.band.token)
       props.showInfo('piece deleted', 3)
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in deleting piece', 3)
@@ -61,7 +61,7 @@ export const PieceNoHistory = (props) => {
   }
 
   const returnToPieces = () => {
-    props.history.push('/pieces')
+    props.router.navigate('/pieces')
   }
 
   if (props.band.username !== null) {

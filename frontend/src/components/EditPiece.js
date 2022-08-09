@@ -12,7 +12,7 @@ import {
   deleteNote,
 } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 import NoteSelectionList from './NoteSelectionList'
 import PieceRows from './PieceRows'
 import NewNote from './NewNote'
@@ -32,7 +32,7 @@ export const EditPieceNoHistory = (props) => {
   })
   useEffect(() => {
     const fetchData = async () => {
-      await props.fetchPiece(props.pieceId, props.band.token)
+      await props.fetchPiece(props.router.params.pieceId, props.band.token)
     }
     fetchData()
   }, [props.band.token, props.pieceId, props.fetchPiece])
@@ -90,7 +90,7 @@ export const EditPieceNoHistory = (props) => {
     try {
       props.deletePiece(props.piece.id, props.band.token)
       props.clearAnalysis()
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
       props.showInfo('piece deleted', 3)
     } catch (exception) {
       console.log('exception: ' + exception)
@@ -178,7 +178,7 @@ export const EditPieceNoHistory = (props) => {
   }
 
   const returnToPieces = () => {
-    props.history.push('/pieces')
+    props.router.navigate('/pieces')
     props.clearAnalysis()
   }
 

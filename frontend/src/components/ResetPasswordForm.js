@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { resetPassword } from '../reducers/loginReducer'
 import { fetchBands } from '../reducers/bandReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
 
@@ -27,7 +27,7 @@ export const ResetPasswordNoHistory = (props) => {
       }
       props.resetPassword(formData)
       props.showInfo('password reset successful', 3)
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error password reset', 3)
@@ -50,7 +50,7 @@ export const ResetPasswordNoHistory = (props) => {
 
   const handleCancel = async (event) => {
     event.preventDefault()
-    props.history.push('/')
+    props.router.navigate('/')
   }
 
   return (

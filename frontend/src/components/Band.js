@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 
 const BandNoHistory = (props) => {
   if (props.band === undefined) {
-    props.history.push('/pieces')
+    props.router.navigate('/pieces')
     return <div />
   }
   return (

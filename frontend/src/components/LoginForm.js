@@ -4,7 +4,7 @@ import { login } from '../reducers/loginReducer'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const LoginFormNoHistory = (props) => {
   const userName = useField('text')
@@ -20,7 +20,7 @@ export const LoginFormNoHistory = (props) => {
       passWord.reset()
       props.showInfo('login successful', 3)
       // Always begin with a known address
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('wrong username or password', 3)

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { showInfo, showError } from '../reducers/notificationReducer'
 import { fetchPiece } from '../reducers/pieceReducer'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 import PieceRows from './PieceRows'
 import NoteSelectionList from './NoteSelectionList'
 import { Link, Element } from 'react-scroll'
@@ -11,39 +11,47 @@ export const SetlistPieceNoHistory = (props) => {
   const [selectedNote, setSelectedNote] = useState('choose')
   useEffect(() => {
     const fetchData = async () => {
-      await props.fetchPiece(props.pieceId, props.band.token)
+      await props.fetchPiece(props.router.params.pieceId, props.band.token)
     }
     fetchData()
-  }, [props.pieceId])
+  }, [props.router.params.pieceId])
 
   if (props.piece === undefined || props.piece === null || props.piece === []) {
     return <div />
   }
 
   const returnToSetlist = () => {
-    props.history.push(`/setlist/${props.setlistId}`)
+    props.router.navigate(`/setlist/${props.router.params.setlistId}`)
   }
 
   const prevPiece = () => {
-    const setlist = props.setlists.find((a) => a.id === props.setlistId)
+    const setlist = props.setlists.find(
+      (a) => a.id === props.router.params.setlistId
+    )
     const pieceIndex = setlist.pieces.findIndex(
-      (piece) => piece.id === props.pieceId
+      (piece) => piece.id === props.router.params.pieceId
     )
     if (pieceIndex > 0) {
-      props.history.push(
-        `/setlistpiece/${props.setlistId}/${setlist.pieces[pieceIndex - 1].id}`
+      props.router.navigate(
+        `/setlistpiece/${props.router.params.setlistId}/${
+          setlist.pieces[pieceIndex - 1].id
+        }`
       )
     }
   }
 
   const nextPiece = () => {
-    const setlist = props.setlists.find((a) => a.id === props.setlistId)
+    const setlist = props.setlists.find(
+      (a) => a.id === props.router.params.setlistId
+    )
     const pieceIndex = setlist.pieces.findIndex(
-      (piece) => piece.id === props.pieceId
+      (piece) => piece.id === props.router.params.pieceId
     )
     if (pieceIndex !== setlist.pieces.length - 1) {
-      props.history.push(
-        `/setlistpiece/${props.setlistId}/${setlist.pieces[pieceIndex + 1].id}`
+      props.router.navigate(
+        `/setlistpiece/${props.router.params.setlistId}/${
+          setlist.pieces[pieceIndex + 1].id
+        }`
       )
     }
   }

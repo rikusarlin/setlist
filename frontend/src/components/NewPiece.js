@@ -5,7 +5,7 @@ import { fetchPieces } from '../reducers/piecesReducer'
 import { connect } from 'react-redux'
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const NewPieceNoHistory = (props) => {
   const title = useField('text')
@@ -32,7 +32,7 @@ export const NewPieceNoHistory = (props) => {
       props.analyzeContents(newPiece, props.band.token)
       props.fetchPieces(props.band.token)
       props.showInfo('piece inserted', 3)
-      props.history.push('/pieces')
+      props.router.navigate('/pieces')
     } catch (exception) {
       console.log('exception: ' + exception)
       props.showError('error in inserting piece', 3)
@@ -45,7 +45,7 @@ export const NewPieceNoHistory = (props) => {
     duration.reset
     delay.reset
     contents.reset
-    props.history.push('/pieces')
+    props.router.navigate('/pieces')
     props.clearAnalysis()
   }
 

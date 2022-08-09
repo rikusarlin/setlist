@@ -7,19 +7,15 @@ import {
   getSetlist,
 } from '../reducers/setlistReducer'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from '../utils'
 
 export const SetlistNoHistory = (props) => {
   //var token = props.band.token
   //var fetchSetlist = props.getSetlist
   useEffect(() => {
-    props.getSetlist(props.setlistId, props.band.token)
-    console.log('props.setlist: ' + JSON.stringify(props.setlist))
-  }, [props.setlistId])
+    props.getSetlist(props.router.params.setlistId, props.band.token)
+  }, [props.router.params.setlistId])
 
-  console.log(
-    'outside useEffect, props.setlist: ' + JSON.stringify(props.setlist)
-  )
   if (
     props.setlist === undefined ||
     props.setlist === null ||
@@ -50,12 +46,17 @@ export const SetlistNoHistory = (props) => {
   }
 
   const handleMovePieceUp = async (event) => {
-    props.movePiece(props.setlistId, event.target.value, 'up', props.band.token)
+    props.movePiece(
+      props.router.params.setlistId,
+      event.target.value,
+      'up',
+      props.band.token
+    )
   }
 
   const handleMovePieceDown = async (event) => {
     props.movePiece(
-      props.setlistId,
+      props.router.params.setlistId,
       event.target.value,
       'down',
       props.band.token
@@ -63,7 +64,7 @@ export const SetlistNoHistory = (props) => {
   }
 
   const returnToSetlists = () => {
-    props.history.push('/setlists')
+    props.router.navigate('/setlists')
   }
 
   const pieceList = props.setlist.pieces.map((piece, index) => {
@@ -72,7 +73,7 @@ export const SetlistNoHistory = (props) => {
         <div className="col-sm-6">
           <Link
             data-cy="piece-link"
-            to={`/setlistpiece/${props.setlistId}/${piece.id}`}
+            to={`/setlistpiece/${props.router.params.setlistId}/${piece.id}`}
           >
             {piece.title}
           </Link>

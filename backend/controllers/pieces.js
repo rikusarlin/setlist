@@ -144,10 +144,11 @@ piecesRouter.put('/:id', async (req, res, next) => {
     if (typeof req.body.artist === 'undefined') {
       return res.status(400).json({ error: 'Artist of piece is required' })
     }
-    var previousPiece = await BandSetlist.get({
+    const prevPiece = await BandSetlist.get({
       pk: `PIECE-${req.params.id}`,
       sk: 'PIECE',
     })
+    var previousPiece = prevPiece
     if (!previousPiece) {
       res.status(404).end()
     }
@@ -180,6 +181,8 @@ piecesRouter.put('/:id', async (req, res, next) => {
       res.status(404).end()
     }
   } catch (error) {
+    const errorText = error.toString()
+    console.log(errorText)
     next(error)
   }
 })

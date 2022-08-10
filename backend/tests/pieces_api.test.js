@@ -4,23 +4,19 @@ const helper = require('./pieces_test_helper')
 const bandHelper = require('./bands_test_helper')
 const app = require('../app')
 const BandSetlist = require('../models/bandsetlist')
-//const jwt = require('jsonwebtoken')
 const testUtil = require('./test_utils')
 
 const api = supertest(app)
 
 var token
-//var decodedToken
 
 // Define console functions so that they exist...
 // Comment if you wish to see console.log
-/*
 global.console = {
   log: jest.fn(),
   info: jest.fn(),
   error: jest.fn(),
 }
-*/
 
 beforeAll(async () => {
   try {
@@ -208,16 +204,10 @@ describe('delete piece', () => {
   })
 })
 
-/*
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-*/
-
 describe('update piece', () => {
-  /*
+  /* There is some problem with these two tests, finding the previous piece results in error
   test('update duration of piece', async () => {
-    var piecesAtStart = await sleep(1000).then(() => helper.piecesInDb())
+    const piecesAtStart = await helper.piecesInDb()
     var pieceToUpdate = piecesAtStart[0]
     const durationBeforeUpdate = pieceToUpdate.duration
     pieceToUpdate.duration += 10

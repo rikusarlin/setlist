@@ -1,15 +1,8 @@
 const BandSetlist = require('../models/bandsetlist')
-//const { v4: uuidv4 } = require('uuid')
-
-//const uuid1 = uuidv4()
-//const uuid2 = uuidv4()
 
 const initialPieces = [
   {
-    //pk: `PIECE-${uuid1}`,
-    //sk: 'PIECE',
     title: 'Knockin on Heavens Door',
-    //id: uuid1,
     artist: 'Bob Dylan',
     duration: 150,
     delay: 35,
@@ -52,9 +45,6 @@ const initialPieces = [
     ],
   },
   {
-    //pk: `PIECE-${uuid2}`,
-    //sk: 'PIECE',
-    //id: uuid2,
     title: 'Here Comes The Sun',
     artist: 'Beatles',
     duration: 185,

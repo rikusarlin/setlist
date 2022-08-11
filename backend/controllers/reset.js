@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const resetRouter = require('express').Router()
-const Band = require('../models/band')
+const BandSetlist = require('../models/bandsetlist')
 
 resetRouter.post('/', async (request, response, next) => {
   try {
@@ -11,7 +11,10 @@ resetRouter.post('/', async (request, response, next) => {
         error: 'invalid username or security answer',
       })
     }
-    const band = await Band.get(body.username)
+    const band = await BandSetlist.get({
+      pk: `BAND-${body.username}`,
+      sk: 'BAND',
+    })
     const securityAnswerCorrect =
       band === null
         ? false
@@ -35,7 +38,11 @@ resetRouter.post('/', async (request, response, next) => {
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.newPassword, saltRounds)
 
-    const updatedBand = new Band({
+    const updatedBand = new BandSetlist({
+      pk: `BAND-${body.username}`,
+      sk: 'BAND',
+      data: `BAND-${body.username}`,
+      id: band.id,
       username: band.username,
       name: band.name,
       securityQuestion: band.securityQuestion,

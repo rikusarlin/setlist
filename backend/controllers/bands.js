@@ -44,6 +44,13 @@ bandsRouter.post('/', async (request, response, next) => {
         .json({ error: '`securityAnswer` is required' })
     }
 
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(body.password, saltRounds)
+    const securityAnswerHash = await bcrypt.hash(
+      body.securityAnswer,
+      saltRounds
+    )
+
     // username needs to be unique, if given
     if (body.username) {
       const fetchedBand = await BandSetlist.get({
@@ -56,12 +63,6 @@ bandsRouter.post('/', async (request, response, next) => {
           .json({ error: 'band with that name already exists' })
       }
     }
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(body.password, saltRounds)
-    const securityAnswerHash = await bcrypt.hash(
-      body.securityAnswer,
-      saltRounds
-    )
 
     const band = new BandSetlist({
       pk: `BAND-${body.username}`,

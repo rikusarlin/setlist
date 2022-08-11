@@ -14,20 +14,21 @@ const setlistRouter = require('./controllers/setlists')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
-// FIXME: move to AWS DynamoDB later on
+dynamoose.logger.providers.set(console)
+if (process.env.NODE_ENV === 'test') {
+  dynamoose.aws.ddb.local()
+} else {
+  const ddb = new dynamoose.aws.sdk.DynamoDB({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AW_REGION,
+  })
+  dynamoose.aws.ddb.set(ddb)
+}
+logger.info('Hopefully connected to DynamoDB!')
 dynamoose.model.defaults.set({
   update: true,
 })
-dynamoose.aws.ddb.local()
-logger.info('hopefully connected to DynamoDB')
-/*
-  .then(() => {
-    logger.info('connected to DynamoDB')
-  })
-  .catch((error) => {
-    logger.error('error in connecting to DynamoDB:', error.message)
-  })
-*/
 
 app.use(cors())
 app.use(express.static('build'))

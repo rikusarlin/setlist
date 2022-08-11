@@ -25,32 +25,26 @@ export const SetlistPieceNoHistory = (props) => {
   }
 
   const prevPiece = () => {
-    const setlist = props.setlists.find(
-      (a) => a.id === props.router.params.setlistId
-    )
-    const pieceIndex = setlist.pieces.findIndex(
+    const pieceIndex = props.setlist.pieces.findIndex(
       (piece) => piece.id === props.router.params.pieceId
     )
     if (pieceIndex > 0) {
       props.router.navigate(
         `/setlistpiece/${props.router.params.setlistId}/${
-          setlist.pieces[pieceIndex - 1].id
+          props.setlist.pieces[pieceIndex - 1].id
         }`
       )
     }
   }
 
   const nextPiece = () => {
-    const setlist = props.setlists.find(
-      (a) => a.id === props.router.params.setlistId
-    )
-    const pieceIndex = setlist.pieces.findIndex(
+    const pieceIndex = props.setlist.pieces.findIndex(
       (piece) => piece.id === props.router.params.pieceId
     )
-    if (pieceIndex !== setlist.pieces.length - 1) {
+    if (pieceIndex !== props.setlist.pieces.length - 1) {
       props.router.navigate(
         `/setlistpiece/${props.router.params.setlistId}/${
-          setlist.pieces[pieceIndex + 1].id
+          props.setlist.pieces[pieceIndex + 1].id
         }`
       )
     }
@@ -156,7 +150,7 @@ const mapStateToProps = (state) => {
   return {
     band: state.band,
     piece: state.piece,
-    setlists: state.setlists,
+    setlist: state.setlist,
   }
 }
 

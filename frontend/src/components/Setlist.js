@@ -34,7 +34,7 @@ export const SetlistNoHistory = (props) => {
     event.preventDefault()
     try {
       props.deletePieceFromSetlist(
-        props.setlistId,
+        props.router.params.setlistId,
         event.target.value,
         props.band.token
       )

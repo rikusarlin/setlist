@@ -14,7 +14,6 @@ const setlistRouter = require('./controllers/setlists')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
-dynamoose.logger.providers.set(console)
 if (process.env.NODE_ENV === 'test') {
   dynamoose.aws.ddb.local()
 } else {
@@ -26,9 +25,6 @@ if (process.env.NODE_ENV === 'test') {
   dynamoose.aws.ddb.set(ddb)
 }
 logger.info('Hopefully connected to DynamoDB!')
-dynamoose.model.defaults.set({
-  update: true,
-})
 
 app.use(cors())
 app.use(express.static('build'))

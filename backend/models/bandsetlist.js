@@ -102,7 +102,7 @@ const bandSetlistSchema = new dynamoose.Schema(
 )
 
 const BandSetlist = dynamoose.model('BandSetlist', bandSetlistSchema, {
-  update: true,
+  throughput: 'ON_DEMAND',
 })
 
 module.exports = BandSetlist

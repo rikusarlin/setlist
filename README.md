@@ -34,7 +34,8 @@ Frontend
 - ability to choose to see one instrument's "performance notes" when playing pieces
 - (ensure that view is changed if another band member changes view, such as selects next piece in setlist)
 
-It is assumed that pieces are represented in text files in the following style:
+It is assumed that pieces are represented in text files in the following style - this means that when you copy stuff 
+from web, you might need to some editing.
 
 ```
 Knockin On Heavens Door chords by Bob Dylan
